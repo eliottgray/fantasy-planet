@@ -19,16 +19,16 @@ class PointFromSphericalCoordinatesTest(unittest.TestCase):
 
     def test_x_axis(self):
         """The Origin (0.0, 0.0) and it's Antipode (Longitude of 180 or -180) represent the bounds of the X axis."""
-        self.run_test(lat=0, lon=0, x=1, y=0, z=0)
-        self.run_test(lat=0, lon=180, x=-1, y=0, z=0)
-        self.run_test(lat=0, lon=-180, x=-1, y=0, z=0)
+        self.run_test(lat=0, lon=0, x=1)
+        self.run_test(lat=0, lon=180, x=-1)
+        self.run_test(lat=0, lon=-180, x=-1)
 
-    def test_poles(self):
+    def test_z_axis(self):
         """The poles represent the bounds of the Z axis."""
-        self.run_test(lat=90.0, lon=0.0, x=0, y=0, z=1)
-        self.run_test(lat=-90.0, lon=0.0, x=0, y=0, z=-1)
+        self.run_test(lat=90.0, lon=0.0, z=1)
+        self.run_test(lat=-90.0, lon=0.0, z=-1)
 
-    def test_90_longitude(self):
+    def test_y_axis(self):
         """90 and negative 90 represent the bounds of the Y axis."""
-        self.run_test(lat=0.0, lon=180, x=-1, y=0, z=0)
-        self.run_test(lat=0.0, lon=-180, x=-1, y=0, z=0)
+        self.run_test(lat=0.0, lon=90, y=1)
+        self.run_test(lat=0.0, lon=-90, y=-1)

@@ -1,5 +1,4 @@
 import numpy as np
-from math import radians
 
 
 class Point:
@@ -15,11 +14,11 @@ class Point:
     @staticmethod
     def from_spherical(lat: float, lon: float, alt: float = 0.0):
         # TODO: Avoid out-of-bounds coordinates.
-        cosLat = np.cos(radians(lat))
-        sinLat = np.sin(radians(lat))
+        cosLat = np.cos(np.radians(lat))
+        sinLat = np.sin(np.radians(lat))
         C = 1 / np.sqrt(cosLat ** 2 + sinLat ** 2)
-        x = (C + alt) * cosLat * np.cos(radians(lon))
-        y = (C + alt) * cosLat * np.sin(radians(lon))
+        x = (C + alt) * cosLat * np.cos(np.radians(lon))
+        y = (C + alt) * cosLat * np.sin(np.radians(lon))
         z = (C + alt) * sinLat
         point = Point(lat=lat, lon=lon, alt=alt, x=x, y=y, z=z)
         return point
