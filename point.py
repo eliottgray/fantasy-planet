@@ -8,10 +8,6 @@ class CoordinateError(Exception):
 class Point:
 
     def __init__(self, lat=None, lon=None, alt=None, x=None, y=None, z=None):
-        if not 90 >= lat >= -90:
-            raise CoordinateError("Latitude {} encountered, which is not a valid coordinate.".format(str(lat)))
-        if not 180 >= lon >= -180:
-            raise CoordinateError("Longitude {} encountered, which is not a valid coordinate.".format(str(lat)))
         self._lat = lat
         self._lon = lon
         self._alt = alt
@@ -21,6 +17,10 @@ class Point:
 
     @staticmethod
     def from_spherical(lat: float, lon: float, alt: float = 0.0):
+        if not 90 >= lat >= -90:
+            raise CoordinateError("Latitude {} encountered, which is not a valid coordinate.".format(str(lat)))
+        if not 180 >= lon >= -180:
+            raise CoordinateError("Longitude {} encountered, which is not a valid coordinate.".format(str(lat)))
         cosLat = np.cos(np.radians(lat))
         sinLat = np.sin(np.radians(lat))
         C = 1 / np.sqrt(cosLat ** 2 + sinLat ** 2)
