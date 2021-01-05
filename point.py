@@ -8,12 +8,13 @@ class CoordinateError(Exception):
 class Point:
 
     def __init__(self, lat=None, lon=None, alt=None, x=None, y=None, z=None):
-        self._lat = lat
-        self._lon = lon
-        self._alt = alt
-        self._x = x
-        self._y = y
-        self._z = z
+        self.lat = lat
+        self.lon = lon
+        self.alt = alt
+        # TODO: Require x, y, z, and alt, since they are required for all operations.
+        self.x = x
+        self.y = y
+        self.z = z
 
     @staticmethod
     def from_spherical(lat: float, lon: float, alt: float = 0.0):
@@ -30,23 +31,28 @@ class Point:
         point = Point(lat=lat, lon=lon, alt=alt, x=x, y=y, z=z)
         return point
 
-    def get_lon(self):
-        return self._lon
+    def rotate_around_x_axis(self, degrees):
+        radians = np.radians(degrees)
+        sin_rad = np.sin(radians)
+        cos_rad = np.cos(radians)
+        new_x = self.x
+        new_y = self.y * cos_rad - self.z * sin_rad
+        new_z = self.z * cos_rad + self.y * sin_rad
+        new_alt = self.alt
+        return Point(x=new_x, y=new_y, z=new_z, alt=new_alt)
 
-    def get_lat(self):
-        return self._lat
+    def rotate_around_y_axis(self, degrees):
+        radians = np.radians(degrees)
+        sin_rad = np.sin(radians)
+        cos_rad = np.cos(radians)
+        new_x = self.x * cos_rad + self.z * sin_rad
+        new_y = self.y
+        new_z = -sin_rad * self.x + self.z * cos_rad
+        new_alt = self.alt
+        return Point(x=new_x, y=new_y, z=new_z, alt=new_alt)
 
-    def get_alt(self):
-        return self._alt
-
-    def get_x(self):
-        return self._x
-
-    def get_y(self):
-        return self._y
-
-    def get_z(self):
-        return self._z
+    def copy(self):
+        return Point(lat=self.lat, lon=self.lon, alt=self.alt, x=self.x, y=self.y, z=self.z)
 
     def __repr__(self):
-        return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self._lat, self._lon, self._alt, self._x, self._y, self._z)
+        return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
