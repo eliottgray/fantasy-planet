@@ -54,3 +54,16 @@ class RotateTetrahedronTest(unittest.TestCase):
         actual = self.tetra.rotate_around_x_axis(90)
         self.compare_tetrahedrons(expected_tetrahedron=expected, actual_tetrahedron=actual)
 
+
+class ContainsPointTest(unittest.TestCase):
+
+    def setUp(self) -> None:
+        a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=0.0, alt=1.0)
+        c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0)
+        d = Point(x=0.0, y=0.0, z=0.0, alt=1.0)
+        self.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+
+    def test_positive_case(self):
+        point = Point(x=0.1, y=0.1, z=0.8, alt=0.0)
+        self.assertTrue(self.tetra.contains(point))
