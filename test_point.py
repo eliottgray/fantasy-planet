@@ -2,6 +2,34 @@ import unittest
 from point import Point, CoordinateError
 
 
+class PointConstructorTest(unittest.TestCase):
+
+    def positive_case(self):
+        point = Point(lat=30.0, lon=45.0, alt=20.3, x=1.0, y=0.7, z=-1.1)
+        self.assertEqual(30.0, point.lat)
+        self.assertEqual(45.0, point.lon)
+        self.assertEqual(20.3, point.alt)
+        self.assertEqual(1.0, point.x)
+        self.assertEqual(0.7, point.y)
+        self.assertEqual(-1.1, point.z)
+
+    def test_missing_x(self):
+        with self.assertRaises(ValueError):
+            Point(x=None, y=1, z=0, alt=0.5)
+
+    def test_missing_y(self):
+        with self.assertRaises(ValueError):
+            Point(x=1, y=None, z=0, alt=0.5)
+
+    def test_missing_z(self):
+        with self.assertRaises(ValueError):
+            Point(x=1, y=1, z=None, alt=0.5)
+
+    def test_missing_alt(self):
+        with self.assertRaises(ValueError):
+            Point(x=1, y=1, z=0, alt=None)
+
+
 class PointFromSphericalCoordinatesTest(unittest.TestCase):
 
     def run_test(self, lat=0.0, lon=0.0, alt=0.0, x=0.0, y=0.0, z=0.0):

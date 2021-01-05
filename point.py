@@ -11,10 +11,17 @@ class Point:
         self.lat = lat
         self.lon = lon
         self.alt = alt
-        # TODO: Require x, y, z, and alt, since they are required for all operations.
         self.x = x
         self.y = y
         self.z = z
+        if alt is None:
+            raise ValueError("Altitude value is None.")
+        if x is None:
+            raise ValueError("X value is None.")
+        if y is None:
+            raise ValueError("Y value is None.")
+        if z is None:
+            raise ValueError("Z value is None.")
 
     @staticmethod
     def from_spherical(lat: float, lon: float, alt: float = 0.0):
