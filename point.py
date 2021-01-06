@@ -63,3 +63,9 @@ class Point:
 
     def __repr__(self):
         return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
+
+    def __eq__(self, other):
+        if self.x == other.x and self.y == other.y and self.z == other.z and self.alt == other.alt:
+            return True
+        else:
+            return False

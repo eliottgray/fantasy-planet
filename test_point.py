@@ -173,3 +173,81 @@ class RotateAroundYAxisTest(unittest.TestCase):
         degrees = 45
         expected = Point(x=0.848528137, y=0.6, z=0.141421356, alt=1.0)
         self.run_test(degrees, expected)
+
+
+class EqualityTest(unittest.TestCase):
+
+    def run_test(self, p1, p2, expected_equality):
+        actual_equality = p1 == p2
+        self.assertEqual(expected_equality, actual_equality)
+
+    def test_identical_attributes(self):
+        x = 1.0
+        y = 0.9
+        z = 0.8
+        alt = 0.7
+        lat = 30.0
+        lon = 45.0
+
+        p1 = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
+        p2 = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
+        self.run_test(p1, p2, expected_equality=True)
+
+    def test_identical_xyzalt_only(self):
+        x = 1.0
+        y = 0.9
+        z = 0.8
+        alt = 0.7
+        lat1 = 30.0
+        lat2 = None
+        lon1 = 45.0
+        lon2 = None
+
+        p1 = Point(x=x, y=y, z=z, alt=alt, lat=lat1, lon=lon1)
+        p2 = Point(x=x, y=y, z=z, alt=alt, lat=lat2, lon=lon2)
+        self.run_test(p1, p2, expected_equality=True)
+
+    def test_identical_xyz_different_alt(self):
+        x = 1.0
+        y = 0.9
+        z = 0.8
+        alt1 = 0.7
+        alt2 = 0.3
+        lat = None
+        lon = None
+
+        p1 = Point(x=x, y=y, z=z, alt=alt1, lat=lat, lon=lon)
+        p2 = Point(x=x, y=y, z=z, alt=alt2, lat=lat, lon=lon)
+        self.run_test(p1, p2, expected_equality=False)
+
+    def test_identical_spherical_coordinates(self):
+        lat = 30.0
+        lon = -90.0
+        alt = 0.5
+
+        p1 = Point.from_spherical(lat=lat, lon=lon, alt=alt)
+        p2 = Point.from_spherical(lat=lat, lon=lon, alt=alt)
+        self.run_test(p1, p2, expected_equality=True)
+
+    def test_identical_lat_lon_different_alt(self):
+        lat = 30.0
+        lon = -90.0
+        alt1 = 0.5
+        alt2 = 1.0
+
+        p1 = Point.from_spherical(lat=lat, lon=lon, alt=alt1)
+        p2 = Point.from_spherical(lat=lat, lon=lon, alt=alt2)
+        self.run_test(p1, p2, expected_equality=False)
+
+    def test_different_spherical_coordinates(self):
+        lat1 = 30.0
+        lat2 = 45.0
+        lon1 = -90.0
+        lon2 = -45.0
+        alt1 = 0.5
+        alt2 = 1.0
+
+        p1 = Point.from_spherical(lat=lat1, lon=lon1, alt=alt1)
+        p2 = Point.from_spherical(lat=lat2, lon=lon2, alt=alt2)
+        self.run_test(p1, p2, expected_equality=False)
+
