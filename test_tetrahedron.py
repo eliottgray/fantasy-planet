@@ -6,10 +6,10 @@ from point import Point
 class TetrahedronTest(unittest.TestCase):
 
     def test_positive_case(self):
-        a = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
-        b = Point(x=0.9, y=0.9, z=0.9, alt=0.9)
-        c = Point(x=0.8, y=0.8, z=0.8, alt=0.8)
-        d = Point(x=0.7, y=0.7, z=0.7, alt=0.7)
+        a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=0.0, alt=1.0)
+        c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0)
+        d = Point(x=0.0, y=-1.0, z=0.0, alt=1.0)
         tetra = Tetrahedron(a=a, b=b, c=c, d=d)
         self.assertEqual(a, tetra.a)
         self.assertEqual(b, tetra.b)
@@ -65,13 +65,21 @@ class ContainsPointTest(unittest.TestCase):
         self.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
 
     def test_vertex(self):
-        vertex = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
+        """Point identical to a vertex of the tetrahedron."""
+        vertex = self.tetra.a.copy()
         self.assertTrue(self.tetra.contains(vertex))
 
     def test_positive_case(self):
+        """Point far inside the bounds of the tetrahedron."""
         point = Point(x=0.0, y=0.0, z=0.5, alt=0.0)
         self.assertTrue(self.tetra.contains(point))
 
     def test_negative_case(self):
-        point = Point(x=0.0, y=0.0, z=0.5, alt=0.0)
+        """Point far outside the bounds of the tetrahedron."""
+        point = Point(x=0.0, y=0.0, z=-1.0, alt=0.0)
         self.assertFalse(self.tetra.contains(point))
+
+    def test_on_edge(self):
+        """By setting the fixture tetrahedron to include a right triangle, a point on the edge can be easily tested."""
+        point = Point(x=0.0, y=-0.5, z=0.5, alt=0.0)
+        self.assertTrue(self.tetra.contains(point))

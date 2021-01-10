@@ -1,4 +1,6 @@
 from point import Point
+from scipy.spatial import Delaunay
+import numpy as np
 
 
 class Tetrahedron:
@@ -8,6 +10,7 @@ class Tetrahedron:
         self.b = b
         self.c = c
         self.d = d
+        self.hull = Delaunay(np.array([[a.x, a.y, a.z], [b.x, b.y, b.z], [c.x, c.y, c.z], [d.x, d.y, d.z]]))
 
     def rotate_around_x_axis(self, degrees: float):
         new_a = self.a.rotate_around_x_axis(degrees)
@@ -24,14 +27,9 @@ class Tetrahedron:
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
     def contains(self, point: Point):
-        # See "An efficient point in polyhedron algorithm" by Jeff Lane, Bob Magedson, Mike Rarick:
-        #  https://doi.org/10.1016/0734-189X(84)90133-6
-        if self.is_vertex(point):
-            return True
-        raise NotImplementedError
-
-    def is_vertex(self, point: Point):
-        if point == self.a or point == self.b or point == self.c or point == self.d:
-            return True
-        else:
-            return False
+        # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
+        point_array = np.array([(point.x, point.y, point.z)])
+        simplex_array = self.hull.find_simplex(point_array)
+        # The returned array of simplex points is only of length one, as we only query a single point at a time.
+        # A value of -1 indicates that no triangle comprising the hull contains the point.
+        return simplex_array[0] >= 0
