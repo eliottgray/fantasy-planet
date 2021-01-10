@@ -61,13 +61,17 @@ class ContainsPointTest(unittest.TestCase):
         a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
         b = Point(x=1.0, y=1.0, z=0.0, alt=1.0)
         c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0)
-        d = Point(x=0.0, y=0.0, z=0.0, alt=1.0)
+        d = Point(x=0.0, y=-1.0, z=0.0, alt=1.0)
         self.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
 
     def test_vertex(self):
         vertex = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
         self.assertTrue(self.tetra.contains(vertex))
 
-    # def test_positive_case(self):
-    #     point = Point(x=0.1, y=0.1, z=0.8, alt=0.0)
-    #     self.assertTrue(self.tetra.contains(point))
+    def test_positive_case(self):
+        point = Point(x=0.0, y=0.0, z=0.5, alt=0.0)
+        self.assertTrue(self.tetra.contains(point))
+
+    def test_negative_case(self):
+        point = Point(x=0.0, y=0.0, z=0.5, alt=0.0)
+        self.assertFalse(self.tetra.contains(point))
