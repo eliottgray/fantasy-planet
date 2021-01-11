@@ -1,5 +1,5 @@
 from point import Point
-from scipy.spatial import Delaunay
+from scipy.spatial import Delaunay, distance
 import numpy as np
 
 
@@ -34,3 +34,17 @@ class Tetrahedron:
         # The returned array of simplex points is only of length one, as we only query a single point at a time.
         # A value of -1 indicates that no triangle comprising the hull contains the point.
         return simplex_array[0] >= 0
+
+    def longest_side_len(self):
+        ab = self.calculate_len(self.a, self.b)
+        ac = self.calculate_len(self.a, self.c)
+        ad = self.calculate_len(self.a, self.d)
+        bc = self.calculate_len(self.b, self.c)
+        bd = self.calculate_len(self.b, self.d)
+        cd = self.calculate_len(self.c, self.d)
+        return max(ab, ac, ad, bc, bd, cd)
+
+    def calculate_len(self, one: Point, two: Point):
+        """Euclidean distance between two points."""
+        # TODO: Move this to the Point class.
+        return distance.euclidean((one.x, one.y, one.z), (two.x, two.y, two.z))
