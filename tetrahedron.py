@@ -10,7 +10,8 @@ class Tetrahedron:
         self.b = b
         self.c = c
         self.d = d
-        self.hull = Delaunay(np.array([[a.x, a.y, a.z], [b.x, b.y, b.z], [c.x, c.y, c.z], [d.x, d.y, d.z]]))
+        # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
+        self.hull = Delaunay(np.array([(a.x, a.y, a.z), (b.x, b.y, b.z), (c.x, c.y, c.z), (d.x, d.y, d.z)]))
 
     def rotate_around_x_axis(self, degrees: float):
         new_a = self.a.rotate_around_x_axis(degrees)
