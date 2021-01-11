@@ -84,16 +84,7 @@ class RotateAroundXAxisTest(unittest.TestCase):
 
     def run_test(self, degrees, expected):
         actual_point = self.fixture.rotate_around_x_axis(degrees)
-
-        # Cartesian coordinates may be approximate, as they are the result of a transformation.
-        self.assertAlmostEqual(expected.x, actual_point.x)
-        self.assertAlmostEqual(expected.y, actual_point.y)
-        self.assertAlmostEqual(expected.z, actual_point.z)
-
-        # Spherical coordinates must have been stored without being transformed.
-        self.assertEqual(expected.alt, actual_point.alt)
-        self.assertEqual(expected.lon, actual_point.lon)
-        self.assertEqual(expected.alt, actual_point.alt)
+        self.assertEqual(expected, actual_point)
 
     def test_rotate_90_degrees(self):
         degrees = 90
@@ -133,16 +124,7 @@ class RotateAroundYAxisTest(unittest.TestCase):
 
     def run_test(self, degrees, expected):
         actual_point = self.fixture.rotate_around_y_axis(degrees)
-
-        # Cartesian coordinates may be approximate, as they are the result of a transformation.
-        self.assertAlmostEqual(expected.x, actual_point.x)
-        self.assertAlmostEqual(expected.y, actual_point.y)
-        self.assertAlmostEqual(expected.z, actual_point.z)
-
-        # Spherical coordinates must have been stored without being transformed.
-        self.assertEqual(expected.alt, actual_point.alt)
-        self.assertEqual(expected.lon, actual_point.lon)
-        self.assertEqual(expected.alt, actual_point.alt)
+        self.assertEqual(expected, actual_point)
 
     def test_rotate_90_degrees(self):
         degrees = 90

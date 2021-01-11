@@ -6,6 +6,17 @@ class CoordinateError(Exception):
     pass
 
 
+def almost_equal(x: float, y: float, epsilon=1e-7):
+    """If the difference between two float values is less than epsilon, return True, else return False."""
+    if x == y:
+        return True
+    delta = abs(x - y)
+    if delta < epsilon:
+        return True
+    else:
+        return False
+
+
 class Point:
 
     def __init__(self, lat: float = None, lon: float = None, alt: float = None, x: float = None, y: float = None, z: float = None):
@@ -70,7 +81,7 @@ class Point:
         return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
 
     def __eq__(self, other: 'Point') -> bool:
-        if self.x == other.x and self.y == other.y and self.z == other.z and self.alt == other.alt:
+        if almost_equal(self.x, other.x) and almost_equal(self.y, other.y) and almost_equal(self.z, other.z) and almost_equal(self.alt, other.alt):
             return True
         else:
             return False

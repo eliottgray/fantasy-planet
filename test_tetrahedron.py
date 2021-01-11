@@ -20,16 +20,7 @@ class TetrahedronTest(unittest.TestCase):
 class RotateTetrahedronTest(unittest.TestCase):
 
     def compare_points(self, expected_point, actual_point):
-
-        # Cartesian coordinates may be approximate, as they are the result of a transformation.
-        self.assertAlmostEqual(expected_point.x, actual_point.x)
-        self.assertAlmostEqual(expected_point.y, actual_point.y)
-        self.assertAlmostEqual(expected_point.z, actual_point.z)
-
-        # Spherical coordinates must have been stored without being transformed.
-        self.assertEqual(expected_point.lat, actual_point.lat)
-        self.assertEqual(expected_point.lon, actual_point.lon)
-        self.assertEqual(expected_point.alt, actual_point.alt)
+        self.assertEqual(expected_point, actual_point)
 
     def compare_tetrahedrons(self, expected_tetrahedron, actual_tetrahedron):
         self.compare_points(expected_tetrahedron.a, actual_tetrahedron.a)
