@@ -1,5 +1,5 @@
 from point import Point
-from scipy.spatial import Delaunay, distance
+from scipy.spatial import Delaunay
 import numpy as np
 
 
@@ -36,15 +36,10 @@ class Tetrahedron:
         return simplex_array[0] >= 0
 
     def longest_side_len(self):
-        ab = self.calculate_len(self.a, self.b)
-        ac = self.calculate_len(self.a, self.c)
-        ad = self.calculate_len(self.a, self.d)
-        bc = self.calculate_len(self.b, self.c)
-        bd = self.calculate_len(self.b, self.d)
-        cd = self.calculate_len(self.c, self.d)
+        ab = self.a.distance(self.b)
+        ac = self.a.distance(self.c)
+        ad = self.a.distance(self.d)
+        bc = self.b.distance(self.c)
+        bd = self.b.distance(self.d)
+        cd = self.c.distance(self.d)
         return max(ab, ac, ad, bc, bd, cd)
-
-    def calculate_len(self, one: Point, two: Point):
-        """Euclidean distance between two points."""
-        # TODO: Move this to the Point class.
-        return distance.euclidean((one.x, one.y, one.z), (two.x, two.y, two.z))

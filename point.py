@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial import distance
 
 
 class CoordinateError(Exception):
@@ -37,6 +38,10 @@ class Point:
         z = (C + alt) * sinLat
         point = Point(lat=lat, lon=lon, alt=alt, x=x, y=y, z=z)
         return point
+
+    def distance(self, other: 'Point'):
+        """Euclidean distance to another Point."""
+        return distance.euclidean((self.x, self.y, self.z), (other.x, other.y, other.z))
 
     def rotate_around_x_axis(self, degrees):
         radians = np.radians(degrees)
