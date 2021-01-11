@@ -4,7 +4,7 @@ from point import Point, CoordinateError
 
 class PointConstructorTest(unittest.TestCase):
 
-    def positive_case(self):
+    def test_positive_case(self):
         point = Point(lat=30.0, lon=45.0, alt=20.3, x=1.0, y=0.7, z=-1.1)
         self.assertEqual(30.0, point.lat)
         self.assertEqual(45.0, point.lon)
@@ -232,4 +232,25 @@ class EqualityTest(unittest.TestCase):
         p1 = Point.from_spherical(lat=lat1, lon=lon1, alt=alt1)
         p2 = Point.from_spherical(lat=lat2, lon=lon2, alt=alt2)
         self.run_test(p1, p2, expected_equality=False)
+
+
+class ReprTest(unittest.TestCase):
+
+    def test_all_values(self):
+        x = 1.0
+        y = 0.9
+        z = 0.8
+        alt = 0.7
+        lat = 0.6
+        lon = 0.5
+        point = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
+        string = repr(point)
+        self.assertTrue(str(x) in string)
+        self.assertTrue(str(y) in string)
+        self.assertTrue(str(z) in string)
+        self.assertTrue(str(alt) in string)
+        self.assertTrue(str(lat) in string)
+        self.assertTrue(str(lon) in string)
+
+
 
