@@ -108,3 +108,7 @@ class Tetrahedron:
             return True
         else:
             return False
+
+    def __hash__(self):
+        # TODO: Determine if there is a better way to permit any ordering of the points to result in the same hash.
+        return hash(hash(self.a) + hash(self.b) + hash(self.c) + hash(self.d))

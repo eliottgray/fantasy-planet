@@ -140,3 +140,40 @@ class SubdivideTest(unittest.TestCase):
         self.run_test(tetra, subdivided_a, subdivided_d)
 
     # TODO: Validate that, in the case of equal sides, edges are preferred in a guaranteed order.
+
+
+class EqualityTest(unittest.TestCase):
+
+    def run_test(self, one: Tetrahedron, two: Tetrahedron, expected_equality: bool):
+        actual_equality = one == two
+        self.assertEqual(expected_equality, actual_equality)
+        actual_hash_equality = hash(one) == hash(two)
+        self.assertEqual(expected_equality, actual_hash_equality)
+
+    def test_identical_tetrahedrons(self):
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        one = Tetrahedron(a=a, b=b, c=c, d=d)
+        two = Tetrahedron(a=a, b=b, c=c, d=d)
+        self.run_test(one, two, expected_equality=True)
+
+    def test_rearranged_points(self):
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        one = Tetrahedron(a=a, b=b, c=c, d=d)
+        two = Tetrahedron(a=c, b=d, c=a, d=b)
+        self.run_test(one, two, expected_equality=True)
+
+    def test_different_point(self):
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        d_two = Point(x=0, y=0, z=0, alt=0)
+        one = Tetrahedron(a=a, b=b, c=c, d=d)
+        two = Tetrahedron(a=a, b=b, c=c, d=d_two)
+        self.run_test(one, two, expected_equality=False)
