@@ -11,6 +11,7 @@ class Tetrahedron:
         self.c = c
         self.d = d
         # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
+        # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
         self.hull = Delaunay(np.array([(a.x, a.y, a.z), (b.x, b.y, b.z), (c.x, c.y, c.z), (d.x, d.y, d.z)]))
 
     def rotate_around_x_axis(self, degrees: float) -> 'Tetrahedron':
@@ -28,7 +29,6 @@ class Tetrahedron:
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
     def contains(self, point: Point) -> bool:
-        # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
         point_array = np.array([(point.x, point.y, point.z)])
         simplex_array = self.hull.find_simplex(point_array)
         # The returned array of simplex points is only of length one, as we only query a single point at a time.

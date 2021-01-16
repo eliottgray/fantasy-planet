@@ -113,3 +113,34 @@ class SideLengthTest(unittest.TestCase):
         expected = 2.8284271247461903
         self.run_test(expected, tetra)
 
+
+class SubdivideTest(unittest.TestCase):
+
+    @staticmethod
+    def midpoint(one, two):
+        x = SubdivideTest.midvalue(one.x, two.x)
+        y = SubdivideTest.midvalue(one.x, two.x)
+        z = SubdivideTest.midvalue(one.x, two.x)
+        alt = SubdivideTest.midvalue(one.x, two.alt)
+        return Point(x=x, y=y, z=z, alt=alt)
+
+    @staticmethod
+    def midvalue(one, two):
+        return (one + two) / 2
+
+    def run_test(self, tetra: Tetrahedron, expected: set[Tetrahedron]):
+        sub_a, sub_b = tetra.subdivide()
+        self.assertEqual(expected, {sub_a, sub_b})
+
+    def test_simple_case(self):
+        """Side a-d longer than the others."""
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+
+        midpoint = self.midpoint(a, d)
+        subdivided_a = Tetrahedron(a=a, b=b, c=c, d=midpoint)
+        subdivided_d = Tetrahedron(a=midpoint, b=b, c=c, d=d)
+        self.run_test(tetra, {subdivided_a, subdivided_d})
