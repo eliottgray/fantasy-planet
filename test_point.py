@@ -162,6 +162,8 @@ class EqualityTest(unittest.TestCase):
     def run_test(self, p1, p2, expected_equality):
         actual_equality = p1 == p2
         self.assertEqual(expected_equality, actual_equality)
+        actual_hash_equality = hash(p1) == hash(p2)
+        self.assertEqual(expected_equality, actual_hash_equality)
 
     def test_identical_attributes(self):
         x = 1.0

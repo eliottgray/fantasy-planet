@@ -93,3 +93,7 @@ class Point:
             return True
         else:
             return False
+
+    def __hash__(self):
+        return hash((self.x, self.y, self.z, self.alt))
+
