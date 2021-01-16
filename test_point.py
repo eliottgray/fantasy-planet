@@ -234,6 +234,34 @@ class EqualityTest(unittest.TestCase):
         self.run_test(p1, p2, expected_equality=False)
 
 
+class MidpointToTest(unittest.TestCase):
+
+    def run_test(self, one: Point, two: Point, expected: Point):
+        actual = one.midpoint_to(two)
+        self.assertEqual(expected, actual)
+
+    def test_origin_midpoint(self):
+        """Two points at opposite ends of the unit space should result in a point at the origin."""
+        positive = Point(x=1, y=1, z=1, alt=1)
+        negative = Point(x=-1, y=-1, z=-1, alt=-1)
+        expected = Point(x=0, y=0, z=0, alt=0)
+        self.run_test(one=positive, two=negative, expected=expected)
+
+    def test_identical_positive(self):
+        """Two identical points in the positive space."""
+        pos1 = Point(x=1, y=1, z=1, alt=1)
+        pos2 = Point(x=1, y=1, z=1, alt=1)
+        expected = Point(x=1, y=1, z=1, alt=1)
+        self.run_test(one=pos1, two=pos2, expected=expected)
+
+    def test_complex_case(self):
+        """Two identical points in the positive space."""
+        one = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
+        two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
+        expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.002)
+        self.run_test(one=one, two=two, expected=expected)
+
+
 class ReprTest(unittest.TestCase):
 
     def test_all_values(self):

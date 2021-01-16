@@ -54,6 +54,14 @@ class Point:
         """Euclidean distance to another Point."""
         return distance.euclidean((self.x, self.y, self.z), (other.x, other.y, other.z))
 
+    def midpoint_to(self, other: 'Point') -> 'Point':
+        """Return the midpoint between this point and the given other point."""
+        x = (self.x + other.x) / 2
+        y = (self.y + other.y) / 2
+        z = (self.z + other.z) / 2
+        alt = (self.alt + other.alt) / 2
+        return Point(x=x, y=y, z=z, alt=alt)
+
     def rotate_around_x_axis(self, degrees: float) -> 'Point':
         radians = np.radians(degrees)
         sin_rad = np.sin(radians)
