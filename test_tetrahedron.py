@@ -79,7 +79,7 @@ class ContainsPointTest(unittest.TestCase):
 class SideLengthTest(unittest.TestCase):
 
     def run_test(self, expected, tetra):
-        actual = tetra.longest_side_len()
+        actual = tetra._calculate_longest_side()
         self.assertAlmostEqual(expected, actual)
 
     def test_simple_case(self):
@@ -116,21 +116,15 @@ class SideLengthTest(unittest.TestCase):
 
 class SubdivideTest(unittest.TestCase):
 
-    @staticmethod
-    def midpoint(one, two):
-        x = SubdivideTest.midvalue(one.x, two.x)
-        y = SubdivideTest.midvalue(one.x, two.x)
-        z = SubdivideTest.midvalue(one.x, two.x)
-        alt = SubdivideTest.midvalue(one.x, two.alt)
-        return Point(x=x, y=y, z=z, alt=alt)
-
-    @staticmethod
-    def midvalue(one, two):
-        return (one + two) / 2
-
-    def run_test(self, tetra: Tetrahedron, expected: set[Tetrahedron]):
+    def run_test(self, tetra: Tetrahedron, expected_one, expected_two):
         sub_a, sub_b = tetra.subdivide()
-        self.assertEqual(expected, {sub_a, sub_b})
+        # Because the returned tetrahedrons are in no particular order, we check both potential valid equality cases.
+        try:
+            self.assertEqual(expected_one, sub_a)
+            self.assertEqual(expected_two, sub_b)
+        except AssertionError:
+            self.assertEqual(expected_one, sub_b)
+            self.assertEqual(expected_two, sub_a)
 
     def test_simple_case(self):
         """Side a-d longer than the others."""
@@ -140,7 +134,7 @@ class SubdivideTest(unittest.TestCase):
         d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
         tetra = Tetrahedron(a=a, b=b, c=c, d=d)
 
-        midpoint = self.midpoint(a, d)
+        midpoint = a.midpoint(d)
         subdivided_a = Tetrahedron(a=a, b=b, c=c, d=midpoint)
         subdivided_d = Tetrahedron(a=midpoint, b=b, c=c, d=d)
-        self.run_test(tetra, {subdivided_a, subdivided_d})
+        self.run_test(tetra, subdivided_a, subdivided_d)

@@ -239,7 +239,7 @@ class EqualityTest(unittest.TestCase):
 class MidpointToTest(unittest.TestCase):
 
     def run_test(self, one: Point, two: Point, expected: Point):
-        actual = one.midpoint_to(two)
+        actual = one.midpoint(two)
         self.assertEqual(expected, actual)
 
     def test_origin_midpoint(self):

@@ -54,7 +54,7 @@ class Point:
         """Euclidean distance to another Point."""
         return distance.euclidean((self.x, self.y, self.z), (other.x, other.y, other.z))
 
-    def midpoint_to(self, other: 'Point') -> 'Point':
+    def midpoint(self, other: 'Point') -> 'Point':
         """Return the midpoint between this point and the given other point."""
         x = (self.x + other.x) / 2
         y = (self.y + other.y) / 2
