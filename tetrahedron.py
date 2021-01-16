@@ -1,6 +1,7 @@
 from point import Point
 from scipy.spatial import Delaunay
 import numpy as np
+import typing
 
 
 class Tetrahedron:
@@ -92,7 +93,7 @@ class Tetrahedron:
             self.d = new_d
         return self.longest_side_len
 
-    def subdivide(self) -> tuple['Tetrahedron', 'Tetrahedron']:
+    def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
         longest_side_len = self._calculate_longest_side()
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
         midpoint = self.a.midpoint(self.b)

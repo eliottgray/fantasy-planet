@@ -138,3 +138,5 @@ class SubdivideTest(unittest.TestCase):
         subdivided_a = Tetrahedron(a=a, b=b, c=c, d=midpoint)
         subdivided_d = Tetrahedron(a=midpoint, b=b, c=c, d=d)
         self.run_test(tetra, subdivided_a, subdivided_d)
+
+    # TODO: Validate that, in the case of equal sides, edges are preferred in a guaranteed order.
