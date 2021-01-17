@@ -236,7 +236,7 @@ class EqualityTest(unittest.TestCase):
         self.run_test(p1, p2, expected_equality=False)
 
 
-class MidpointToTest(unittest.TestCase):
+class MidpointTest(unittest.TestCase):
 
     def run_test(self, one: Point, two: Point, expected: Point):
         actual = one.midpoint(two)
@@ -254,6 +254,13 @@ class MidpointToTest(unittest.TestCase):
         pos1 = Point(x=1, y=1, z=1, alt=1)
         pos2 = Point(x=1, y=1, z=1, alt=1)
         expected = Point(x=1, y=1, z=1, alt=1)
+        self.run_test(one=pos1, two=pos2, expected=expected)
+
+    def test_identical_negative(self):
+        """Two identical points in the negative space."""
+        pos1 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
+        pos2 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
+        expected = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
         self.run_test(one=pos1, two=pos2, expected=expected)
 
     def test_complex_case(self):
