@@ -94,7 +94,7 @@ class Tetrahedron:
         return self.longest_side_len
 
     def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
-        longest_side_len = self._calculate_longest_side()
+        longest_side_len = self._calculate_longest_side()  # TODO: Avoid needing this operation for the side effects.
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
         midpoint = self.a.midpoint(self.b)
         tetra_one = Tetrahedron(a=self.a, b=midpoint, c=self.c, d=self.d)
@@ -111,4 +111,5 @@ class Tetrahedron:
 
     def __hash__(self):
         # TODO: Determine if there is a better way to permit any ordering of the points to result in the same hash.
-        return hash(hash(self.a) + hash(self.b) + hash(self.c) + hash(self.d))
+        total = hash(self.a) + hash(self.b) + hash(self.c) + hash(self.d)
+        return hash(total)
