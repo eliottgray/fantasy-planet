@@ -1,5 +1,5 @@
 import unittest
-from tetrahedron import Tetrahedron
+from tetrahedron import Tetrahedron, DEFAULT_A, DEFAULT_B, DEFAULT_C, DEFAULT_D
 from point import Point
 
 
@@ -15,6 +15,13 @@ class TetrahedronTest(unittest.TestCase):
         self.assertEqual(b, tetra.b)
         self.assertEqual(c, tetra.c)
         self.assertEqual(d, tetra.d)
+
+    def test_default(self):
+        default = Tetrahedron.build_default()
+        self.assertEqual(DEFAULT_A, default.a)
+        self.assertEqual(DEFAULT_B, default.b)
+        self.assertEqual(DEFAULT_C, default.c)
+        self.assertEqual(DEFAULT_D, default.d)
 
 
 class RotateTetrahedronTest(unittest.TestCase):

@@ -2,6 +2,14 @@ from point import Point
 from scipy.spatial import Delaunay
 import numpy as np
 import typing
+from math import sqrt
+
+
+DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
+DEFAULT_A = Point(x=-sqrt(3.0) - 0.20, y=-sqrt(3.0) - 0.22, z=-sqrt(3.0) - 0.23, alt=DEFAULT_ALTITUDE)
+DEFAULT_B = Point(x=-sqrt(3.0) - 0.19, y=sqrt(3.0) + 0.18, z=sqrt(3.0) + 0.17, alt=DEFAULT_ALTITUDE)
+DEFAULT_C = Point(x=sqrt(3.0) + 0.21, y=-sqrt(3.0) - 0.24, z=sqrt(3.0) + 0.15, alt=DEFAULT_ALTITUDE)
+DEFAULT_D = Point(x=sqrt(3.0) + 0.24, y=sqrt(3.0) + 0.22, z=-sqrt(3.0) - 0.25, alt=DEFAULT_ALTITUDE)
 
 
 class Tetrahedron:
@@ -15,6 +23,19 @@ class Tetrahedron:
         # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
         self.hull = Delaunay(np.array([(a.x, a.y, a.z), (b.x, b.y, b.z), (c.x, c.y, c.z), (d.x, d.y, d.z)]))
         self.longest_side_len = None
+
+    @staticmethod
+    def build_default() -> 'Tetrahedron':
+        """
+        Creates a Tetrahedron with default orientation and altitudes.
+        :return: Default Tetrahedron.
+        """
+        a = DEFAULT_A
+        b = DEFAULT_B
+        c = DEFAULT_C
+        d = DEFAULT_D
+        default = Tetrahedron(a=DEFAULT_A.copy(), b=DEFAULT_B.copy(), c=DEFAULT_C.copy(), d=DEFAULT_D.copy())
+        return default
 
     def rotate_around_x_axis(self, degrees: float) -> 'Tetrahedron':
         new_a = self.a.rotate_around_x_axis(degrees)
