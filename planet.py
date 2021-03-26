@@ -19,9 +19,12 @@ class Planet(object):
         self.tetra = Tetrahedron.build_default()
 
     def get_elevation_at(self, lat: float, lon: float):
-        point = Point(lat=lat, lon=lon)
+        point = Point.from_spherical(lat=lat, lon=lon)
         current = self.tetra
+        subdivisions = 0
         while current.get_longest_side_length() > self.resolution:
+            subdivisions += 1
+            print(subdivisions, current.get_longest_side_length())
             sub_one, sub_two = current.subdivide()
             if sub_one.contains(point):
                 current = sub_one

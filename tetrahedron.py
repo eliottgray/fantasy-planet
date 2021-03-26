@@ -110,7 +110,7 @@ class Tetrahedron:
         return longest_side_len
 
     def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
-        self.get_longest_side_length()  # TODO: Avoid needing this operation for the side effects.
+        self._calculate_longest_side()
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
         midpoint = self.a.midpoint(self.b)
         tetra_one = Tetrahedron(a=self.a, b=midpoint, c=self.c, d=self.d)
