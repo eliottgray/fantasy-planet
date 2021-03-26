@@ -149,6 +149,38 @@ class SubdivideTest(unittest.TestCase):
     # TODO: Validate that, in the case of equal sides, edges are preferred in a guaranteed order.
 
 
+class AverageAltitudeTest(unittest.TestCase):
+
+    @staticmethod
+    def construct_tetra(alt_1: float, alt_2: float, alt_3: float, alt_4: float) -> Tetrahedron:
+        a = Point(x=0.0, y=0.0, z=1.0, alt=alt_1)
+        b = Point(x=1.0, y=0.0, z=-1.0, alt=alt_2)
+        c = Point(x=-1.0, y=1.0, z=-1.0, alt=alt_3)
+        d = Point(x=-1.0, y=-1.0, z=-1.0, alt=alt_4)
+        return Tetrahedron(a=a, b=b, c=c, d=d)
+
+    def run_test(self, tetra: Tetrahedron, expected: float):
+        actual = tetra.average_altitude()
+        self.assertAlmostEqual(expected, actual)
+
+    def test_identical_altitudes(self):
+        altitude = 1.0
+        tetra = self.construct_tetra(altitude, altitude, altitude, altitude)
+        self.run_test(tetra, altitude)
+
+    def test_different_altitudes(self):
+        expected = 1.0
+        tetra = self.construct_tetra(1.2, 1.1, 0.9, 0.8)
+        self.run_test(tetra, expected)
+
+    def test_tiny_difference(self):
+        one = 1.000001
+        two = 1.000003
+        expected = 1.000002
+        tetra = self.construct_tetra(one, one, two, two)
+        self.run_test(tetra, expected)
+
+
 class EqualityTest(unittest.TestCase):
 
     def run_test(self, one: Tetrahedron, two: Tetrahedron, expected_equality: bool):

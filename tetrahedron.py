@@ -122,6 +122,12 @@ class Tetrahedron:
         tetra_two = Tetrahedron(a=midpoint, b=self.b, c=self.c, d=self.d)
         return tetra_one, tetra_two
 
+    def average_altitude(self):
+        """
+        :return:  Average altitude of the constituent points.
+        """
+        return (self.a.alt + self.b.alt + self.c.alt + self.d.alt) / 4
+
     def __eq__(self, other: 'Tetrahedron') -> bool:
         set_a = {self.a, self.b, self.c, self.d}
         set_b = {other.a, other.b, other.c, other.d}
