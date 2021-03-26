@@ -18,3 +18,11 @@ class PlanetConstructorTest(unittest.TestCase):
         invalid_resolution = "I am not a numeric value."
         with self.assertRaises(PlanetError):
             Planet(resolution=invalid_resolution)
+
+#
+# class GetElevationAtCoordinateTest(unittest.TestCase):
+#
+#     def test_low_resolution(self):
+#         planet = Planet(resolution=5000)
+#         elevation = planet.get_elevation_at(lat=0.0, lon=0.0)
+#         self.assertIsInstance(Number, elevation)
