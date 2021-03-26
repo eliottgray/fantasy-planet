@@ -25,4 +25,4 @@ class GetElevationAtCoordinateTest(unittest.TestCase):
     def test_low_resolution(self):
         planet = Planet(resolution=4.0)
         elevation = planet.get_elevation_at(lat=45.0, lon=23.0)
-        self.assertIsInstance(Number, elevation)
+        self.assertIsInstance(elevation, Number)
