@@ -1,5 +1,6 @@
 from point import Point
 from scipy.spatial import Delaunay
+from scipy.optimize import linprog
 import numpy as np
 import typing
 from math import sqrt
@@ -53,6 +54,18 @@ class Tetrahedron:
         # The returned array of simplex points is only of length one, as we only query a single point at a time.
         # A value of -1 indicates that no triangle comprising the hull contains the point.
         return simplex_array[0] >= 0
+
+    def contains_custom(self, point: Point) -> bool:
+        # from: https://stackoverflow.com/a/43564754
+        point = np.array([point.x, point.y, point.z])
+        tetrahedron = np.array([(self.a.x, self.a.y, self.a.z), (self.b.x, self.b.y, self.b.z), (self.c.x, self.c.y, self.c.z), (self.d.x, self.d.y, self.d.z)])
+
+        n_points = len(point)
+        c = np.zeros(n_points)
+        A = np.r_[point.T, np.ones((1, n_points))]
+        b = np.r_[tetrahedron, np.ones(1)]
+        lp = linprog(c, A_eq=A, b_eq=b)
+        return lp.success
 
     def get_longest_side_length(self) -> float:
         if not self._longest_side_len:
