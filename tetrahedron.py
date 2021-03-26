@@ -30,10 +30,6 @@ class Tetrahedron:
         Creates a Tetrahedron with default orientation and altitudes.
         :return: Default Tetrahedron.
         """
-        a = DEFAULT_A
-        b = DEFAULT_B
-        c = DEFAULT_C
-        d = DEFAULT_D
         default = Tetrahedron(a=DEFAULT_A.copy(), b=DEFAULT_B.copy(), c=DEFAULT_C.copy(), d=DEFAULT_D.copy())
         return default
 
@@ -106,20 +102,15 @@ class Tetrahedron:
             e2 = self.d
             n1 = self.a
             n2 = self.d
-        self._longest_side_len = longest
-        # TODO: Is it necessary to copy?  Can I just update the references?
-        new_a = e1.copy()
-        new_b = e2.copy()
-        new_c = n1.copy()
-        new_d = n2.copy()
-        self.a = new_a
-        self.b = new_b
-        self.c = new_c
-        self.d = new_d
-        return self._longest_side_len
+        longest_side_len = longest
+        self.a = e1
+        self.b = e2
+        self.c = n1
+        self.d = n2
+        return longest_side_len
 
     def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
-        self._calculate_longest_side()  # TODO: Avoid needing this operation for the side effects.
+        self.get_longest_side_length()  # TODO: Avoid needing this operation for the side effects.
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
         midpoint = self.a.midpoint(self.b)
         tetra_one = Tetrahedron(a=self.a, b=midpoint, c=self.c, d=self.d)
