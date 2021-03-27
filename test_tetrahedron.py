@@ -216,3 +216,20 @@ class EqualityTest(unittest.TestCase):
         one = Tetrahedron(a=a, b=b, c=c, d=d)
         two = Tetrahedron(a=a, b=b, c=c, d=d_two)
         self.run_test(one, two, expected_equality=False)
+
+
+class CopyTest(unittest.TestCase):
+
+    def setUp(self) -> None:
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        self.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+        self.copy = self.tetra.copy()
+
+    def test_copy_is_equal(self):
+        self.assertEqual(self.tetra, self.copy)
+
+    def test_copy_has_different_memory_address(self):
+        self.assertFalse(self.tetra is self.copy)

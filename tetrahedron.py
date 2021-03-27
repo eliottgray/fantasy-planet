@@ -136,6 +136,17 @@ class Tetrahedron:
         """
         return (self.a.alt + self.b.alt + self.c.alt + self.d.alt) / 4
 
+    def copy(self):
+        """
+        :return: New object with new points that have identical coordinates.
+        """
+        return Tetrahedron(
+            a=self.a.copy(),
+            b=self.b.copy(),
+            c=self.c.copy(),
+            d=self.d.copy()
+        )
+
     def __eq__(self, other: 'Tetrahedron') -> bool:
         set_a = {self.a, self.b, self.c, self.d}
         set_b = {other.a, other.b, other.c, other.d}
