@@ -117,6 +117,19 @@ class RotateAroundXAxisTest(unittest.TestCase):
         self.run_test(degrees, expected)
 
 
+class CopyTest(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.fixture = Point(x=0.5, y=0.6, z=0.7, alt=1.0)
+        self.copy = self.fixture.copy()
+
+    def test_copy_is_equal(self):
+        self.assertEqual(self.fixture, self.copy)
+
+    def test_copy_has_different_memory_address(self):
+        self.assertFalse(self.fixture is self.copy)
+
+
 class RotateAroundYAxisTest(unittest.TestCase):
 
     def setUp(self) -> None:
