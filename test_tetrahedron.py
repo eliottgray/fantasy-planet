@@ -231,5 +231,11 @@ class CopyTest(unittest.TestCase):
     def test_copy_is_equal(self):
         self.assertEqual(self.tetra, self.copy)
 
-    def test_copy_has_different_memory_address(self):
+    def test_copy_has_different_memory_addresses(self):
         self.assertFalse(self.tetra is self.copy)
+        # Copy must also copy points.
+        self.assertFalse(self.tetra.a is self.copy.a)
+        self.assertFalse(self.tetra.b is self.copy.b)
+        self.assertFalse(self.tetra.c is self.copy.c)
+        self.assertFalse(self.tetra.d is self.copy.d)
+
