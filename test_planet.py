@@ -23,6 +23,11 @@ class PlanetConstructorTest(unittest.TestCase):
 class GetElevationAtCoordinateTest(unittest.TestCase):
 
     def test_low_resolution(self):
-        planet = Planet(resolution=4.0)
+        planet = Planet(resolution=100000.0)
+        elevation = planet.get_elevation_at(lat=-10.0, lon=-43.0)
+        self.assertIsInstance(elevation, Number)
+
+    def test_high_resolution(self):
+        planet = Planet(resolution=50.0)
         elevation = planet.get_elevation_at(lat=45.0, lon=23.0)
         self.assertIsInstance(elevation, Number)
