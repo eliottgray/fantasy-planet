@@ -89,10 +89,7 @@ class Point:
         return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
 
     def __eq__(self, other: 'Point') -> bool:
-        if almost_equal(self.x, other.x) and almost_equal(self.y, other.y) and almost_equal(self.z, other.z) and almost_equal(self.alt, other.alt):
-            return True
-        else:
-            return False
+        return almost_equal(self.x, other.x) and almost_equal(self.y, other.y) and almost_equal(self.z, other.z) and almost_equal(self.alt, other.alt)
 
     def __hash__(self):
         return hash((self.x, self.y, self.z, self.alt))
