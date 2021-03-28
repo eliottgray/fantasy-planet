@@ -1,6 +1,5 @@
 from point import Point
 from scipy.spatial import Delaunay
-from scipy.optimize import linprog
 import numpy as np
 import typing
 

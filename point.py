@@ -2,6 +2,7 @@ import numpy as np
 from scipy.spatial import distance
 import wgs84
 
+
 class CoordinateError(Exception):
     pass
 
@@ -11,10 +12,7 @@ def almost_equal(x: float, y: float, epsilon=1e-7):
     if x == y:
         return True
     delta = abs(x - y)
-    if delta < epsilon:
-        return True
-    else:
-        return False
+    return delta < epsilon
 
 
 class Point:
