@@ -50,24 +50,13 @@ class Tetrahedron:
         new_d = self.d.rotate_around_y_axis(degrees)
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
-    def contains_old(self, point: Point) -> bool:
+    def contains(self, point: Point) -> bool:
         hull = Delaunay(np.array([(self.a.x, self.a.y, self.a.z), (self.b.x, self.b.y, self.b.z), (self.c.x, self.c.y, self.c.z), (self.d.x, self.d.y, self.d.z)]))
         point_array = np.array([(point.x, point.y, point.z)])
         simplex_array = hull.find_simplex(point_array)
         # The returned array of simplex points is only of length one, as we only query a single point at a time.
         # A value of -1 indicates that no triangle comprising the hull contains the point.
         return simplex_array[0] >= 0
-
-    def contains(self, point: Point) -> bool:
-        # from: https://stackoverflow.com/a/43564754
-        point = np.array([point.x, point.y, point.z])
-        tetrahedron = np.array([[self.a.x, self.a.y, self.a.z], [self.b.x, self.b.y, self.b.z], [self.c.x, self.c.y, self.c.z], [self.d.x, self.d.y, self.d.z]])
-        num_coordinates = len(tetrahedron)
-        c = np.zeros(num_coordinates)
-        A = np.r_[tetrahedron.T, np.ones((1, num_coordinates))]
-        b = np.r_[point, np.ones(1)]
-        lp = linprog(c, A_eq=A, b_eq=b)
-        return lp.success
 
     def get_longest_side_length(self) -> float:
         if not self._longest_side_len:
@@ -116,7 +105,7 @@ class Tetrahedron:
             e1 = self.c
             e2 = self.d
             n1 = self.a
-            n2 = self.d
+            n2 = self.b
         longest_side_len = longest
         self.a = e1
         self.b = e2
