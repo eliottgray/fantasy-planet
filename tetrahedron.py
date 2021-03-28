@@ -138,6 +138,9 @@ class Tetrahedron:
             d=self.d.copy()
         )
 
+    def __repr__(self):
+        return "Tetrahedron(a={}, b={}, c={}, d={})".format(repr(self.a), repr(self.b), repr(self.c), repr(self.d))
+
     def __eq__(self, other: 'Tetrahedron') -> bool:
         set_a = {self.a, self.b, self.c, self.d}
         set_b = {other.a, other.b, other.c, other.d}

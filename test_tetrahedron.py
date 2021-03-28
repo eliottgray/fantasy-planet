@@ -243,3 +243,15 @@ class CopyTest(unittest.TestCase):
         self.assertFalse(self.tetra.c is self.copy.c)
         self.assertFalse(self.tetra.d is self.copy.d)
 
+
+class ReprTest(unittest.TestCase):
+
+    def test_eval(self):
+        a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        b = Point(x=1.0, y=1.0, z=-1.0, alt=1.0)
+        c = Point(x=1.0, y=-1.0, z=-1.0, alt=1.0)
+        d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
+        tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+        new = eval(repr(tetra))
+        self.assertEqual(tetra, new)
+
