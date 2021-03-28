@@ -47,22 +47,22 @@ class PointFromSphericalCoordinatesTest(unittest.TestCase):
 
     def test_x_axis(self):
         """The Origin (0.0, 0.0) and it's Antipode represent the bounds of the X axis."""
-        self.run_test(lat=0, lon=0, x=1)
-        self.run_test(lat=0, lon=180, x=-1)
-        self.run_test(lat=0, lon=-180, x=-1)
+        self.run_test(lat=0, lon=0, x=6378137)
+        self.run_test(lat=0, lon=180, x=-6378137)
+        self.run_test(lat=0, lon=-180, x=-6378137)
 
     def test_z_axis(self):
         """The poles represent the bounds of the Z axis."""
-        self.run_test(lat=90.0, lon=0.0, z=1)
-        self.run_test(lat=-90.0, lon=0.0, z=-1)
+        self.run_test(lat=90.0, lon=0.0, z=6356752.314245179)
+        self.run_test(lat=-90.0, lon=0.0, z=-6356752.314245179)
 
     def test_y_axis(self):
         """90 and negative 90 represent the bounds of the Y axis."""
-        self.run_test(lat=0.0, lon=90, y=1)
-        self.run_test(lat=0.0, lon=-90, y=-1)
+        self.run_test(lat=0.0, lon=90, y=6378137)
+        self.run_test(lat=0.0, lon=-90, y=-6378137)
 
     def test_all_axes(self):
-        self.run_test(lat=45, lon=45, x=0.5, y=0.5, z=0.70710678)
+        self.run_test(lat=45, lon=45, x=3194419.1450605732, y=3194419.1450605732, z=4487348.408865919)
 
     def test_invalid_latitude(self):
         with self.assertRaises(CoordinateError):

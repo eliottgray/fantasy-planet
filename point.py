@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial import distance
-
+import wgs84
 
 class CoordinateError(Exception):
     pass
@@ -41,12 +41,19 @@ class Point:
             raise CoordinateError("Latitude {} encountered, which is not a valid coordinate.".format(str(lat)))
         if not 180 >= lon >= -180:
             raise CoordinateError("Longitude {} encountered, which is not a valid coordinate.".format(str(lat)))
-        cosLat = np.cos(np.radians(lat))
-        sinLat = np.sin(np.radians(lat))
-        C = 1 / np.sqrt(cosLat ** 2 + sinLat ** 2)
-        x = (C + alt) * cosLat * np.cos(np.radians(lon))
-        y = (C + alt) * cosLat * np.sin(np.radians(lon))
-        z = (C + alt) * sinLat
+        radLat = np.radians(lat)
+        radLon = np.radians(lon)
+        cosLat = np.cos(radLat)
+        sinLat = np.sin(radLat)
+        cosLon = np.cos(radLon)
+        sinLon = np.sin(radLon)
+        major_squared = wgs84.SEMI_MAJOR_AXIS ** 2
+        minor_squared = wgs84.SEMI_MINOR_AXIS ** 2
+        prime_vertical_radius_of_curvature = major_squared / np.sqrt(major_squared * (cosLat ** 2) + minor_squared * (sinLat ** 2))
+
+        x = (prime_vertical_radius_of_curvature + alt) * cosLat * cosLon
+        y = (prime_vertical_radius_of_curvature + alt) * cosLat * sinLon
+        z = ((minor_squared / major_squared) * prime_vertical_radius_of_curvature + alt) * sinLat
         point = Point(lat=lat, lon=lon, alt=alt, x=x, y=y, z=z)
         return point
 
