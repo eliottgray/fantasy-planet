@@ -302,5 +302,7 @@ class ReprTest(unittest.TestCase):
         self.assertTrue(str(lat) in string)
         self.assertTrue(str(lon) in string)
 
-
-
+    def test_eval(self):
+        a = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
+        b = eval(repr(a))
+        self.assertEqual(a, b)

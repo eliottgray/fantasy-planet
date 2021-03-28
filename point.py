@@ -93,7 +93,7 @@ class Point:
         return Point(lat=self.lat, lon=self.lon, alt=self.alt, x=self.x, y=self.y, z=self.z)
 
     def __repr__(self) -> str:
-        return "Point[lat: {}, lon: {}, alt: {}, x: {}, y: {}, z: {}]".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
+        return "Point(lat={}, lon={}, alt={}, x={}, y={}, z={})".format(self.lat, self.lon, self.alt, self.x, self.y, self.z)
 
     def __eq__(self, other: 'Point') -> bool:
         return almost_equal(self.x, other.x) and almost_equal(self.y, other.y) and almost_equal(self.z, other.z) and almost_equal(self.alt, other.alt)
