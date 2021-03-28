@@ -150,10 +150,7 @@ class Tetrahedron:
     def __eq__(self, other: 'Tetrahedron') -> bool:
         set_a = {self.a, self.b, self.c, self.d}
         set_b = {other.a, other.b, other.c, other.d}
-        if set_a == set_b:
-            return True
-        else:
-            return False
+        return set_a == set_b
 
     def __hash__(self):
         # TODO: Determine if there is a better way to permit any ordering of the points to result in the same hash.
