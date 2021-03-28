@@ -3,14 +3,9 @@ from scipy.spatial import Delaunay
 from scipy.optimize import linprog
 import numpy as np
 import typing
-from math import sqrt
 
 
 DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
-DEFAULT_A = Point(x=-sqrt(3.0) - 0.20, y=-sqrt(3.0) - 0.22, z=-sqrt(3.0) - 0.23, alt=DEFAULT_ALTITUDE)
-DEFAULT_B = Point(x=-sqrt(3.0) - 0.19, y=sqrt(3.0) + 0.18, z=sqrt(3.0) + 0.17, alt=DEFAULT_ALTITUDE)
-DEFAULT_C = Point(x=sqrt(3.0) + 0.21, y=-sqrt(3.0) - 0.24, z=sqrt(3.0) + 0.15, alt=DEFAULT_ALTITUDE)
-DEFAULT_D = Point(x=sqrt(3.0) + 0.24, y=sqrt(3.0) + 0.22, z=-sqrt(3.0) - 0.25, alt=DEFAULT_ALTITUDE)
 
 
 class Tetrahedron:
@@ -22,16 +17,23 @@ class Tetrahedron:
         self.d = d
         # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
         # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
-        self.hull = Delaunay(np.array([(a.x, a.y, a.z), (b.x, b.y, b.z), (c.x, c.y, c.z), (d.x, d.y, d.z)]))
         self._longest_side_len = None
 
     @staticmethod
-    def build_default() -> 'Tetrahedron':
+    def build_default(alt=25000000) -> 'Tetrahedron':
         """
         Creates a Tetrahedron with default orientation and altitudes.
         :return: Default Tetrahedron.
         """
-        default = Tetrahedron(a=DEFAULT_A.copy(), b=DEFAULT_B.copy(), c=DEFAULT_C.copy(), d=DEFAULT_D.copy())
+        a = Point.from_spherical(lat=90, lon=0, alt=alt)
+        b = Point.from_spherical(lat=-30, lon=0, alt=alt)
+        c = Point.from_spherical(lat=-30, lon=120, alt=alt)
+        d = Point.from_spherical(lat=-30, lon=-120, alt=alt)
+        a.alt = DEFAULT_ALTITUDE
+        b.alt = DEFAULT_ALTITUDE
+        c.alt = DEFAULT_ALTITUDE
+        d.alt = DEFAULT_ALTITUDE
+        default = Tetrahedron(a=a, b=b, c=c, d=d)
         return default
 
     def rotate_around_x_axis(self, degrees: float) -> 'Tetrahedron':
@@ -48,22 +50,22 @@ class Tetrahedron:
         new_d = self.d.rotate_around_y_axis(degrees)
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
-    def contains(self, point: Point) -> bool:
+    def contains_old(self, point: Point) -> bool:
+        hull = Delaunay(np.array([(self.a.x, self.a.y, self.a.z), (self.b.x, self.b.y, self.b.z), (self.c.x, self.c.y, self.c.z), (self.d.x, self.d.y, self.d.z)]))
         point_array = np.array([(point.x, point.y, point.z)])
-        simplex_array = self.hull.find_simplex(point_array)
+        simplex_array = hull.find_simplex(point_array)
         # The returned array of simplex points is only of length one, as we only query a single point at a time.
         # A value of -1 indicates that no triangle comprising the hull contains the point.
         return simplex_array[0] >= 0
 
-    def contains_custom(self, point: Point) -> bool:
+    def contains(self, point: Point) -> bool:
         # from: https://stackoverflow.com/a/43564754
         point = np.array([point.x, point.y, point.z])
-        tetrahedron = np.array([(self.a.x, self.a.y, self.a.z), (self.b.x, self.b.y, self.b.z), (self.c.x, self.c.y, self.c.z), (self.d.x, self.d.y, self.d.z)])
-
-        n_points = len(point)
-        c = np.zeros(n_points)
-        A = np.r_[point.T, np.ones((1, n_points))]
-        b = np.r_[tetrahedron, np.ones(1)]
+        tetrahedron = np.array([[self.a.x, self.a.y, self.a.z], [self.b.x, self.b.y, self.b.z], [self.c.x, self.c.y, self.c.z], [self.d.x, self.d.y, self.d.z]])
+        num_coordinates = len(tetrahedron)
+        c = np.zeros(num_coordinates)
+        A = np.r_[tetrahedron.T, np.ones((1, num_coordinates))]
+        b = np.r_[point, np.ones(1)]
         lp = linprog(c, A_eq=A, b_eq=b)
         return lp.success
 
@@ -123,7 +125,7 @@ class Tetrahedron:
         return longest_side_len
 
     def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
-        self._calculate_longest_side()
+        self.get_longest_side_length()
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
         midpoint = self.a.midpoint(self.b)
         tetra_one = Tetrahedron(a=self.a, b=midpoint, c=self.c, d=self.d)

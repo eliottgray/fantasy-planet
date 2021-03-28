@@ -1,11 +1,11 @@
 import unittest
-from tetrahedron import Tetrahedron, DEFAULT_A, DEFAULT_B, DEFAULT_C, DEFAULT_D
+from tetrahedron import Tetrahedron
 from point import Point
 
 
 class TetrahedronTest(unittest.TestCase):
 
-    def test_positive_case(self):
+    def test_arbitrary_tetrahedron(self):
         a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
         b = Point(x=1.0, y=1.0, z=0.0, alt=1.0)
         c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0)
@@ -17,11 +17,15 @@ class TetrahedronTest(unittest.TestCase):
         self.assertEqual(d, tetra.d)
 
     def test_default(self):
+        """Default tetrahedron should cover all surface-level points on the globe."""
         default = Tetrahedron.build_default()
-        self.assertEqual(DEFAULT_A, default.a)
-        self.assertEqual(DEFAULT_B, default.b)
-        self.assertEqual(DEFAULT_C, default.c)
-        self.assertEqual(DEFAULT_D, default.d)
+        failures = []
+        for lat in range(-90, 91, 5):
+            for lon in range(-180, 181, 5):
+                point = Point.from_spherical(lat=lat, lon=lon, alt=0)
+                if not default.contains(point):
+                    failures.append("lat  {}  lon  {}".format(str(lat), str(lon)))
+        self.assertEqual(0, len(failures), "{} failures to find test point contained in default tetrahedron.")
 
 
 class RotateTetrahedronTest(unittest.TestCase):
