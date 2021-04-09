@@ -29,6 +29,7 @@ class Point:
         self.x = x
         self.y = y
         self.z = z
+        self.xyz = (x, y, z)
         if alt is None:
             raise ValueError("Altitude value is None.")
         if seed is None:
@@ -64,7 +65,7 @@ class Point:
 
     def distance(self, other: 'Point') -> float:
         """Euclidean distance to another Point."""
-        return distance.euclidean((self.x, self.y, self.z), (other.x, other.y, other.z))
+        return distance.euclidean(self.xyz, other.xyz)
 
     def midpoint(self, other: 'Point', length: float) -> 'Point':
         """Return the midpoint between this point and the given other point."""

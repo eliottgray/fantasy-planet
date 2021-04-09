@@ -52,8 +52,8 @@ class Tetrahedron:
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
     def contains(self, point: Point) -> bool:
-        hull = Delaunay(np.array([(self.a.x, self.a.y, self.a.z), (self.b.x, self.b.y, self.b.z), (self.c.x, self.c.y, self.c.z), (self.d.x, self.d.y, self.d.z)]))
-        point_array = np.array([(point.x, point.y, point.z)])
+        hull = Delaunay(np.array([self.a.xyz, self.b.xyz, self.c.xyz, self.d.xyz]))
+        point_array = np.array([point.xyz])
         simplex_array = hull.find_simplex(point_array)
         # The returned array of simplex points is only of length one, as we only query a single point at a time.
         # A value of -1 indicates that no triangle comprising the hull contains the point.
