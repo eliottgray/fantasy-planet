@@ -2,14 +2,17 @@ import unittest
 from tetrahedron import Tetrahedron
 from point import Point
 
+# A single seed for all tests improves reproducibility.
+SEED = 12345.0
+
 
 class TetrahedronTest(unittest.TestCase):
 
     def test_arbitrary_tetrahedron(self):
-        a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)
-        b = Point(x=1.0, y=1.0, z=0.0, alt=1.0)
-        c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0)
-        d = Point(x=0.0, y=-1.0, z=0.0, alt=1.0)
+        a = Point(x=0.0, y=0.0, z=1.0, alt=1.0, seed=SEED)
+        b = Point(x=1.0, y=1.0, z=0.0, alt=1.0, seed=SEED)
+        c = Point(x=-1.0, y=1.0, z=0.0, alt=1.0, seed=SEED)
+        d = Point(x=0.0, y=-1.0, z=0.0, alt=1.0, seed=SEED)
         tetra = Tetrahedron(a=a, b=b, c=c, d=d)
         self.assertEqual(a, tetra.a)
         self.assertEqual(b, tetra.b)
@@ -18,11 +21,11 @@ class TetrahedronTest(unittest.TestCase):
 
     def test_default(self):
         """Default tetrahedron should cover all surface-level points on the globe."""
-        default = Tetrahedron.build_default()
+        default = Tetrahedron.build_default(SEED)
         failures = []
         for lat in range(-90, 91, 5):
             for lon in range(-180, 181, 5):
-                point = Point.from_spherical(lat=lat, lon=lon, alt=0)
+                point = Point.from_spherical(lat=lat, lon=lon, alt=0, seed=SEED)
                 if not default.contains(point):
                     failures.append("lat  {}  lon  {}".format(str(lat), str(lon)))
         self.assertEqual(0, len(failures), "{} failures to find test point contained in default tetrahedron.")
@@ -145,7 +148,7 @@ class SubdivideTest(unittest.TestCase):
         d = Point(x=-1.0, y=0.0, z=-1.0, alt=1.0)
         tetra = Tetrahedron(a=a, b=b, c=c, d=d)
 
-        midpoint = a.midpoint(d)
+        midpoint = a.midpoint(d, a.distance(d))
         subdivided_a = Tetrahedron(a=a, b=b, c=c, d=midpoint)
         subdivided_d = Tetrahedron(a=midpoint, b=b, c=c, d=d)
         self.run_test(tetra, subdivided_a, subdivided_d)

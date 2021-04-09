@@ -1,5 +1,7 @@
 import unittest
 from point import Point, CoordinateError
+import random
+from defaults import DEFAULT_SEED
 
 
 class PointConstructorTest(unittest.TestCase):
@@ -12,6 +14,7 @@ class PointConstructorTest(unittest.TestCase):
         self.assertEqual(1.0, point.x)
         self.assertEqual(0.7, point.y)
         self.assertEqual(-1.1, point.z)
+        self.assertEqual(DEFAULT_SEED, point.seed)
 
     def test_missing_x(self):
         with self.assertRaises(ValueError):
@@ -28,6 +31,10 @@ class PointConstructorTest(unittest.TestCase):
     def test_missing_alt(self):
         with self.assertRaises(ValueError):
             Point(x=1, y=1, z=0, alt=None)
+
+    def test_missing_seed(self):
+        with self.assertRaises(ValueError):
+            Point(x=1, y=1, z=0, alt=0.5, seed=None)
 
 
 class PointFromSphericalCoordinatesTest(unittest.TestCase):
@@ -251,36 +258,45 @@ class EqualityTest(unittest.TestCase):
 
 class MidpointTest(unittest.TestCase):
 
+    def setUp(self) -> None:
+        self.local_random = random.Random()
+
+    def get_new_seed(self, one: float, two: float):
+        # TODO: Call a utility class in Point and here, instead of redefining the logic here.
+        self.local_random.seed((one + two) / 2)
+        return self.local_random.random()
+
     def run_test(self, one: Point, two: Point, expected: Point):
-        actual = one.midpoint(two)
+        length = one.distance(two)
+        actual = one.midpoint(two, length)
         self.assertEqual(expected, actual)
 
     def test_origin_midpoint(self):
         """Two points at opposite ends of the unit space should result in a point at the origin."""
         positive = Point(x=1, y=1, z=1, alt=1)
         negative = Point(x=-1, y=-1, z=-1, alt=-1)
-        expected = Point(x=0, y=0, z=0, alt=0)
+        expected = Point(x=0, y=0, z=0, alt=0.40110450912868567, seed=self.get_new_seed(positive.seed, negative.seed))
         self.run_test(one=positive, two=negative, expected=expected)
 
     def test_identical_positive(self):
         """Two identical points in the positive space."""
         pos1 = Point(x=1, y=1, z=1, alt=1)
         pos2 = Point(x=1, y=1, z=1, alt=1)
-        expected = Point(x=1, y=1, z=1, alt=1)
+        expected = Point(x=1, y=1, z=1, alt=1, seed=self.get_new_seed(pos1.seed, pos2.seed))
         self.run_test(one=pos1, two=pos2, expected=expected)
 
     def test_identical_negative(self):
         """Two identical points in the negative space."""
         pos1 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
         pos2 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
-        expected = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
+        expected = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5, seed=self.get_new_seed(pos1.seed, pos2.seed))
         self.run_test(one=pos1, two=pos2, expected=expected)
 
     def test_complex_case(self):
         """Two identical points in the positive space."""
         one = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
         two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
-        expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.002)
+        expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.022828282028331495, seed=self.get_new_seed(one.seed, two.seed))
         self.run_test(one=one, two=two, expected=expected)
 
 

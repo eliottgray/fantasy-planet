@@ -1,6 +1,7 @@
 from numbers import Number
 from tetrahedron import Tetrahedron
 from point import Point
+from defaults import DEFAULT_SEED
 
 
 class PlanetError(Exception):
@@ -9,14 +10,14 @@ class PlanetError(Exception):
 
 class Planet(object):
 
-    def __init__(self, resolution=10):
+    def __init__(self, seed=DEFAULT_SEED, resolution=10):
         """
         :param resolution: Approximate resolution of the calculated planet.
         """
         if not isinstance(resolution, Number):
             raise PlanetError("Provided resolution parameter must be a Number.")
         self.resolution = resolution
-        self.tetra = Tetrahedron.build_default()
+        self.tetra = Tetrahedron.build_default(seed)
 
     def get_elevation_at(self, lat: float, lon: float):
         point = Point.from_spherical(lat=lat, lon=lon)
