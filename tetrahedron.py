@@ -2,7 +2,7 @@ from point import Point
 from scipy.spatial import Delaunay
 import numpy as np
 import typing
-
+import random
 
 DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
 
@@ -19,15 +19,17 @@ class Tetrahedron:
         self._longest_side_len = None
 
     @staticmethod
-    def build_default(alt=25000000) -> 'Tetrahedron':
+    def build_default(seed, alt=25000000) -> 'Tetrahedron':
         """
         Creates a Tetrahedron with default orientation and altitudes.
         :return: Default Tetrahedron.
         """
-        a = Point.from_spherical(lat=90, lon=0, alt=alt)
-        b = Point.from_spherical(lat=-30, lon=0, alt=alt)
-        c = Point.from_spherical(lat=-30, lon=120, alt=alt)
-        d = Point.from_spherical(lat=-30, lon=-120, alt=alt)
+        local_random = random.Random(seed)
+
+        a = Point.from_spherical(lat=90, lon=0, alt=alt, seed=local_random.random())
+        b = Point.from_spherical(lat=-30, lon=0, alt=alt, seed=local_random.random())
+        c = Point.from_spherical(lat=-30, lon=120, alt=alt, seed=local_random.random())
+        d = Point.from_spherical(lat=-30, lon=-120, alt=alt, seed=local_random.random())
         a.alt = DEFAULT_ALTITUDE
         b.alt = DEFAULT_ALTITUDE
         c.alt = DEFAULT_ALTITUDE
@@ -113,9 +115,9 @@ class Tetrahedron:
         return longest_side_len
 
     def subdivide(self) -> typing.Tuple['Tetrahedron', 'Tetrahedron']:
-        self.get_longest_side_length()
+        length = self.get_longest_side_length()
         # Since calculating the longest side cached the longest edge as A->B, we can split A->B.
-        midpoint = self.a.midpoint(self.b)
+        midpoint = self.a.midpoint(self.b, length)
         tetra_one = Tetrahedron(a=self.a, b=midpoint, c=self.c, d=self.d)
         tetra_two = Tetrahedron(a=midpoint, b=self.b, c=self.c, d=self.d)
         return tetra_one, tetra_two

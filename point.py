@@ -1,6 +1,10 @@
 import numpy as np
 from scipy.spatial import distance
 import wgs84
+import random
+from defaults import DEFAULT_SEED
+
+LOCAL_RANDOM = random.Random()  # TODO: This should be provided by the caller.
 
 
 class CoordinateError(Exception):
@@ -17,7 +21,7 @@ def almost_equal(x: float, y: float, epsilon=1e-7):
 
 class Point:
 
-    def __init__(self, alt: float, seed: int, x: float, y: float, z: float, lat: float = None, lon: float = None,):
+    def __init__(self, alt: float, x: float, y: float, z: float, seed: float = DEFAULT_SEED, lat: float = None, lon: float = None):
         self.lat = lat
         self.lon = lon
         self.alt = alt
@@ -37,7 +41,7 @@ class Point:
             raise ValueError("Z value is None.")
 
     @staticmethod
-    def from_spherical(seed: int, lat: float, lon: float, alt: float = 0.0) -> 'Point':
+    def from_spherical(lat: float, lon: float, alt: float = 0.0, seed: float = DEFAULT_SEED) -> 'Point':
         if not 90 >= lat >= -90:
             raise CoordinateError("Latitude {} encountered, which is not a valid coordinate.".format(str(lat)))
         if not 180 >= lon >= -180:
@@ -62,13 +66,20 @@ class Point:
         """Euclidean distance to another Point."""
         return distance.euclidean((self.x, self.y, self.z), (other.x, other.y, other.z))
 
-    def midpoint(self, other: 'Point') -> 'Point':
+    def midpoint(self, other: 'Point', length: float) -> 'Point':
         """Return the midpoint between this point and the given other point."""
+        # TODO: Random generater should be passed in, though.... does that truly matter?  hm.
+        LOCAL_RANDOM.seed((self.seed + other.seed) / 2)
+        new_seed = LOCAL_RANDOM.random()
+        alt_weight = 0.45
+        alt_pow = 1.0
+        length_weigbt = 0.035
+        length_pow = 0.47
         x = (self.x + other.x) / 2
         y = (self.y + other.y) / 2
         z = (self.z + other.z) / 2
-        alt = (self.alt + other.alt) / 2
-        return Point(x=x, y=y, z=z, alt=alt, seed=self.seed)
+        alt = (self.alt + other.alt) / 2 + new_seed * alt_weight * pow(abs(self.alt - other.alt), alt_pow) + new_seed * length_weigbt * pow(length, length_pow)
+        return Point(x=x, y=y, z=z, alt=alt, seed=new_seed)
 
     def rotate_around_x_axis(self, degrees: float) -> 'Point':
         radians = np.radians(degrees)
