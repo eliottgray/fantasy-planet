@@ -30,7 +30,7 @@ class Planet(object):
             if sub_one.contains(point):
                 current = sub_one
             else:
-                assert sub_two.contains(point)
+                # assert sub_two.contains(point)  # TODO: only during testing, or not at all.
                 current = sub_two
         elevation = current.average_altitude()
         return elevation

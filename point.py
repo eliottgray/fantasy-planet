@@ -3,6 +3,7 @@ from scipy.spatial import distance
 import wgs84
 import random
 from defaults import DEFAULT_SEED
+import math
 
 LOCAL_RANDOM = random.Random()  # TODO: This should be provided by the caller.
 
@@ -65,7 +66,10 @@ class Point:
 
     def distance(self, other: 'Point') -> float:
         """Euclidean distance to another Point."""
-        return distance.euclidean(self.xyz, other.xyz)
+        # TODO: Profile against using np.linalg.norm(v1-v2)
+        dist = [(a - b) ** 2 for a, b in zip(self.xyz, other.xyz)]
+        dist = math.sqrt(sum(dist))
+        return dist
 
     def midpoint(self, other: 'Point', length: float) -> 'Point':
         """Return the midpoint between this point and the given other point."""
@@ -74,12 +78,12 @@ class Point:
         new_seed = LOCAL_RANDOM.random()
         alt_weight = 0.45
         alt_pow = 1.0
-        length_weigbt = 0.035
+        length_weight = 0.035
         length_pow = 0.47
         x = (self.x + other.x) / 2
         y = (self.y + other.y) / 2
         z = (self.z + other.z) / 2
-        alt = (self.alt + other.alt) / 2 + new_seed * alt_weight * pow(abs(self.alt - other.alt), alt_pow) + new_seed * length_weigbt * pow(length, length_pow)
+        alt = (self.alt + other.alt) / 2 + new_seed * alt_weight * pow(abs(self.alt - other.alt), alt_pow) + new_seed * length_weight * pow(length, length_pow)
         return Point(x=x, y=y, z=z, alt=alt, seed=new_seed)
 
     def rotate_around_x_axis(self, degrees: float) -> 'Point':

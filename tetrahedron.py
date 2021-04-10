@@ -1,10 +1,30 @@
 from point import Point
-from scipy.spatial import Delaunay
 import numpy as np
 import typing
 import random
 
 DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
+
+
+def tetra_coords(vertices):
+    """
+    Given a list of the xyz coordinates of the vertices of a tetrahedron,
+    return tetrahedron coordinate system
+    """
+    origin, *rest = vertices
+    mat = (np.array(rest) - origin).T
+    tetra = np.linalg.inv(mat)
+    return tetra, origin
+
+
+def pointInside(point, tetra, origin):
+    """
+    Takes a single point or array of points, as well as tetra and origin objects returned by
+    the Tetrahedron function.
+    Returns a boolean or boolean array indicating whether the point is inside the tetrahedron.
+    """
+    newp = np.matmul(tetra, (point-origin).T).T
+    return np.all(newp>=0, axis=-1) & np.all(newp <=1, axis=-1) & (np.sum(newp, axis=-1) <=1)
 
 
 class Tetrahedron:
@@ -15,7 +35,6 @@ class Tetrahedron:
         self.c = c
         self.d = d
         # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
-        # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
         self._longest_side_len = None
 
     @staticmethod
@@ -52,12 +71,20 @@ class Tetrahedron:
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
     def contains(self, point: Point) -> bool:
-        hull = Delaunay(np.array([self.a.xyz, self.b.xyz, self.c.xyz, self.d.xyz]))
-        point_array = np.array([point.xyz])
-        simplex_array = hull.find_simplex(point_array)
-        # The returned array of simplex points is only of length one, as we only query a single point at a time.
-        # A value of -1 indicates that no triangle comprising the hull contains the point.
-        return simplex_array[0] >= 0
+        """
+        Returns True if the given point lies inside the Tetrahedron, else False.
+        Taken from Stack Overflow: https://stackoverflow.com/a/60745339
+        """
+        v1 = np.array(self.a.xyz)
+        v2 = np.array(self.b.xyz)
+        v3 = np.array(self.c.xyz)
+        v4 = np.array(self.d.xyz)
+        p = np.array(point.xyz)
+
+        vertices = [v1, v2, v3, v4]
+        tetra, origin = tetra_coords(vertices)
+        inTet = pointInside(p, tetra, origin)
+        return inTet
 
     def get_longest_side_length(self) -> float:
         if not self._longest_side_len:
