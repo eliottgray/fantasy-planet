@@ -2,7 +2,7 @@ import unittest
 from point import Point, CoordinateError
 import random
 from defaults import DEFAULT_SEED
-
+import math
 
 class PointConstructorTest(unittest.TestCase):
 
@@ -254,6 +254,29 @@ class EqualityTest(unittest.TestCase):
         p1 = Point.from_spherical(lat=lat1, lon=lon1, alt=alt1)
         p2 = Point.from_spherical(lat=lat2, lon=lon2, alt=alt2)
         self.run_test(p1, p2, expected_equality=False)
+
+
+class DistanceTest(unittest.TestCase):
+
+    @staticmethod
+    def calculate_euclidean_dist(p1: Point, p2: Point):
+        return math.sqrt(pow(abs(p1.x - p2.x), 2) + pow(abs(p1.y - p2.y), 2) + pow(abs(p1.z - p2.z), 2))
+
+    def run_test(self, p1: Point, p2: Point, expected):
+
+        actual = p1.distance(p2)
+        self.assertAlmostEqual(expected, actual)
+
+    def test_identical_points(self):
+        a = Point(x=-0.7, y=0.6, z=0.5, alt=1.0)
+        b = Point(x=-0.7, y=0.6, z=0.5, alt=1.0)
+        self.run_test(p1=a, p2=b, expected=0)
+
+    def test_different_points(self):
+        a = Point(x=-0.7, y=0.6, z=0.5, alt=1.0)
+        b = Point(x=-0.2, y=-0.1, z=0.0, alt=1.0)
+        expected = self.calculate_euclidean_dist(a, b)
+        self.run_test(p1=a, p2=b, expected=expected)
 
 
 class MidpointTest(unittest.TestCase):
