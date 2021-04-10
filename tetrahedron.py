@@ -6,21 +6,25 @@ import random
 DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
 
 
-def sameside(v1, v2, v3, v4, p):
-    normal = np.cross(v2-v1, v3-v1)
-    return np.dot(normal, v4 - v1) * np.dot(normal, p - v1) > 0
+def tetra_coords(vertices):
+    """
+    Given a list of the xyz coordinates of the vertices of a tetrahedron,
+    return tetrahedron coordinate system
+    """
+    origin, *rest = vertices
+    mat = (np.array(rest) - origin).T
+    tetra = np.linalg.inv(mat)
+    return tetra, origin
 
 
-def tetraCoord(A, B, C, D):
-    """Given four numpy arrays, each defining (x, y, z) of a tetrahedron coordinate, return """
-    v1 = B-A
-    v2 = C-A
-    v3 = D-A
-    # mat defines an affine transform from the tetrahedron to the orthogonal system
-    mat = np.concatenate((np.array((v1,v2,v3,A)).T, np.array([[0,0,0,1]])))
-    # The inverse matrix does the opposite (from orthogonal to tetrahedron)
-    M1 = np.linalg.inv(mat)
-    return(M1)
+def pointInside(point, tetra, origin):
+    """
+    Takes a single point or array of points, as well as tetra and origin objects returned by
+    the Tetrahedron function.
+    Returns a boolean or boolean array indicating whether the point is inside the tetrahedron.
+    """
+    newp = np.matmul(tetra, (point-origin).T).T
+    return np.all(newp>=0, axis=-1) & np.all(newp <=1, axis=-1) & (np.sum(newp, axis=-1) <=1)
 
 
 class Tetrahedron:
@@ -31,7 +35,6 @@ class Tetrahedron:
         self.c = c
         self.d = d
         # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
-        # Stack overflow suggestion to use scipy Delaunay class: https://stackoverflow.com/a/16898636
         self._longest_side_len = None
 
     @staticmethod
@@ -70,20 +73,18 @@ class Tetrahedron:
     def contains(self, point: Point) -> bool:
         """
         Returns True if the given point lies inside the Tetrahedron, else False.
-        Taken from Stack Overflow: https://stackoverflow.com/a/51733522
+        Taken from Stack Overflow: https://stackoverflow.com/a/60745339
         """
         v1 = np.array(self.a.xyz)
         v2 = np.array(self.b.xyz)
         v3 = np.array(self.c.xyz)
         v4 = np.array(self.d.xyz)
         p = np.array(point.xyz)
-        # Find the transform matrix from orthogonal to tetrahedron system
-        M1 = tetraCoord(v1, v2, v3, v4)
-        # apply the transform to P
-        p1 = np.append(p, 1)
-        newp = M1.dot(p1)
-        # perform test
-        return (np.all(newp >= 0) and np.all(newp <= 1) and sameside(v2, v3, v4, v1, p))
+
+        vertices = [v1, v2, v3, v4]
+        tetra, origin = tetra_coords(vertices)
+        inTet = pointInside(p, tetra, origin)
+        return inTet
 
     def get_longest_side_length(self) -> float:
         if not self._longest_side_len:
