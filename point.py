@@ -3,6 +3,7 @@ from scipy.spatial import distance
 import wgs84
 import random
 from defaults import DEFAULT_SEED
+import math
 
 LOCAL_RANDOM = random.Random()  # TODO: This should be provided by the caller.
 
@@ -65,7 +66,10 @@ class Point:
 
     def distance(self, other: 'Point') -> float:
         """Euclidean distance to another Point."""
-        return distance.euclidean(self.xyz, other.xyz)
+        # TODO: Profile against using np.linalg.norm(v1-v2)
+        dist = [(a - b) ** 2 for a, b in zip(self.xyz, other.xyz)]
+        dist = math.sqrt(sum(dist))
+        return dist
 
     def midpoint(self, other: 'Point', length: float) -> 'Point':
         """Return the midpoint between this point and the given other point."""
