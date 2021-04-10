@@ -1,10 +1,26 @@
 from point import Point
-from scipy.spatial import Delaunay
 import numpy as np
 import typing
 import random
 
 DEFAULT_ALTITUDE = -.02   # Just below 'sea level' of 0 altitude.
+
+
+def sameside(v1, v2, v3, v4, p):
+    normal = np.cross(v2-v1, v3-v1)
+    return np.dot(normal, v4 - v1) * np.dot(normal, p - v1) > 0
+
+
+def tetraCoord(A, B, C, D):
+    """Given four numpy arrays, each defining (x, y, z) of a tetrahedron coordinate, return """
+    v1 = B-A
+    v2 = C-A
+    v3 = D-A
+    # mat defines an affine transform from the tetrahedron to the orthogonal system
+    mat = np.concatenate((np.array((v1,v2,v3,A)).T, np.array([[0,0,0,1]])))
+    # The inverse matrix does the opposite (from orthogonal to tetrahedron)
+    M1 = np.linalg.inv(mat)
+    return(M1)
 
 
 class Tetrahedron:
@@ -52,12 +68,22 @@ class Tetrahedron:
         return Tetrahedron(a=new_a, b=new_b, c=new_c, d=new_d)
 
     def contains(self, point: Point) -> bool:
-        hull = Delaunay(np.array([self.a.xyz, self.b.xyz, self.c.xyz, self.d.xyz]))
-        point_array = np.array([point.xyz])
-        simplex_array = hull.find_simplex(point_array)
-        # The returned array of simplex points is only of length one, as we only query a single point at a time.
-        # A value of -1 indicates that no triangle comprising the hull contains the point.
-        return simplex_array[0] >= 0
+        """
+        Returns True if the given point lies inside the Tetrahedron, else False.
+        Taken from Stack Overflow: https://stackoverflow.com/a/51733522
+        """
+        v1 = np.array(self.a.xyz)
+        v2 = np.array(self.b.xyz)
+        v3 = np.array(self.c.xyz)
+        v4 = np.array(self.d.xyz)
+        p = np.array(point.xyz)
+        # Find the transform matrix from orthogonal to tetrahedron system
+        M1 = tetraCoord(v1, v2, v3, v4)
+        # apply the transform to P
+        p1 = np.append(p, 1)
+        newp = M1.dot(p1)
+        # perform test
+        return (np.all(newp >= 0) and np.all(newp <= 1) and sameside(v2, v3, v4, v1, p))
 
     def get_longest_side_length(self) -> float:
         if not self._longest_side_len:

@@ -47,5 +47,5 @@ class Writer(object):
                 self.recurse_write(top_cell, 0, outputf)
 
 
-writer = Writer(h3_depth=0)
+writer = Writer(h3_depth=1)
 writer.write("test_geojson_out.json")

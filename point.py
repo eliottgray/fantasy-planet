@@ -74,12 +74,12 @@ class Point:
         new_seed = LOCAL_RANDOM.random()
         alt_weight = 0.45
         alt_pow = 1.0
-        length_weigbt = 0.035
+        length_weight = 0.035
         length_pow = 0.47
         x = (self.x + other.x) / 2
         y = (self.y + other.y) / 2
         z = (self.z + other.z) / 2
-        alt = (self.alt + other.alt) / 2 + new_seed * alt_weight * pow(abs(self.alt - other.alt), alt_pow) + new_seed * length_weigbt * pow(length, length_pow)
+        alt = (self.alt + other.alt) / 2 + new_seed * alt_weight * pow(abs(self.alt - other.alt), alt_pow) + new_seed * length_weight * pow(length, length_pow)
         return Point(x=x, y=y, z=z, alt=alt, seed=new_seed)
 
     def rotate_around_x_axis(self, degrees: float) -> 'Point':
