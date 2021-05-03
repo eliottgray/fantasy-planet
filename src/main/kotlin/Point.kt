@@ -31,6 +31,35 @@ class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val se
             return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
         }
     }
+
+    fun rotateAroundXAxis(degrees: Double): Point {
+        val radians = degrees * (PI/180)
+        val sinRad = sin(radians)
+        val cosRad = cos(radians)
+        val newY = this.y * cosRad - this.z * sinRad
+        val newZ = this.z * cosRad + this.y * sinRad
+        return Point(x=this.x, y=newY, z=newZ, alt=this.alt, seed=this.seed)
+    }
+
+    fun rotateAroundYAxis(degrees: Double): Point {
+        val radians = degrees * (PI/180)
+        val sinRad = sin(radians)
+        val cosRad = cos(radians)
+        val newX = this.x * cosRad + this.z * sinRad
+        val newZ = -sinRad * this.x + this.z * cosRad
+        return Point(x=newX, y=this.y, z=newZ, alt=this.alt, seed=this.seed)
+    }
+
+    fun copy(): Point {
+        return Point(lat=this.lat, lon=this.lon, alt=this.alt, seed=this.seed, x=this.x, y=this.y, z=this.z)
+    }
+
+    fun distance(other: Point): Double {
+        val xSquared = (this.x - other.x).pow(2)
+        val ySquared = (this.y - other.y).pow(2)
+        val zSquared = (this.z - other.z).pow(2)
+        return sqrt(xSquared + ySquared + zSquared)
+    }
 }
 
 
