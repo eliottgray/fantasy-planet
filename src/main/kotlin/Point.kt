@@ -1,13 +1,12 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
+import kotlin.random.Random
 
-class CoordinateError(message:String): Exception(message)
 
-
-class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.DEFAULT_SEED, val lat: Double? = null, val lon: Double? = null) {
+class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val seed: Int = Defaults.DEFAULT_SEED, val lat: Double? = null, val lon: Double? = null) {
 
     companion object{
-        fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Double = Defaults.DEFAULT_SEED): Point {
+        fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Int = Defaults.DEFAULT_SEED): Point {
             if (lat > 90 || lat < -90){
                 throw CoordinateError("Invalid latitude encountered: $lat")
             }
@@ -29,6 +28,17 @@ class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val se
             val z = ((minorSquared / majorSquared) * primeVerticalRadiusOfCurvature + alt) * sinLat
 
             return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
+        }
+
+        fun dotProduct(vector1: Array<Double>, vector2: Array<Double>): Double {
+            if (vector1.size != vector2.size) {
+                throw CoordinateError("Incompatible vector sizes encountered")
+            }
+            var sum = 0.0
+            for (i in vector1.indices) {
+                sum += vector1[i] * vector2[i]
+            }
+            return sum
         }
     }
 
@@ -60,47 +70,24 @@ class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val se
         val zSquared = (this.z - other.z).pow(2)
         return sqrt(xSquared + ySquared + zSquared)
     }
+
+    fun midpoint(other: Point, length: Double): Point {
+        println(other)
+        val newRandom = Random((this.seed + other.seed) / 2)
+        val newSeed = newRandom.nextInt()
+        val newModifier = newRandom.nextDouble()
+        val altWeight = 0.45
+        val altPow = 1.0
+        val lengthWeight = 0.035
+        val lengthPow = 0.47
+        val x = (this.x + other.x) / 2
+        val y = (this.y + other.y) / 2
+        val z = (this.z + other.z) / 2
+        val alt = (this.alt + other.alt) / 2 + newModifier * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newModifier * lengthWeight * length.pow(lengthPow)
+        return Point(x=x, y=y, z=z, alt=alt, seed=newSeed)
+    }
+
+    override fun toString(): String {
+        return "Point(x=$x, y=$y, z=$z, alt=$alt, seed=$seed, lat=$lat, lon=$lon)"
+    }
 }
-
-
-
-/*
-    @staticmethod
-    def from_spherical(lat: float, lon: float, alt: float = 0.0, seed: float = DEFAULT_SEED) -> 'Point':
-        if not 90 >= lat >= -90:
-            raise CoordinateError("Latitude {} encountered, which is not a valid coordinate.".format(str(lat)))
-        if not 180 >= lon >= -180:
-            raise CoordinateError("Longitude {} encountered, which is not a valid coordinate.".format(str(lat)))
-
-        major_squared = wgs84.SEMI_MAJOR_AXIS ** 2
-        minor_squared = wgs84.SEMI_MINOR_AXIS ** 2
-        prime_vertical_radius_of_curvature = major_squared / np.sqrt(major_squared * (cosLat ** 2) + minor_squared * (sinLat ** 2))
-
-        x = (prime_vertical_radius_of_curvature + alt) * cosLat * cosLon
-        y = (prime_vertical_radius_of_curvature + alt) * cosLat * sinLon
-        z = ((minor_squared / major_squared) * prime_vertical_radius_of_curvature + alt) * sinLat
-        point = Point(lat=lat, lon=lon, alt=alt, x=x, y=y, z=z, seed=seed)
-        return point
-
- */
-/*
-    def __init__(self, alt: float, x: float, y: float, z: float, seed: float = DEFAULT_SEED, lat: float = None, lon: float = None):
-        self.lat = lat
-        self.lon = lon
-        self.alt = alt
-        self.seed = seed
-        self.x = x
-        self.y = y
-        self.z = z
-        self.xyz = (x, y, z)
-        if alt is None:
-            raise ValueError("Altitude value is None.")
-        if seed is None:
-            raise ValueError("Seed value is None.")
-        if x is None:
-            raise ValueError("X value is None.")
-        if y is None:
-            raise ValueError("Y value is None.")
-        if z is None:
-            raise ValueError("Z value is None.")
- */

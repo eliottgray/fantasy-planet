@@ -3,11 +3,23 @@ import com.eliottgray.kotlin.Defaults
 import com.eliottgray.kotlin.Point
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.random.Random
 import kotlin.test.assertNotSame
+
+
+fun testPointEquality(one: Point, two: Point) {
+    // TODO: Use equality override, to test all attributes at once?  Is that even necessary?
+    assertEquals(one.x, two.x, 1.0E-7)
+    assertEquals(one.y, two.y, 1.0E-7)
+    assertEquals(one.z, two.z, 1.0E-7)
+    assertEquals(one.alt, two.alt, 1.0E-7)
+    assertEquals(one.seed, two.seed)
+}
 
 
 class ConstructorTest {
@@ -91,11 +103,7 @@ class RotateAroundXAxisTest{
 
     private fun run_test(degrees: Double, expected: Point){
         val actualPoint = this.fixture.rotateAroundXAxis(degrees)
-        // TODO: Use equality override, to test all attributes at once?  Is that even necessary?
-        assertEquals(expected.x, actualPoint.x, 1.0E-7)
-        assertEquals(expected.y, actualPoint.y, 1.0E-7)
-        assertEquals(expected.z, actualPoint.z, 1.0E-7)
-        assertEquals(expected.seed, actualPoint.seed)
+        testPointEquality(expected, actualPoint)
     }
 
     @Test
@@ -152,11 +160,7 @@ class RotateAroundYAxisTest{
 
     private fun run_test(degrees: Double, expected: Point){
         val actualPoint = this.fixture.rotateAroundYAxis(degrees)
-        // TODO: Use equality override, to test all attributes at once?  Is that even necessary?
-        assertEquals(expected.x, actualPoint.x, 1.0E-7)
-        assertEquals(expected.y, actualPoint.y, 1.0E-7)
-        assertEquals(expected.z, actualPoint.z, 1.0E-7)
-        assertEquals(expected.seed, actualPoint.seed)
+        testPointEquality(expected, actualPoint)
     }
 
     @Test
@@ -208,16 +212,8 @@ class CopyTest {
     fun test_copy() {
         val fixture = Point(x = 0.5, y = 0.6, z = 0.7, alt = 1.0)
         val copy = fixture.copy()
-
-        // TODO: Use equality override, to test all attributes at once?  Is that even necessary?
-        assertEquals(fixture.x, copy.x, 1.0E-7)
-        assertEquals(fixture.y, copy.y, 1.0E-7)
-        assertEquals(fixture.z, copy.z, 1.0E-7)
-        assertEquals(fixture.alt, copy.alt, 1.0E-7)
-        assertEquals(fixture.seed, copy.seed)
-
-        // Guards against error to actually have the fixture and copy being different entities.
-        assertNotSame(fixture, copy)
+        testPointEquality(fixture, copy)
+        assertNotSame(fixture, copy)  // Guards against error where copy just points to the same memory address.
     }
 }
 
@@ -263,5 +259,74 @@ class DistanceTest {
     fun three_axis() {
         this.run_test(x = 1.0, y = 2.0, z = -3.0)
     }
+}
 
+class MidpointTest{
+
+    private fun generate_seed(one: Point, two: Point): Int {
+        return Random((one.seed + two.seed) / 2).nextInt()
+    }
+
+    private fun run_test(one: Point, two: Point, expected: Point) {
+        val length = one.distance(two)
+        val actual = one.midpoint(two, length)
+        testPointEquality(expected, actual)
+    }
+
+    @Test
+    fun test_origin_midpoint(){
+        // Two points at opposite ends of the unit space should result in a point at the origin.
+        val positive = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
+        val negative = Point(x=-1.0, y=-1.0, z=-1.0, alt=-1.0)
+        val expected = Point(x=0.0, y=0.0, z=0.0, alt=0.9314346753803272, seed=generate_seed(positive, negative))
+        run_test(one=positive, two=negative, expected=expected)
+    }
+
+    @Test
+    fun test_identical_positive(){
+        // Two identical points in the positive space.
+        val pos1 = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
+        val pos2 = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
+        val expected = Point(x=1.0, y=1.0, z=1.0, alt=1.0, seed=generate_seed(pos1, pos2))
+        run_test(one=pos1, two=pos2, expected=expected)
+    }
+
+    @Test
+    fun test_identical_negative(){
+        // Two identical points in the negative space.
+        val neg1 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
+        val neg2 = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5)
+        val expected = Point(x=-0.5, y=-0.5, z=-0.5, alt=-0.5, seed=generate_seed(neg1, neg2))
+        run_test(one=neg1, two=neg2, expected=expected)
+    }
+
+    @Test
+    fun test_complex_case(){
+        // Two identical points in the negative space.
+        val one = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
+        val two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
+        val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.0503669060513222, seed=generate_seed(one, two))
+        run_test(one=one, two=two, expected=expected)
+    }
+}
+
+class ToStringTest{
+
+    @Test
+    fun test_all_values(){
+        val x = 1.0
+        val y = 0.9
+        val z = 0.8
+        val alt = 0.7
+        val lat = 0.6
+        val lon = 0.5
+        val point = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
+        val string = point.toString()
+        assertTrue(string.contains(x.toString()))
+        assertTrue(string.contains(y.toString()))
+        assertTrue(string.contains(z.toString()))
+        assertTrue(string.contains(alt.toString()))
+        assertTrue(string.contains(lat.toString()))
+        assertTrue(string.contains(lon.toString()))
+    }
 }

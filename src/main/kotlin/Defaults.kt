@@ -1,5 +1,5 @@
 package com.eliottgray.kotlin
 
 object Defaults {
-    const val DEFAULT_SEED = 12345.0
+    const val DEFAULT_SEED = 12345
 }
