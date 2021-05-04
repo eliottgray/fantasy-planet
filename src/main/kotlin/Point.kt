@@ -62,7 +62,6 @@ class Point(var alt: Double, val x: Double, val y: Double, val z: Double, val se
     }
 
     fun midpoint(other: Point, length: Double): Point {
-        println(other)
         val newRandom = Random((this.seed + other.seed) / 2)
         val newSeed = newRandom.nextInt()
         val newModifier = newRandom.nextDouble()
