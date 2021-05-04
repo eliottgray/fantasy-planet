@@ -322,7 +322,7 @@ class ToStringTest{
         val lon = 0.5
         val point = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
         val string = point.toString()
-        assertTrue(!string.contains(x.toString()))
+        assertTrue(string.contains(x.toString()))
         assertTrue(string.contains(y.toString()))
         assertTrue(string.contains(z.toString()))
         assertTrue(string.contains(alt.toString()))
