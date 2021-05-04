@@ -120,3 +120,42 @@ class RotateTetrahedronTest {
         this.compareTetrahedrons(expected=expected, actual=actual)
     }
 }
+
+class LongestSideTest{
+
+    private lateinit var tetra: Tetrahedron
+    private val expected = 2.8284271247461903
+
+    @BeforeEach
+    fun setUp(){
+        // Side a-d is longer than the others.
+        val a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        val b = Point(x=1.0, y=1.0, z=-1.0, alt=2.0)
+        val c = Point(x=1.0, y=-1.0, z=-1.0, alt=3.0)
+        val d = Point(x=-1.0, y=0.0, z=-1.0, alt=4.0)
+        this.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+    }
+
+    private fun run_test(tetra: Tetrahedron){
+        val actual = tetra.longestSide
+        assertEquals(expected, actual, 1.0E-7)
+        assertEquals(expected, tetra.a.distance(tetra.b), 1.0E-7)  // Longest side must always be A-B.
+    }
+
+    @Test
+    fun test_simple_case(){
+        run_test(this.tetra)
+    }
+
+    @Test
+    fun test_rotated_case(){
+        val rotated = this.tetra.rotateAroundXAxis(29.0).rotateAroundYAxis(123.0)
+        run_test(rotated)
+    }
+
+    @Test
+    fun test_scrambled_points_case(){
+        val scrambled = Tetrahedron(a=this.tetra.b, b=this.tetra.d, c=this.tetra.a, d=this.tetra.c)
+        run_test(scrambled)
+    }
+}
