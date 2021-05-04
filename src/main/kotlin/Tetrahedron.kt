@@ -1,8 +1,6 @@
 package com.eliottgray.kotlin
 import kotlin.random.Random
 
-const val DEFAULT_ALTITUDE = -.02   // Just below 'sea level' of 0 altitude.
-
 class Tetrahedron(val a: Point, val b: Point, val c: Point, val d: Point) {
 
     companion object {
@@ -17,10 +15,10 @@ class Tetrahedron(val a: Point, val b: Point, val c: Point, val d: Point) {
             val d = Point.fromSpherical(lat=-30.0, lon=-120.0, alt=alt, seed=random.nextInt())
 
             // TODO ideally don't have to override altitude after fromSpherical, but alt is used for lat/lon -> XYZ.
-            a.alt = DEFAULT_ALTITUDE
-            b.alt = DEFAULT_ALTITUDE
-            c.alt = DEFAULT_ALTITUDE
-            d.alt = DEFAULT_ALTITUDE
+            a.alt = Defaults.ALTITUDE
+            b.alt = Defaults.ALTITUDE
+            c.alt = Defaults.ALTITUDE
+            d.alt = Defaults.ALTITUDE
             return Tetrahedron(a=a, b=b, c=c, d=d)
         }
 

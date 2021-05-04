@@ -10,6 +10,6 @@ class TestMain {
 
     @Test
     fun test_args(){
-        main(arrayOf("A", "whole", "new", "world!"))
+        main(arrayOf("A", "Whole", "New", "World!"))
     }
 }

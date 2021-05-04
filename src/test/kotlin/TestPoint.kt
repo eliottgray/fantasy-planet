@@ -23,7 +23,7 @@ class PointConstructorTest {
         assertEquals(1.0, point.x)
         assertEquals(0.7, point.y)
         assertEquals(-1.1, point.z)
-        assertEquals(Defaults.DEFAULT_SEED, point.seed)
+        assertEquals(Defaults.SEED, point.seed)
     }
 }
 
