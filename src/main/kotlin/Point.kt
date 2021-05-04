@@ -3,7 +3,7 @@ import kotlin.math.*
 import kotlin.random.Random
 
 
-class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val seed: Int = Defaults.DEFAULT_SEED, val lat: Double? = null, val lon: Double? = null) {
+class Point(var alt: Double, val x: Double, val y: Double, val z: Double, val seed: Int = Defaults.DEFAULT_SEED, val lat: Double? = null, val lon: Double? = null) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Int = Defaults.DEFAULT_SEED): Point {
@@ -30,16 +30,6 @@ class Point(val alt: Double, val x: Double, val y: Double, val z: Double, val se
             return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
         }
 
-        fun dotProduct(vector1: Array<Double>, vector2: Array<Double>): Double {
-            if (vector1.size != vector2.size) {
-                throw CoordinateError("Incompatible vector sizes encountered")
-            }
-            var sum = 0.0
-            for (i in vector1.indices) {
-                sum += vector1[i] * vector2[i]
-            }
-            return sum
-        }
     }
 
     fun rotateAroundXAxis(degrees: Double): Point {

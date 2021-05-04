@@ -22,7 +22,7 @@ fun testPointEquality(one: Point, two: Point) {
 }
 
 
-class ConstructorTest {
+class PointConstructorTest {
 
     @Test
     fun test_positive_case(){
