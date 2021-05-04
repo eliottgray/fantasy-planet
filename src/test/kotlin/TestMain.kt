@@ -4,8 +4,12 @@ import com.eliottgray.kotlin.main
 class TestMain {
 
     @Test
-    fun test_runs(){
+    fun test_no_args(){
+        main(arrayOf())
+    }
 
-        main(arrayOf("foo"))
+    @Test
+    fun test_args(){
+        main(arrayOf("A", "whole", "new", "world!"))
     }
 }

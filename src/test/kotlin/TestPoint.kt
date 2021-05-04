@@ -12,16 +12,6 @@ import kotlin.random.Random
 import kotlin.test.assertNotSame
 
 
-fun testPointEquality(one: Point, two: Point) {
-    // TODO: Use equality override, to test all attributes at once?  Is that even necessary?
-    assertEquals(one.x, two.x, 1.0E-7)
-    assertEquals(one.y, two.y, 1.0E-7)
-    assertEquals(one.z, two.z, 1.0E-7)
-    assertEquals(one.alt, two.alt, 1.0E-7)
-    assertEquals(one.seed, two.seed)
-}
-
-
 class PointConstructorTest {
 
     @Test

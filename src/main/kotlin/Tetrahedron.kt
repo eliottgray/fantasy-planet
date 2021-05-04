@@ -63,35 +63,20 @@ class Tetrahedron(val a: Point, val b: Point, val c: Point, val d: Point) {
                 sameSide(this.c, this.d, this.a, this.b, point) &&
                 sameSide(this.d, this.a, this.b, this.c, point)
     }
+
+    fun rotateAroundXAxis(degrees: Double): Tetrahedron {
+        val newA = this.a.rotateAroundXAxis(degrees)
+        val newB = this.b.rotateAroundXAxis(degrees)
+        val newC = this.c.rotateAroundXAxis(degrees)
+        val newD = this.d.rotateAroundXAxis(degrees)
+        return Tetrahedron(a = newA, b = newB, c = newC, d = newD)
+    }
+
+    fun rotateAroundYAxis(degrees: Double): Tetrahedron {
+        val newA = this.a.rotateAroundYAxis(degrees)
+        val newB = this.b.rotateAroundYAxis(degrees)
+        val newC = this.c.rotateAroundYAxis(degrees)
+        val newD = this.d.rotateAroundYAxis(degrees)
+        return Tetrahedron(a = newA, b = newB, c = newC, d = newD)
+    }
 }
-
-/*
-
-    def __init__(self, a: Point, b: Point, c: Point, d: Point):
-        self.a = a
-        self.b = b
-        self.c = c
-        self.d = d
-        # TODO: Profile space/time difference of pre-generating a tuple for each point, or just defining them here.
-        self._longest_side_len = None
-
-    @staticmethod
-    def build_default(seed, alt=25000000) -> 'Tetrahedron':
-        """
-        Creates a Tetrahedron with default orientation and altitudes.
-        :return: Default Tetrahedron.
-        """
-        local_random = random.Random(seed)
-
-        a = Point.from_spherical(lat=90, lon=0, alt=alt, seed=local_random.random())
-        b = Point.from_spherical(lat=-30, lon=0, alt=alt, seed=local_random.random())
-        c = Point.from_spherical(lat=-30, lon=120, alt=alt, seed=local_random.random())
-        d = Point.from_spherical(lat=-30, lon=-120, alt=alt, seed=local_random.random())
-        a.alt = DEFAULT_ALTITUDE
-        b.alt = DEFAULT_ALTITUDE
-        c.alt = DEFAULT_ALTITUDE
-        d.alt = DEFAULT_ALTITUDE
-        default = Tetrahedron(a=a, b=b, c=c, d=d)
-        return default
-
- */

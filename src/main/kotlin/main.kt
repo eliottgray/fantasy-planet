@@ -1,5 +1,10 @@
 package com.eliottgray.kotlin
 
 fun main(args: Array<String>) {
-    println("Hello World!")
+    if (args.isEmpty()){
+        println("Hello World!")
+    } else {
+        val joined = args.joinToString(separator = " ")
+        println(joined)
+    }
 }

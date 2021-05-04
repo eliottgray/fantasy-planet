@@ -78,21 +78,45 @@ class ContainsPointTest {
     }
 }
 
-/*
+class RotateTetrahedronTest {
 
-    def test_vertex(self):
-        """Point identical to a vertex of the tetrahedron."""
-        vertex = self.tetra.a.copy()
-        self.assertTrue(self.tetra.contains(vertex))
+    private lateinit var tetra: Tetrahedron
 
+    private fun compareTetrahedrons(expected: Tetrahedron, actual: Tetrahedron) {
+        testPointEquality(expected.a, actual.a)
+        testPointEquality(expected.b, actual.b)
+        testPointEquality(expected.c, actual.c)
+        testPointEquality(expected.d, actual.d)
+    }
 
-    def test_negative_case(self):
-        """Point far outside the bounds of the tetrahedron."""
-        point = Point(x=0.0, y=0.0, z=-1.0, alt=0.0)
-        self.assertFalse(self.tetra.contains(point))
+    @BeforeEach
+    fun setUp(){
+        val a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)   // "Top" of pyramid.
+        val b = Point(x=1.0, y=0.0, z=-1.0, alt=0.9)
+        val c = Point(x=-1.0, y=1.0, z=-1.0, alt=0.8)
+        val d = Point(x=-1.0, y=-1.0, z=-1.0, alt=0.7)
+        this.tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+    }
 
-    def test_on_edge(self):
-        """By setting the fixture tetrahedron to include a right triangle, a point on the edge can be easily tested."""
-        point = Point(x=0.0, y=-0.5, z=0.5, alt=0.0)
-        self.assertTrue(self.tetra.contains(point))
- */
+    @Test
+    fun test_rotate_around_x_axis_90_degrees(){
+        val a = Point(x=0.0, y=-1.0, z=0.0, alt=1.0)
+        val b = Point(x=1.0, y=1.0, z=0.0, alt=0.9)
+        val c = Point(x=-1.0, y=1.0, z=1.0, alt=0.8)
+        val d = Point(x=-1.0, y=1.0, z=-1.0, alt=0.7)
+        val expected = Tetrahedron(a=a, b=b, c=c, d=d)
+        val actual = this.tetra.rotateAroundXAxis(90.0)
+        this.compareTetrahedrons(expected=expected, actual=actual)
+    }
+
+    @Test
+    fun test_rotate_around_y_axis_90_degrees(){
+        val a = Point(x=1.0, y=0.0, z=0.0, alt=1.0)
+        val b = Point(x=-1.0, y=0.0, z=-1.0, alt=0.9)
+        val c = Point(x=-1.0, y=1.0, z=1.0, alt=0.8)
+        val d = Point(x=-1.0, y=-1.0, z=1.0, alt=0.7)
+        val expected = Tetrahedron(a=a, b=b, c=c, d=d)
+        val actual = this.tetra.rotateAroundYAxis(90.0)
+        this.compareTetrahedrons(expected=expected, actual=actual)
+    }
+}
