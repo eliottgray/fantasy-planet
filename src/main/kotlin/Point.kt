@@ -3,7 +3,7 @@ import kotlin.math.*
 import kotlin.random.Random
 
 
-class Point(var alt: Double, val x: Double, val y: Double, val z: Double, val seed: Int = Defaults.SEED, val lat: Double? = null, val lon: Double? = null) {
+class Point(var alt: Double = Defaults.ALTITUDE, val x: Double, val y: Double, val z: Double, val seed: Int = Defaults.SEED, val lat: Double? = null, val lon: Double? = null) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Int = Defaults.SEED): Point {
