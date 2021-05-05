@@ -1,10 +1,6 @@
 package com.eliottgray.kotlin
 
 fun main(args: Array<String>) {
-    if (args.isEmpty()){
-        println("Hello World!")
-    } else {
-        val joined = args.joinToString(separator = " ")
-        println(joined)
-    }
+    val writer = H3Writer(h3Depth=3)
+    writer.write("test_geojson_out.json")
 }
