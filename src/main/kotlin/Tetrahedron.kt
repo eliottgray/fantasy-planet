@@ -65,6 +65,11 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         longest
     }
 
+    val averageAltitude by lazy {
+        // Average altitude of constituent points.
+        (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
+    }
+
     companion object {
 
         fun buildDefault(seed: Int, alt: Double=25000000.0): Tetrahedron{
@@ -138,5 +143,15 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         val newC = this.c.rotateAroundYAxis(degrees)
         val newD = this.d.rotateAroundYAxis(degrees)
         return Tetrahedron(a = newA, b = newB, c = newC, d = newD)
+    }
+
+    fun subdivide(): Pair<Tetrahedron, Tetrahedron> {
+        val length = this.longestSide
+        // Since calculating the longest side orients the longest edge as A->B, we can just split between A->B.
+        // TODO: Instead of relying on the side effect of calculating longest side, just retrieve what the longest edge is and divide there.
+        val midpoint = this.a.midpoint(this.b, length)
+        val tetraOne = Tetrahedron(a=this.a, b=midpoint, c=this.c, d=this.d)
+        val tetraTwo = Tetrahedron(a=midpoint, b=this.b, c=this.c, d=this.d)
+        return Pair(tetraOne, tetraTwo)
     }
 }

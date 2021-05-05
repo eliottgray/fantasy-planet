@@ -82,13 +82,6 @@ class RotateTetrahedronTest {
 
     private lateinit var tetra: Tetrahedron
 
-    private fun compareTetrahedrons(expected: Tetrahedron, actual: Tetrahedron) {
-        testPointEquality(expected.a, actual.a)
-        testPointEquality(expected.b, actual.b)
-        testPointEquality(expected.c, actual.c)
-        testPointEquality(expected.d, actual.d)
-    }
-
     @BeforeEach
     fun setUp(){
         val a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)   // "Top" of pyramid.
@@ -106,7 +99,7 @@ class RotateTetrahedronTest {
         val d = Point(x=-1.0, y=1.0, z=-1.0, alt=0.7)
         val expected = Tetrahedron(a=a, b=b, c=c, d=d)
         val actual = this.tetra.rotateAroundXAxis(90.0)
-        this.compareTetrahedrons(expected=expected, actual=actual)
+        compareTetrahedrons(expected=expected, actual=actual)
     }
 
     @Test
@@ -117,7 +110,7 @@ class RotateTetrahedronTest {
         val d = Point(x=-1.0, y=-1.0, z=1.0, alt=0.7)
         val expected = Tetrahedron(a=a, b=b, c=c, d=d)
         val actual = this.tetra.rotateAroundYAxis(90.0)
-        this.compareTetrahedrons(expected=expected, actual=actual)
+        compareTetrahedrons(expected=expected, actual=actual)
     }
 }
 
@@ -157,5 +150,71 @@ class LongestSideTest{
     fun test_scrambled_points_case(){
         val scrambled = Tetrahedron(a=this.tetra.b, b=this.tetra.d, c=this.tetra.a, d=this.tetra.c)
         run_test(scrambled)
+    }
+}
+
+class SubdivideTest{
+
+    private fun run_test(tetra: Tetrahedron, expectedOne: Tetrahedron, expectedTwo: Tetrahedron) {
+        val (subOne, subTwo) = tetra.subdivide()
+        compareTetrahedrons(expectedOne, subOne)
+        compareTetrahedrons(expectedTwo, subTwo)
+    }
+
+    @Test
+    fun test_simple_case(){
+        // Side a-d longer than the others.
+        val a = Point(x=1.0, y=0.0, z=1.0, alt=1.0)
+        val b = Point(x=1.0, y=1.0, z=-1.0, alt=2.0)
+        val c = Point(x=1.0, y=-1.0, z=-1.0, alt=3.0)
+        val d = Point(x=-1.0, y=0.0, z=-1.0, alt=4.0)
+        val tetra = Tetrahedron(a=a, b=b, c=c, d=d)
+
+        val length = a.distance(d)
+        val midpoint = a.midpoint(d, length)
+        val subdividedA = Tetrahedron(a=a, b=midpoint, c=b, d=c)
+        val subdividedB = Tetrahedron(a=midpoint, b=d, c=b, d=c)
+        run_test(tetra, subdividedA, subdividedB)
+    }
+    // TODO: Validate that, in the case of equal sides, edges are preferred in a guaranteed order.
+}
+
+
+class AverageAltitudeTest {
+
+    private fun constructTetra(alt1: Double, alt2: Double, alt3: Double, alt4: Double): Tetrahedron {
+        val a = Point(x=0.0, y=0.0, z=1.0, alt=alt1)
+        val b = Point(x=1.0, y=0.0, z=-1.0, alt=alt2)
+        val c = Point(x=-1.0, y=1.0, z=-1.0, alt=alt3)
+        val d = Point(x=-1.0, y=-1.0, z=-1.0, alt=alt4)
+        return Tetrahedron(a=a, b=b, c=c, d=d)
+    }
+
+    private fun run_test(tetra: Tetrahedron, expected: Double){
+        val actual = tetra.averageAltitude
+        assertEquals(expected, actual, 1.0E-7)
+    }
+
+    @Test
+    fun test_identical_altitudes(){
+        val alt = 1.0
+        val tetra = constructTetra(alt, alt, alt, alt)
+        run_test(tetra, alt)
+    }
+
+    @Test
+    fun test_different_altitudes(){
+        val expected = 1.0
+        val tetra = this.constructTetra(1.2, 1.1, 0.9, 0.8)
+        run_test(tetra, expected)
+    }
+
+    @Test
+    fun test_tiny_difference(){
+        val one = 1.000001
+        val two = 1.000003
+        val expected = 1.000002
+        val tetra = this.constructTetra(one, one, two, two)
+        run_test(tetra, expected)
     }
 }
