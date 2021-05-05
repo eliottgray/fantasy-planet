@@ -1,9 +1,5 @@
 .idea
 
-# Python
-.coverage
-__pycache__/
-
 # Kotlin
 .gradle/
 build/
