@@ -300,7 +300,7 @@ class MidpointTest{
     }
 }
 
-class ToStringTest{
+class PointToStringTest{
 
     @Test
     fun test_all_values(){

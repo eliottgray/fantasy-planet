@@ -218,3 +218,21 @@ class AverageAltitudeTest {
         run_test(tetra, expected)
     }
 }
+
+class TetrahedronToStringTest {
+
+    @Test
+    fun test_all_values() {
+        val a = Point(x = 1.0, y = 0.0, z = 1.0, alt = 1.0)
+        val b = Point(x = 1.0, y = 1.0, z = -1.0, alt = 2.0)
+        val c = Point(x = 1.0, y = -1.0, z = -1.0, alt = 3.0)
+        val d = Point(x = -1.0, y = 0.0, z = -1.0, alt = 4.0)
+        val tetra = Tetrahedron(a = a, b = b, c = c, d = d)
+        val string = tetra.toString()
+        print(string)
+        assertTrue(string.contains(a.toString()))
+        assertTrue(string.contains(b.toString()))
+        assertTrue(string.contains(c.toString()))
+        assertTrue(string.contains(d.toString()))
+    }
+}
