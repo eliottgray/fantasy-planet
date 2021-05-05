@@ -1,6 +1,6 @@
 package com.eliottgray.kotlin
 
-class Planet(val seed: Int = Defaults.SEED, val resolution: Int = Defaults.RESOLUTION){
+class Planet(val seed: Int = Defaults.SEED, val resolution: Int = Defaults.RESOLUTION_METERS){
     val tetra = Tetrahedron.buildDefault(seed)
 
     init {

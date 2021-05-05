@@ -21,7 +21,6 @@ class TetrahedronConstructorTest {
         assertEquals(d, tetra.d)
     }
 
-    // TODO: Enable test of default once .contains() method is implemented.
     @Test
     fun test_default(){
         // Default tetrahedron should cover all surface-level points on the globe.

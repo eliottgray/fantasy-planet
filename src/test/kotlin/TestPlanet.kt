@@ -11,7 +11,7 @@ class PlanetConstructorTest {
     fun test_positive_case(){
         val planet = Planet()
         assertEquals(Defaults.SEED, planet.seed)
-        assertEquals(Defaults.RESOLUTION, planet.resolution)
+        assertEquals(Defaults.RESOLUTION_METERS, planet.resolution)
     }
 
     @Test

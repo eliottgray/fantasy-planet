@@ -82,10 +82,10 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
             val d = Point.fromSpherical(lat=-30.0, lon=-120.0, alt=alt, seed=random.nextInt())
 
             // TODO ideally don't have to override altitude after fromSpherical, but alt is used for lat/lon -> XYZ.
-            a.alt = Defaults.ALTITUDE
-            b.alt = Defaults.ALTITUDE
-            c.alt = Defaults.ALTITUDE
-            d.alt = Defaults.ALTITUDE
+            a.alt = Defaults.ALTITUDE_METERS
+            b.alt = Defaults.ALTITUDE_METERS
+            c.alt = Defaults.ALTITUDE_METERS
+            d.alt = Defaults.ALTITUDE_METERS
             return Tetrahedron(a=a, b=b, c=c, d=d)
         }
 
