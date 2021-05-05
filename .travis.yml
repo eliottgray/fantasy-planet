@@ -1,11 +1,8 @@
-language: python
-python:
-  - "3.6"      # current default Python on Travis CI
-  - "3.7"
-  - "3.8"
-  - "3.9"
-install:
-  - pip install -r requirements.txt
-  - pip install pytest-cov
+language: java
+jdk:
+  - oraclejdk11
+before_install:
+  - chmod +x gradlew
+  - chmod +x gradle/wrapper/gradle-wrapper.jar
 script:
-  - pytest --cov=. --durations=10
+  - ./gradlew clean test build
