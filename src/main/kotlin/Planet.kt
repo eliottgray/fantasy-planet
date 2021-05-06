@@ -60,5 +60,4 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
     fun getH3Elevations(h3Nodes: ArrayList<Point>): ArrayList<Point> {
         return recursiveGetH3Elevations(h3Nodes, this.tetra)
     }
-
 }
