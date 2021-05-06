@@ -1,6 +1,7 @@
 import com.eliottgray.kotlin.CoordinateError
 import com.eliottgray.kotlin.Defaults
 import com.eliottgray.kotlin.Point
+import com.eliottgray.kotlin.Utils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.random.Random
 import kotlin.test.assertNotSame
 
 
@@ -253,8 +253,8 @@ class DistanceTest {
 
 class MidpointTest{
 
-    private fun generate_seed(one: Point, two: Point): Int {
-        return Random((one.seed + two.seed) / 2).nextInt()
+    private fun generate_seed(one: Point, two: Point): Double {
+        return Utils.mutateSeed(one.seed, two.seed)
     }
 
     private fun run_test(one: Point, two: Point, expected: Point) {
@@ -268,7 +268,7 @@ class MidpointTest{
         // Two points at opposite ends of the unit space should result in a point at the origin.
         val positive = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
         val negative = Point(x=-1.0, y=-1.0, z=-1.0, alt=-1.0)
-        val expected = Point(x=0.0, y=0.0, z=0.0, alt=0.9314346753803272, seed=generate_seed(positive, negative))
+        val expected = Point(x=0.0, y=0.0, z=0.0, alt=0.5626778152394969, seed=generate_seed(positive, negative))
         run_test(one=positive, two=negative, expected=expected)
     }
 
@@ -295,7 +295,7 @@ class MidpointTest{
         // Two identical points in the negative space.
         val one = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
         val two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
-        val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.0503669060513222, seed=generate_seed(one, two))
+        val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.031218350729469505, seed=generate_seed(one, two))
         run_test(one=one, two=two, expected=expected)
     }
 }

@@ -7,10 +7,10 @@ import org.json.simple.JSONObject
 import java.io.File
 import kotlin.math.roundToInt
 
-class H3Writer(val h3Depth: Int) {
+class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     private val h3Core: H3Core = H3Core.newInstance()
     private val edgeLength = h3Core.edgeLength(h3Depth, LengthUnit.m)
-    private val planet = Planet(resolution = (edgeLength * 0.6).roundToInt())
+    private val planet = Planet(seed = seed, resolution = (edgeLength * 0.6).roundToInt())
 
     private fun toGeoJSONFeature(h3Node: Long): JSONObject {
         val geo: GeoCoord = h3Core.h3ToGeo(h3Node)
@@ -56,6 +56,7 @@ class H3Writer(val h3Depth: Int) {
         // TODO: handle errors related to IO.
         // TODO: File should not exist before writing, since write will append text repeatedly.
 
+        // TODO: Avoid having to collect everything into memory at once.
 
         val features = JSONArray()
         for (index in res0) {

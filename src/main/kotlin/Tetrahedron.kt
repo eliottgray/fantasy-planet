@@ -1,5 +1,4 @@
 package com.eliottgray.kotlin
-import kotlin.random.Random
 
 class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
 
@@ -72,14 +71,18 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
 
     companion object {
 
-        fun buildDefault(seed: Int, alt: Double=25000000.0): Tetrahedron{
+        fun buildDefault(seed: Double, alt: Double=25000000.0): Tetrahedron{
             // Creates a Tetrahedron with default orientation and altitudes
-            val random = Random(seed)
+            val aSeed = Utils.mutateSeed(seed, seed)
+            val bSeed = Utils.mutateSeed(seed, aSeed)
+            val cSeed = Utils.mutateSeed(seed, bSeed)
+            val dSeed = Utils.mutateSeed(seed, cSeed)
 
-            val a = Point.fromSpherical(lat=90.0, lon=0.0, alt=alt, seed=random.nextInt())
-            val b = Point.fromSpherical(lat=-30.0, lon=0.0, alt=alt, seed=random.nextInt())
-            val c = Point.fromSpherical(lat=-30.0, lon=120.0, alt=alt, seed=random.nextInt())
-            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, alt=alt, seed=random.nextInt())
+
+            val a = Point.fromSpherical(lat=90.0, lon=0.0, alt=alt, seed=aSeed)
+            val b = Point.fromSpherical(lat=-30.0, lon=0.0, alt=alt, seed=bSeed)
+            val c = Point.fromSpherical(lat=-30.0, lon=120.0, alt=alt, seed=cSeed)
+            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, alt=alt, seed=dSeed)
 
             // TODO ideally don't have to override altitude after fromSpherical, but alt is used for lat/lon -> XYZ.
             a.alt = Defaults.ALTITUDE_METERS
