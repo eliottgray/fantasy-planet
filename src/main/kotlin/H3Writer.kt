@@ -11,7 +11,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     private val edgeLength = h3Core.edgeLength(h3Depth, LengthUnit.m)
     private val planet = Planet(seed = seed, resolution = (edgeLength * 0.6).roundToInt())
 
-    private fun pointToGeoJSONFeature(point: Point): JSONObject {
+    private fun toGeoJSONFeature(point: Point): JSONObject {
         val properties = JSONObject()
         properties["alt"] = point.alt
 
@@ -56,7 +56,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
 
         val features = JSONArray()
         for (point in finishedPoints){
-            val feature = pointToGeoJSONFeature(point)
+            val feature = toGeoJSONFeature(point)
             features.add(feature)
         }
         val featureCollection = JSONObject()
