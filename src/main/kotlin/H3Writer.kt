@@ -1,7 +1,6 @@
 package com.eliottgray.kotlin
 import com.uber.h3core.H3Core
 import com.uber.h3core.LengthUnit
-import com.uber.h3core.util.GeoCoord
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import java.io.File
@@ -12,16 +11,13 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     private val edgeLength = h3Core.edgeLength(h3Depth, LengthUnit.m)
     private val planet = Planet(seed = seed, resolution = (edgeLength * 0.6).roundToInt())
 
-    private fun toGeoJSONFeature(h3Node: Long): JSONObject {
-        val geo: GeoCoord = h3Core.h3ToGeo(h3Node)
-        val elevation = planet.getElevationAt(lat=geo.lat, lon=geo.lng)
+    private fun toGeoJSONFeature(point: Point): JSONObject {
         val properties = JSONObject()
-        properties["h3"] = h3Node
-        properties["alt"] = elevation
+        properties["alt"] = point.alt
 
         val coordinates = JSONArray()
-        coordinates.add(geo.lng)
-        coordinates.add(geo.lat)
+        coordinates.add(point.lon)
+        coordinates.add(point.lat)
 
         val geometry = JSONObject()
         geometry["type"] = "Point"
@@ -35,38 +31,39 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         return feature
     }
 
-    private fun recursiveCollect(current: Long, depth: Int, features: JSONArray) {
-        if (depth >= h3Depth){
-            features.add(toGeoJSONFeature(current))
-        } else {
-            val newDepth = depth + 1
-            val children = h3Core.h3ToChildren(current, newDepth)
-            for (child in children){
-                recursiveCollect(child, newDepth, features)
-            }
-        }
-    }
-
     fun collectAndWrite(filepath: String){
         val res0 = h3Core.res0Indexes
+        val children = ArrayList<Long>()
+        for (res0Node in res0) {
+            children.addAll(h3Core.h3ToChildren(res0Node, h3Depth))
+        }
+        val allPoints = ArrayList(children.map {
+            val geo = h3Core.h3ToGeo(it)
+            Point.fromSpherical(lat = geo.lat, lon = geo.lng)
+        })
+
+        // TODO: handle errors related to IO.
+
+
+        val finishedPoints = planet.getH3Elevations(allPoints)
+
         val file = File(filepath)
         if (file.exists()){
             file.delete()
         }
-        // TODO: handle errors related to IO.
-        // TODO: File should not exist before writing, since write will append text repeatedly.
 
-        // TODO: Avoid having to collect everything into memory at once.
+        val bufferedWriter = file.bufferedWriter()
 
         val features = JSONArray()
-        for (index in res0) {
-            recursiveCollect(index, 0, features)
+        for (point in finishedPoints){
+            val feature = toGeoJSONFeature(point)
+            features.add(feature)
         }
-
         val featureCollection = JSONObject()
         featureCollection["type"] = "FeatureCollection"
         featureCollection["features"] = features
 
-        file.writeText(featureCollection.toJSONString())
+        bufferedWriter.write(featureCollection.toJSONString())
+        bufferedWriter.close()
     }
 }
