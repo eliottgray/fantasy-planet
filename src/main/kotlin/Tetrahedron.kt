@@ -5,11 +5,11 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
     val longestSide: Double by lazy {
         val ab = this.a.distance(this.b)
         val ac = this.a.distance(this.c)
-        var longest: Double?
-        var e1: Point?
-        var e2: Point?
-        var n1: Point?
-        var n2: Point?
+        var longest: Double
+        var e1: Point
+        var e2: Point
+        var n1: Point
+        var n2: Point
         if (ab >= ac){
             longest = ab
             e1 = this.a

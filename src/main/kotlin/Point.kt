@@ -2,7 +2,7 @@ package com.eliottgray.kotlin
 import kotlin.math.*
 
 
-class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double? = null, val lon: Double? = null) {
+class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Double = Defaults.SEED): Point {
