@@ -88,11 +88,17 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         }
 
         val bufferedWriter = file.bufferedWriter()
+
+        val features = JSONArray()
         for (point in finishedPoints){
             val feature = pointToGeoJSONFeature(point)
-            bufferedWriter.write(feature.toJSONString())
-            bufferedWriter.write("\n")
+            features.add(feature)
         }
+        val featureCollection = JSONObject()
+        featureCollection["type"] = "FeatureCollection"
+        featureCollection["features"] = features
+
+        bufferedWriter.write(featureCollection.toJSONString())
         bufferedWriter.close()
     }
 }
