@@ -35,6 +35,25 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         return feature
     }
 
+    private fun pointToGeoJSONFeature(point: Point): JSONObject {
+        val properties = JSONObject()
+        properties["alt"] = point.alt
+
+        val coordinates = JSONArray()
+        coordinates.add(point.lon)
+        coordinates.add(point.lat)
+
+        val geometry = JSONObject()
+        geometry["type"] = "Point"
+        geometry["coordinates"] = coordinates
+
+        val feature = JSONObject()
+        feature["type"] = "Feature"
+        feature["properties"] = properties
+        feature["geometry"] = geometry
+
+        return feature
+    }
     private fun recursiveCollect(current: Long, depth: Int, features: JSONArray) {
         if (depth >= h3Depth){
             features.add(toGeoJSONFeature(current))
@@ -49,24 +68,31 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
 
     fun collectAndWrite(filepath: String){
         val res0 = h3Core.res0Indexes
+        val children = ArrayList<Long>()
+        for (res0Node in res0) {
+            children.addAll(h3Core.h3ToChildren(res0Node, h3Depth))
+        }
+        val allPoints = ArrayList(children.map {
+            val geo = h3Core.h3ToGeo(it)
+            Point.fromSpherical(lat = geo.lat, lon = geo.lng)
+        })
+
+        // TODO: handle errors related to IO.
+
+
+        val finishedPoints = planet.getH3Elevations(allPoints)
+
         val file = File(filepath)
         if (file.exists()){
             file.delete()
         }
-        // TODO: handle errors related to IO.
-        // TODO: File should not exist before writing, since write will append text repeatedly.
 
-        // TODO: Avoid having to collect everything into memory at once.
-
-        val features = JSONArray()
-        for (index in res0) {
-            recursiveCollect(index, 0, features)
+        val bufferedWriter = file.bufferedWriter()
+        for (point in finishedPoints){
+            val feature = pointToGeoJSONFeature(point)
+            bufferedWriter.write(feature.toJSONString())
+            bufferedWriter.write("\n")
         }
-
-        val featureCollection = JSONObject()
-        featureCollection["type"] = "FeatureCollection"
-        featureCollection["features"] = features
-
-        file.writeText(featureCollection.toJSONString())
+        bufferedWriter.close()
     }
 }
