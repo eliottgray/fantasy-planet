@@ -1,7 +1,7 @@
 package com.eliottgray.kotlin
 
 class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RESOLUTION_METERS){
-    private val squishedSeed = Utils.squishSeed(seed)
+    private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
 
     init {

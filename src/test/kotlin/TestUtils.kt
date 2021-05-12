@@ -1,4 +1,4 @@
-import com.eliottgray.kotlin.Utils
+import com.eliottgray.kotlin.mutateSeed
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -9,13 +9,13 @@ class MutateSeedTest {
 
     @Test
     fun test_small_numbers(){
-        val result = Utils.mutateSeed(0.1, 0.2)
+        val result = mutateSeed(0.1, 0.2)
         assertTrue(result in -1.0..1.0)
     }
 
     @Test
     fun test_large_numbers(){
-        val result = Utils.mutateSeed(999999.0, 999999.0)
+        val result = mutateSeed(999999.0, 999999.0)
         assertTrue(result in -1.0..1.0)
     }
 
@@ -29,7 +29,7 @@ class MutateSeedTest {
             counter += 1
             val one = newRandom.nextDouble()
             val two = newRandom.nextDouble()
-            val result = Utils.mutateSeed(one, two)
+            val result = mutateSeed(one, two)
 
             // Round to 2 decimal places.
             val rounded = round(result / 0.01) * 0.01

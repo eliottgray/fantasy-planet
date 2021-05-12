@@ -73,10 +73,10 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
 
         fun buildDefault(seed: Double, alt: Double=25000000.0): Tetrahedron{
             // Creates a Tetrahedron with default orientation and altitudes
-            val aSeed = Utils.mutateSeed(seed, seed)
-            val bSeed = Utils.mutateSeed(seed, aSeed)
-            val cSeed = Utils.mutateSeed(seed, bSeed)
-            val dSeed = Utils.mutateSeed(seed, cSeed)
+            val aSeed = mutateSeed(seed, seed)
+            val bSeed = mutateSeed(seed, aSeed)
+            val cSeed = mutateSeed(seed, bSeed)
+            val dSeed = mutateSeed(seed, cSeed)
 
 
             val a = Point.fromSpherical(lat=90.0, lon=0.0, alt=alt, seed=aSeed)

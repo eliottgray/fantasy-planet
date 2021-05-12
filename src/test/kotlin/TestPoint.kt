@@ -1,7 +1,4 @@
-import com.eliottgray.kotlin.CoordinateError
-import com.eliottgray.kotlin.Defaults
-import com.eliottgray.kotlin.Point
-import com.eliottgray.kotlin.Utils
+import com.eliottgray.kotlin.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -254,7 +251,7 @@ class DistanceTest {
 class MidpointTest{
 
     private fun generate_seed(one: Point, two: Point): Double {
-        return Utils.mutateSeed(one.seed, two.seed)
+        return mutateSeed(one.seed, two.seed)
     }
 
     private fun run_test(one: Point, two: Point, expected: Point) {
