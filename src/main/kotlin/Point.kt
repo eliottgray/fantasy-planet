@@ -1,31 +1,11 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
 
-
-class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
+open class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Double = Defaults.SEED): Point {
-            if (lat > 90 || lat < -90){
-                throw CoordinateError("Invalid latitude encountered: $lat")
-            }
-            if (lon > 180 || lon < -180){
-                throw CoordinateError("Invalid longitude encountered: $lon")
-            }
-            val radLat = lat * (PI/180) // TODO: does compilation optimize away multiple divisions of PI?
-            val radLon = lon * (PI/180)
-            val cosLat = cos(radLat)
-            val sinLat = sin(radLat)
-            val cosLon = cos(radLon)
-            val sinLon = sin(radLon)
-            val majorSquared = WGS84.SEMI_MAJOR_AXIS.pow(2)
-            val minorSquared = WGS84.SEMI_MINOR_AXIS.pow(2)
-            val primeVerticalRadiusOfCurvature = majorSquared / sqrt(majorSquared * cosLat.pow(2) + minorSquared * sinLat.pow(2))
-
-            val x = (primeVerticalRadiusOfCurvature + alt) * cosLat * cosLon
-            val y = (primeVerticalRadiusOfCurvature + alt) * cosLat * sinLon
-            val z = ((minorSquared / majorSquared) * primeVerticalRadiusOfCurvature + alt) * sinLat
-
+            val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = alt)
             return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
         }
 
@@ -61,7 +41,7 @@ class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Do
     }
 
     fun midpoint(other: Point, length: Double): Point {
-        val newSeed = Utils.mutateSeed(this.seed, other.seed)
+        val newSeed = mutateSeed(this.seed, other.seed)
         val altWeight = 0.45
         val altPow = 1.0
         val lengthWeight = 0.035
