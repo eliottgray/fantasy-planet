@@ -1,14 +1,13 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
 
-open class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
+data class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Double = Defaults.SEED): Point {
             val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = alt)
             return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
         }
-
     }
 
     fun rotateAroundXAxis(degrees: Double): Point {
@@ -27,10 +26,6 @@ open class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val 
         val newX = this.x * cosRad + this.z * sinRad
         val newZ = -sinRad * this.x + this.z * cosRad
         return Point(x=newX, y=this.y, z=newZ, alt=this.alt, seed=this.seed)
-    }
-
-    fun copy(): Point {
-        return Point(lat=this.lat, lon=this.lon, alt=this.alt, seed=this.seed, x=this.x, y=this.y, z=this.z)
     }
 
     fun distance(other: Point): Double {
@@ -75,9 +70,5 @@ open class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val 
         val lengthPow = 0.47
         val alt = (this.alt + other.alt) / 2 + newSeed * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newSeed * lengthWeight * length.pow(lengthPow)
         return Point(x=x, y=y, z=z, alt=alt, seed=newSeed)
-    }
-
-    override fun toString(): String {
-        return "Point(x=$x, y=$y, z=$z, alt=$alt, seed=$seed, lat=$lat, lon=$lon)"
     }
 }

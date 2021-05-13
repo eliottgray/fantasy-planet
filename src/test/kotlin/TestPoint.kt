@@ -90,7 +90,7 @@ class RotateAroundXAxisTest{
 
     private fun run_test(degrees: Double, expected: Point){
         val actualPoint = this.fixture.rotateAroundXAxis(degrees)
-        testPointEquality(expected, actualPoint)
+        testPointsAlmostEqual(expected, actualPoint)
     }
 
     @Test
@@ -147,7 +147,7 @@ class RotateAroundYAxisTest{
 
     private fun run_test(degrees: Double, expected: Point){
         val actualPoint = this.fixture.rotateAroundYAxis(degrees)
-        testPointEquality(expected, actualPoint)
+        testPointsAlmostEqual(expected, actualPoint)
     }
 
     @Test
@@ -199,7 +199,7 @@ class CopyTest {
     fun test_copy() {
         val fixture = Point(x = 0.5, y = 0.6, z = 0.7, alt = 1.0)
         val copy = fixture.copy()
-        testPointEquality(fixture, copy)
+        assertEquals(fixture, copy)
         assertNotSame(fixture, copy)  // Guards against error where copy just points to the same memory address.
     }
 }
@@ -257,7 +257,7 @@ class MidpointTest{
     private fun run_test(one: Point, two: Point, expected: Point) {
         val length = one.distance(two)
         val actual = one.midpoint(two, length)
-        testPointEquality(expected, actual)
+        assertEquals(expected, actual)
     }
 
     @Test
