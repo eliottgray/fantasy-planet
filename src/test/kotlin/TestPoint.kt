@@ -1,12 +1,10 @@
 import com.eliottgray.kotlin.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import kotlin.math.pow
 import kotlin.math.sqrt
-import kotlin.test.assertNotSame
 
 
 class PointConstructorTest {
@@ -193,17 +191,6 @@ class RotateAroundYAxisTest{
     }
 }
 
-class CopyTest {
-
-    @Test
-    fun test_copy() {
-        val fixture = Point(x = 0.5, y = 0.6, z = 0.7, alt = 1.0)
-        val copy = fixture.copy()
-        assertEquals(fixture, copy)
-        assertNotSame(fixture, copy)  // Guards against error where copy just points to the same memory address.
-    }
-}
-
 class DistanceTest {
 
     private lateinit var fixture: Point
@@ -294,26 +281,5 @@ class MidpointTest{
         val two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
         val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.031218350729469505, seed=generate_seed(one, two))
         run_test(one=one, two=two, expected=expected)
-    }
-}
-
-class PointToStringTest{
-
-    @Test
-    fun test_all_values(){
-        val x = 1.0
-        val y = 0.9
-        val z = 0.8
-        val alt = 0.7
-        val lat = 0.6
-        val lon = 0.5
-        val point = Point(x=x, y=y, z=z, alt=alt, lat=lat, lon=lon)
-        val string = point.toString()
-        assertTrue(string.contains(x.toString()))
-        assertTrue(string.contains(y.toString()))
-        assertTrue(string.contains(z.toString()))
-        assertTrue(string.contains(alt.toString()))
-        assertTrue(string.contains(lat.toString()))
-        assertTrue(string.contains(lon.toString()))
     }
 }

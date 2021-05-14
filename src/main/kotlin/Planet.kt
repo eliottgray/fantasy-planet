@@ -27,7 +27,7 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
         return current.averageAltitude
     }
 
-    private fun recursiveGetH3Elevations(points: ArrayList<Point>, current: Tetrahedron): ArrayList<Point> {
+    fun getMultipleElevations(points: ArrayList<Point>, current: Tetrahedron = this.tetra): ArrayList<Point> {
         if (points.isEmpty()){
             return points
         }
@@ -44,8 +44,8 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                     rightNodes.add(point)
                 }
             }
-            val results = recursiveGetH3Elevations(leftNodes, leftTetra)
-            results.addAll(recursiveGetH3Elevations(rightNodes, rightTetra))
+            val results = getMultipleElevations(leftNodes, leftTetra)
+            results.addAll(getMultipleElevations(rightNodes, rightTetra))
             return results
         } else {
             val elevation = current.averageAltitude
@@ -55,9 +55,5 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
             }
             return points
         }
-    }
-
-    fun getH3Elevations(h3Nodes: ArrayList<Point>): ArrayList<Point> {
-        return recursiveGetH3Elevations(h3Nodes, this.tetra)
     }
 }

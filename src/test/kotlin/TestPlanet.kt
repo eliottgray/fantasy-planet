@@ -1,8 +1,10 @@
 import com.eliottgray.kotlin.Defaults
 import com.eliottgray.kotlin.Planet
 import com.eliottgray.kotlin.PlanetError
+import com.eliottgray.kotlin.Point
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class PlanetConstructorTest {
@@ -36,7 +38,7 @@ class PlanetConstructorTest {
     }
 }
 
-class GetElevationAtCoordinateTest{
+class GetElevationAtCoordinateTest {
 
     @Test
     fun test_low_resolution(){
@@ -50,5 +52,33 @@ class GetElevationAtCoordinateTest{
         val planet = Planet(seed=54399875.0, resolution=50)
         val elevation = planet.getElevationAt(lat=45.0, lon=23.0)
         assertEquals(-39.31818838120323, elevation)
+    }
+}
+
+class GetMultipleElevationsTest {
+
+    lateinit var planet: Planet
+
+    @BeforeEach
+    fun setUp(){
+        planet = Planet(seed=99987.0, resolution=100000)
+    }
+
+    @Test
+    fun test_multiple_points(){
+        val points = arrayListOf(
+            Point.fromSpherical(lat=-10.0, lon=-43.0),
+            Point.fromSpherical(lat=45.0, lon=23.0)
+        )
+        val results = planet.getMultipleElevations(points)
+
+        for (point in results){
+            if (point.lat == -10.0) {
+                assertEquals(147.77922543048044, point.alt, 1.0E-7)
+            } else {
+                assertEquals(point.lat, 45.0)
+                assertEquals(-144.66142049532252, point.alt)
+            }
+        }
     }
 }
