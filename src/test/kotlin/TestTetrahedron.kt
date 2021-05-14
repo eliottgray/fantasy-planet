@@ -28,7 +28,7 @@ class TetrahedronConstructorTest {
         val failures = arrayListOf<String>()
         for (lat in -90..91 step 5) {
             for (lon in -180..181 step 5) {
-                val point = Point.fromSpherical(lat=lat.toDouble(), lon=lon.toDouble(), alt=0.0, seed=Defaults.SEED)
+                val point = Point.fromSpherical(lat=lat.toDouble(), lon=lon.toDouble(), initialAlt=0.0, seed=Defaults.SEED)
                 if (!default.contains(point)){
                     failures.add("Lat $lat lon $lon")
                 }

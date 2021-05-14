@@ -27,7 +27,7 @@ class PointConstructorTest {
 class FromSphericalTest {
 
     private fun run_test(lat: Double = 0.0, lon: Double = 0.0, alt: Double = 0.0, x: Double = 0.0, y: Double = 0.0, z: Double = 0.0){
-        val actualPoint = Point.fromSpherical(lat=lat, lon=lon, alt=alt)
+        val actualPoint = Point.fromSpherical(lat=lat, lon=lon, initialAlt=alt)
 
         // Cartesian coordinates may be approximate, as they are the result of a transformation.
         assertEquals(x, actualPoint.x, 1.0E-7)
