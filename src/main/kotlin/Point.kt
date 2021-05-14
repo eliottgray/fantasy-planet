@@ -1,12 +1,12 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
 
-data class Point(var alt: Double = Defaults.ALTITUDE_METERS, val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0) {
+data class Point(val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0, var alt: Double = 0.0) {
 
     companion object{
-        fun fromSpherical(lat: Double, lon: Double, alt: Double = 0.0, seed: Double = Defaults.SEED): Point {
-            val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = alt)
-            return Point(alt=alt, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
+        fun fromSpherical(lat: Double, lon: Double, initialAlt: Double = 0.0, seed: Double = Defaults.SEED, altSeed: Double = 0.0): Point {
+            val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = initialAlt)
+            return Point(alt=altSeed, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon)
         }
     }
 

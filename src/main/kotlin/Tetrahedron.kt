@@ -78,17 +78,11 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
             val cSeed = mutateSeed(seed, bSeed)
             val dSeed = mutateSeed(seed, cSeed)
 
+            val a = Point.fromSpherical(lat=90.0, lon=0.0, initialAlt=alt, seed=aSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val b = Point.fromSpherical(lat=-30.0, lon=0.0, initialAlt=alt, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val c = Point.fromSpherical(lat=-30.0, lon=120.0, initialAlt=alt, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, initialAlt=alt, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
 
-            val a = Point.fromSpherical(lat=90.0, lon=0.0, alt=alt, seed=aSeed)
-            val b = Point.fromSpherical(lat=-30.0, lon=0.0, alt=alt, seed=bSeed)
-            val c = Point.fromSpherical(lat=-30.0, lon=120.0, alt=alt, seed=cSeed)
-            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, alt=alt, seed=dSeed)
-
-            // TODO ideally don't have to override altitude after fromSpherical, but alt is used for lat/lon -> XYZ.
-            a.alt = Defaults.ALTITUDE_METERS
-            b.alt = Defaults.ALTITUDE_METERS
-            c.alt = Defaults.ALTITUDE_METERS
-            d.alt = Defaults.ALTITUDE_METERS
             return Tetrahedron(a=a, b=b, c=c, d=d)
         }
 
