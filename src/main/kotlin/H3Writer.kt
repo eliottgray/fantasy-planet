@@ -45,7 +45,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         // TODO: handle errors related to IO.
 
 
-        val finishedPoints = planet.getH3Elevations(allPoints)
+        val finishedPoints = planet.getMultipleElevations(allPoints)
 
         val file = File(filepath)
         if (file.exists()){

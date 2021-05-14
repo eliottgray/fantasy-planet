@@ -1,6 +1,6 @@
 package com.eliottgray.kotlin
 
-class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
+data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
 
     val longestSide: Double by lazy {
         val ab = this.a.distance(this.b)
@@ -150,13 +150,5 @@ class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         val tetraOne = Tetrahedron(a=this.a, b=midpoint, c=this.c, d=this.d)
         val tetraTwo = Tetrahedron(a=midpoint, b=this.b, c=this.c, d=this.d)
         return Pair(tetraOne, tetraTwo)
-    }
-
-    override fun toString(): String {
-        val aStr = this.a.toString()
-        val bStr = this.b.toString()
-        val cStr = this.c.toString()
-        val dStr = this.d.toString()
-        return "Tetrahedron(a=$aStr, b=$bStr, c=$cStr, d=$dStr)"
     }
 }
