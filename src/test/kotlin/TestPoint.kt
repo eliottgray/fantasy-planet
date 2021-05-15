@@ -252,7 +252,7 @@ class MidpointTest{
         // Two points at opposite ends of the unit space should result in a point at the origin.
         val positive = Point(x=1.0, y=1.0, z=1.0, alt=1.0)
         val negative = Point(x=-1.0, y=-1.0, z=-1.0, alt=-1.0)
-        val expected = Point(x=0.0, y=0.0, z=0.0, alt=0.5626778152394969, seed=generate_seed(positive, negative))
+        val expected = Point(x=0.0, y=0.0, z=0.0, alt=1.207180808344458, seed=generate_seed(positive, negative))
         run_test(one=positive, two=negative, expected=expected)
     }
 
@@ -279,7 +279,7 @@ class MidpointTest{
         // Two identical points in the negative space.
         val one = Point(x=0.73, y=1.0001, z=-1.0, alt=0.002)
         val two = Point(x=-1.0, y=0.01, z=-0.2343, alt=0.002)
-        val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.031218350729469505, seed=generate_seed(one, two))
+        val expected = Point(x=-0.135, y=0.50505, z=-0.61715, alt=0.5446265135472907, seed=generate_seed(one, two))
         run_test(one=one, two=two, expected=expected)
     }
 }

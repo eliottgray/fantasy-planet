@@ -26,8 +26,8 @@ class TetrahedronConstructorTest {
         // Default tetrahedron should cover all surface-level points on the globe.
         val default = Tetrahedron.buildDefault(Defaults.SEED)
         val failures = arrayListOf<String>()
-        for (lat in -90..91 step 5) {
-            for (lon in -180..181 step 5) {
+        for (lat in -90..90 step 1) {
+            for (lon in -180..180 step 1) {
                 val point = Point.fromSpherical(lat=lat.toDouble(), lon=lon.toDouble(), initialAlt=0.0, seed=Defaults.SEED)
                 if (!default.contains(point)){
                     failures.add("Lat $lat lon $lon")

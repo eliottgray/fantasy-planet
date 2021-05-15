@@ -44,14 +44,14 @@ class GetElevationAtCoordinateTest {
     fun test_low_resolution(){
         val planet = Planet(seed=99987.0, resolution=100000)
         val elevation = planet.getElevationAt(lat=-10.0, lon=-43.0)
-        assertEquals(-106.73954005463241, elevation)
+        assertEquals(-2206.5303409091907, elevation)
     }
 
     @Test
     fun test_high_resolution(){
         val planet = Planet(seed=54399875.0, resolution=50)
         val elevation = planet.getElevationAt(lat=45.0, lon=23.0)
-        assertEquals(-100.57347147365873, elevation)
+        assertEquals(160.4482471060341, elevation)
     }
 }
 
@@ -74,10 +74,10 @@ class GetMultipleElevationsTest {
 
         for (point in results){
             if (point.lat == -10.0) {
-                assertEquals(-106.73954005463241, point.alt, 1.0E-7)
+                assertEquals(-2206.5303409091907, point.alt, 1.0E-7)
             } else {
                 assertEquals(point.lat, 45.0)
-                assertEquals(72.92436897719139, point.alt)
+                assertEquals(-1272.5419541701758, point.alt)
             }
         }
     }

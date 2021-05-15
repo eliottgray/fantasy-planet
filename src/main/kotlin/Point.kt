@@ -37,13 +37,37 @@ data class Point(val x: Double, val y: Double, val z: Double, val seed: Double =
 
     fun midpoint(other: Point, length: Double): Point {
         val newSeed = mutateSeed(this.seed, other.seed)
+        val seedTwo = mutateSeed(newSeed, newSeed)
+
+        val cutOne = 0.5 + 0.1 * mutateSeed(seedTwo, seedTwo)
+        val cutTwo = 1 - cutOne
+
+        val x: Double
+        val y: Double
+        val z: Double
+        when {
+            this.seed < other.seed -> {
+                x = cutOne * this.x + cutTwo * other.x
+                y = cutOne * this.y + cutTwo * other.y
+                z = cutOne * this.z + cutTwo * other.z
+            }
+            this.seed > other.seed -> {
+                x = cutTwo * this.x + cutOne * other.x
+                y = cutTwo * this.y + cutOne * other.y
+                z = cutTwo * this.z + cutOne * other.z
+            }
+            else -> {
+                // Without a way of ordering, an equal split is required.
+                x = (this.x + other.x) / 2
+                y = (this.y + other.y) / 2
+                z = (this.z + other.z) / 2
+            }
+        }
+
         val altWeight = 0.45
         val altPow = 1.0
-        val lengthWeight = 0.035
+        val lengthWeight = 0.65
         val lengthPow = 0.47
-        val x = (this.x + other.x) / 2
-        val y = (this.y + other.y) / 2
-        val z = (this.z + other.z) / 2
         val alt = (this.alt + other.alt) / 2 + newSeed * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newSeed * lengthWeight * length.pow(lengthPow)
         return Point(x=x, y=y, z=z, alt=alt, seed=newSeed)
     }
