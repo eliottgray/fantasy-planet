@@ -10,7 +10,6 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         val bd = this.b.distance(this.d)
         val cd = this.c.distance(this.d)
 
-
         var longest: Double = ab
         if (ac > longest) longest = ac
         if (ad > longest) longest = ad
@@ -18,45 +17,54 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         if (bd > longest) longest = bd
         if (cd > longest) longest = cd
 
-        var e1: Point = this.a
-        var e2: Point = this.b
-        var n1: Point = this.c
-        var n2: Point = this.d
-        if (ac == longest) {
-            e1 = this.a
-            e2 = this.c
-            n1 = this.b
-            n2 = this.d
+        val e1: Point
+        val e2: Point
+        val n1: Point
+        val n2: Point
+
+        // In the case of identical sides, prefer reordering by checking CD first and AB last.
+        when (longest) {
+            cd -> {
+                e1 = this.c
+                e2 = this.d
+                n1 = this.a
+                n2 = this.b
+            }
+            bd -> {
+                e1 = this.b
+                e2 = this.d
+                n1 = this.a
+                n2 = this.c
+            }
+            bc -> {
+                e1 = this.b
+                e2 = this.c
+                n1 = this.a
+                n2 = this.d
+            }
+            ad -> {
+                e1 = this.a
+                e2 = this.d
+                n1 = this.b
+                n2 = this.c
+            }
+            ac -> {
+                e1 = this.a
+                e2 = this.c
+                n1 = this.b
+                n2 = this.d
+            }
+            else -> {
+                assert(ab == longest)
+                e1 = this.a
+                e2 = this.b
+                n1 = this.c
+                n2 = this.d
+            }
         }
 
-        if (ad == longest) {
-            e1 = this.a
-            e2 = this.d
-            n1 = this.b
-            n2 = this.c
-        }
-
-        if (bc == longest){
-            e1 = this.b
-            e2 = this.c
-            n1 = this.a
-            n2 = this.d
-        }
-
-        if (bd == longest){
-            e1 = this.b
-            e2 = this.d
-            n1 = this.a
-            n2 = this.c
-        }
-
-        if (cd == longest){
-            e1 = this.c
-            e2 = this.d
-            n1 = this.a
-            n2 = this.b
-        }
-        // TODO: It would be good to avoid needing side effects. Instead of reassignment, consider saving new reference.
+        // TODO: It would be good to avoid needing side effects. Instead of reassignment, consider
+        //   returning a new Tetrahedron instead.
         this.a = e1
         this.b = e2
         this.c = n1
