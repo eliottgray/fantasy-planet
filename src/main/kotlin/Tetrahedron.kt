@@ -79,7 +79,7 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
 
     companion object {
 
-        fun buildDefault(seed: Double, alt: Double=15_000_000.0): Tetrahedron{
+        fun buildDefault(seed: Double, alt: Double=25_000_000.0): Tetrahedron{
             // Creates a Tetrahedron with default orientation and altitudes
             val aSeed = mutateSeed(seed, seed)
             val bSeed = mutateSeed(seed, aSeed)
@@ -90,11 +90,6 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
             val b = Point.fromSpherical(lat=-29.1, lon=-1.1, initialAlt=alt+2_000_000, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
             val c = Point.fromSpherical(lat=-28.2, lon=119.2, initialAlt=alt+3_000_000, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
             val d = Point.fromSpherical(lat=-31.3, lon=-121.3, initialAlt=alt+4_000_000, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val origin = Point(x=0.0, y=0.0, z=0.0)
-            println(origin.distance(a))
-            println(origin.distance(b))
-            println(origin.distance(c))
-            println(origin.distance(d))
 
             return Tetrahedron(a=a, b=b, c=c, d=d)
         }

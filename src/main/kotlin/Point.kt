@@ -66,7 +66,7 @@ data class Point(val x: Double, val y: Double, val z: Double, val seed: Double =
 
         val altWeight = 0.45
         val altPow = 1.0
-        val lengthWeight = 0.035
+        val lengthWeight = 0.65
         val lengthPow = 0.47
         val alt = (this.alt + other.alt) / 2 + newSeed * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newSeed * lengthWeight * length.pow(lengthPow)
         return Point(x=x, y=y, z=z, alt=alt, seed=newSeed)
