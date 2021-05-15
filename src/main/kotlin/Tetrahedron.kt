@@ -5,52 +5,52 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
     val longestSide: Double by lazy {
         val ab = this.a.distance(this.b)
         val ac = this.a.distance(this.c)
-        var longest: Double
-        var e1: Point
-        var e2: Point
-        var n1: Point
-        var n2: Point
-        if (ab >= ac){
-            longest = ab
-            e1 = this.a
-            e2 = this.b
-            n1 = this.c
-            n2 = this.d
-        } else{
-            longest = ac
+        val ad = this.a.distance(this.d)
+        val bc = this.b.distance(this.c)
+        val bd = this.b.distance(this.d)
+        val cd = this.c.distance(this.d)
+
+
+        var longest: Double = ab
+        if (ac > longest) longest = ac
+        if (ad > longest) longest = ad
+        if (bc > longest) longest = bc
+        if (bd > longest) longest = bd
+        if (cd > longest) longest = cd
+
+        var e1: Point = this.a
+        var e2: Point = this.b
+        var n1: Point = this.c
+        var n2: Point = this.d
+        if (ac == longest) {
             e1 = this.a
             e2 = this.c
             n1 = this.b
             n2 = this.d
         }
-        val ad = this.a.distance(this.d)
-        if (ad > longest){
-            longest = ad
+
+        if (ad == longest) {
             e1 = this.a
             e2 = this.d
             n1 = this.b
             n2 = this.c
         }
-        val bc = this.b.distance(this.c)
-        if (bc > longest) {
-            longest = bc
+
+        if (bc == longest){
             e1 = this.b
             e2 = this.c
             n1 = this.a
             n2 = this.d
         }
 
-        val bd = this.b.distance(this.d)
-        if (bd > longest){
-            longest = bd
+        if (bd == longest){
             e1 = this.b
-            e2 = this.c
+            e2 = this.d
             n1 = this.a
-            n2 = this.d
+            n2 = this.c
         }
-        val cd = this.c.distance(this.d)
-        if (cd > longest){
-            longest = cd
+
+        if (cd == longest){
             e1 = this.c
             e2 = this.d
             n1 = this.a
