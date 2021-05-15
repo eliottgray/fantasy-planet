@@ -1,6 +1,7 @@
 package com.eliottgray.kotlin
 import com.uber.h3core.H3Core
 import com.uber.h3core.LengthUnit
+import kotlinx.coroutines.Dispatchers
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import java.io.File
@@ -8,6 +9,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     private val h3Core: H3Core = H3Core.newInstance()
@@ -62,14 +64,6 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
 
         // TODO: handle errors related to IO.
 
-        val finishedPoints = ArrayList<Point>()
-        var newPoint: Point
-        while (count > 0) {
-            newPoint = channel.receive()
-            finishedPoints.add(newPoint)
-            count--
-        }
-
         val file = File(filepath)
         if (file.exists()){
             file.delete()
@@ -77,9 +71,14 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
 
         val bufferedWriter = file.bufferedWriter()
         bufferedWriter.write("lat,lon,alt\n")
-        for (point in finishedPoints){
-            val csvRow = toCSVRow(point)
+
+        var newPoint: Point
+        while (count > 0) {
+            newPoint = channel.receive()
+            val csvRow = toCSVRow(newPoint)
             bufferedWriter.write(csvRow)
+            count--
+
         }
         bufferedWriter.close()
     }
