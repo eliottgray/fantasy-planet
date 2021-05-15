@@ -78,10 +78,20 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
             val cSeed = mutateSeed(seed, bSeed)
             val dSeed = mutateSeed(seed, cSeed)
 
-            val a = Point.fromSpherical(lat=90.0, lon=0.0, initialAlt=alt, seed=aSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val b = Point.fromSpherical(lat=-30.0, lon=0.0, initialAlt=alt, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val c = Point.fromSpherical(lat=-30.0, lon=120.0, initialAlt=alt, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, initialAlt=alt, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val mod = 1.5
+            val a = Point(x=-9771629.941634936*mod, y=-9644067.201634936*mod, z=-9580285.831634935*mod, seed=aSeed, alt=Defaults.ALTITUDE_METERS)
+            val b = Point(x=-9835411.311634935*mod, y=12195322.001634935*mod, z=12131540.631634936*mod, seed=bSeed, alt=Defaults.ALTITUDE_METERS)
+            val c = Point(x=12386666.111634936*mod, y=-9516504.461634936*mod, z=12003977.891634936*mod, seed=cSeed, alt=Defaults.ALTITUDE_METERS)
+            val d = Point(x=12578010.221634936*mod, y=12450447.481634935*mod, z=-9452723.091634935*mod, seed=dSeed, alt=Defaults.ALTITUDE_METERS)
+//            val a = Point.fromSpherical(lat=89.0, lon=1.0, initialAlt=alt+1000000, seed=aSeed, altSeed=Defaults.ALTITUDE_METERS)
+//            val b = Point.fromSpherical(lat=-29.0, lon=-1.5, initialAlt=alt+2000000, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
+//            val c = Point.fromSpherical(lat=-28.0, lon=119.0, initialAlt=alt+3000000, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
+//            val d = Point.fromSpherical(lat=-31.0, lon=-121.8, initialAlt=alt+4000000, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val origin = Point(x=0.0, y=0.0, z=0.0)
+            println(origin.distance(a))
+            println(origin.distance(b))
+            println(origin.distance(c))
+            println(origin.distance(d))
 
             return Tetrahedron(a=a, b=b, c=c, d=d)
         }
