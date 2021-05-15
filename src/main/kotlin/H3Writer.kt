@@ -34,9 +34,12 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         return feature
     }
 
+    private fun toCSVRow(point: Point): String{
+        return "${point.lat},${point.lon},${point.alt}\n"
+    }
+
     suspend fun collectAndWrite(filepath: String) = coroutineScope {
         val channel = Channel<Point>()
-
         val res0 = h3Core.res0Indexes
         var count = 0
 
@@ -73,17 +76,11 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         }
 
         val bufferedWriter = file.bufferedWriter()
-
-        val features = JSONArray()
+        bufferedWriter.write("lat,lon,alt\n")
         for (point in finishedPoints){
-            val feature = toGeoJSONFeature(point)
-            features.add(feature)
+            val csvRow = toCSVRow(point)
+            bufferedWriter.write(csvRow)
         }
-        val featureCollection = JSONObject()
-        featureCollection["type"] = "FeatureCollection"
-        featureCollection["features"] = features
-
-        bufferedWriter.write(featureCollection.toJSONString())
         bufferedWriter.close()
     }
 }
