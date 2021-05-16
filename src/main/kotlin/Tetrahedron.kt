@@ -1,89 +1,87 @@
 package com.eliottgray.kotlin
 
-data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
+data class Tetrahedron private constructor(val a: Point, val b: Point, val c: Point, val d: Point, val longestSide: Double) {
 
-    val longestSide: Double by lazy {
-        val ab = this.a.distance(this.b)
-        val ac = this.a.distance(this.c)
-        var longest: Double
-        var e1: Point
-        var e2: Point
-        var n1: Point
-        var n2: Point
-        if (ab >= ac){
-            longest = ab
-            e1 = this.a
-            e2 = this.b
-            n1 = this.c
-            n2 = this.d
-        } else{
-            longest = ac
-            e1 = this.a
-            e2 = this.c
-            n1 = this.b
-            n2 = this.d
-        }
-        val ad = this.a.distance(this.d)
-        if (ad > longest){
-            longest = ad
-            e1 = this.a
-            e2 = this.d
-            n1 = this.b
-            n2 = this.c
-        }
-        val bc = this.b.distance(this.c)
-        if (bc > longest) {
-            longest = bc
-            e1 = this.b
-            e2 = this.c
-            n1 = this.a
-            n2 = this.d
-        }
-
-        val bd = this.b.distance(this.d)
-        if (bd > longest){
-            longest = bd
-            e1 = this.b
-            e2 = this.c
-            n1 = this.a
-            n2 = this.d
-        }
-        val cd = this.c.distance(this.d)
-        if (cd > longest){
-            longest = cd
-            e1 = this.c
-            e2 = this.d
-            n1 = this.a
-            n2 = this.b
-        }
-        // TODO: It would be good to avoid needing side effects. Instead of reassignment, consider saving new reference.
-        this.a = e1
-        this.b = e2
-        this.c = n1
-        this.d = n2
-        longest
-    }
-
-    val averageAltitude by lazy {
-        // Average altitude of constituent points.
-        (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
-    }
+    val averageAltitude = (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
 
     companion object {
 
-        fun buildDefault(seed: Double, alt: Double=25000000.0): Tetrahedron{
+        fun buildDefault(seed: Double, alt: Double=25_000_000.0): Tetrahedron{
             // Creates a Tetrahedron with default orientation and altitudes
             val aSeed = mutateSeed(seed, seed)
             val bSeed = mutateSeed(seed, aSeed)
             val cSeed = mutateSeed(seed, bSeed)
             val dSeed = mutateSeed(seed, cSeed)
 
-            val a = Point.fromSpherical(lat=90.0, lon=0.0, initialAlt=alt, seed=aSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val b = Point.fromSpherical(lat=-30.0, lon=0.0, initialAlt=alt, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val c = Point.fromSpherical(lat=-30.0, lon=120.0, initialAlt=alt, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
-            val d = Point.fromSpherical(lat=-30.0, lon=-120.0, initialAlt=alt, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val a = Point.fromSpherical(lat=89.0, lon=1.0, initialAlt=alt+1_000_000, seed=aSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val b = Point.fromSpherical(lat=-29.1, lon=-1.1, initialAlt=alt+2_000_000, seed=bSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val c = Point.fromSpherical(lat=-28.2, lon=119.2, initialAlt=alt+3_000_000, seed=cSeed, altSeed=Defaults.ALTITUDE_METERS)
+            val d = Point.fromSpherical(lat=-31.3, lon=-121.3, initialAlt=alt+4_000_000, seed=dSeed, altSeed=Defaults.ALTITUDE_METERS)
 
-            return Tetrahedron(a=a, b=b, c=c, d=d)
+            return withOrderedPoints(a=a, b=b, c=c, d=d)
+        }
+
+        fun withOrderedPoints(a: Point, b: Point, c: Point, d: Point): Tetrahedron {
+            val ab = a.distance(b)
+            val ac = a.distance(c)
+            val ad = a.distance(d)
+            val bc = b.distance(c)
+            val bd = b.distance(d)
+            val cd = c.distance(d)
+
+            var longest: Double = ab
+            if (ac > longest) longest = ac
+            if (ad > longest) longest = ad
+            if (bc > longest) longest = bc
+            if (bd > longest) longest = bd
+            if (cd > longest) longest = cd
+
+            val e1: Point
+            val e2: Point
+            val n1: Point
+            val n2: Point
+
+            // In the case of identical sides, prefer reordering by checking CD first and AB last.
+            when (longest) {
+                cd -> {
+                    e1 = c
+                    e2 = d
+                    n1 = a
+                    n2 = b
+                }
+                bd -> {
+                    e1 = b
+                    e2 = d
+                    n1 = a
+                    n2 = c
+                }
+                bc -> {
+                    e1 = b
+                    e2 = c
+                    n1 = a
+                    n2 = d
+                }
+                ad -> {
+                    e1 = a
+                    e2 = d
+                    n1 = b
+                    n2 = c
+                }
+                ac -> {
+                    e1 = a
+                    e2 = c
+                    n1 = b
+                    n2 = d
+                }
+                else -> {
+                    assert(ab == longest)
+                    e1 = a
+                    e2 = b
+                    n1 = c
+                    n2 = d
+                }
+            }
+            return Tetrahedron(e1, e2, n1, n2, longest)
         }
 
         private fun sameSide(one: Point, two: Point, three: Point, four: Point, tested: Point): Boolean {
@@ -131,7 +129,7 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         val newB = this.b.rotateAroundXAxis(degrees)
         val newC = this.c.rotateAroundXAxis(degrees)
         val newD = this.d.rotateAroundXAxis(degrees)
-        return Tetrahedron(a = newA, b = newB, c = newC, d = newD)
+        return Tetrahedron(a = newA, b = newB, c = newC, d = newD, longestSide=this.longestSide)
     }
 
     fun rotateAroundYAxis(degrees: Double): Tetrahedron {
@@ -139,16 +137,15 @@ data class Tetrahedron(var a: Point, var b: Point, var c: Point, var d: Point) {
         val newB = this.b.rotateAroundYAxis(degrees)
         val newC = this.c.rotateAroundYAxis(degrees)
         val newD = this.d.rotateAroundYAxis(degrees)
-        return Tetrahedron(a = newA, b = newB, c = newC, d = newD)
+        return withOrderedPoints(a = newA, b = newB, c = newC, d = newD)
     }
 
     fun subdivide(): Pair<Tetrahedron, Tetrahedron> {
         val length = this.longestSide
-        // Since calculating the longest side orients the longest edge as A->B, we can just split between A->B.
-        // TODO: Instead of relying on the side effect of calculating longest side, just retrieve what the longest edge is and divide there.
-        val midpoint = this.a.midpoint(this.b, length)
-        val tetraOne = Tetrahedron(a=this.a, b=midpoint, c=this.c, d=this.d)
-        val tetraTwo = Tetrahedron(a=midpoint, b=this.b, c=this.c, d=this.d)
+        assert(length == a.distance(b))
+        val midpoint = this.a.midpoint(this.b, length)  // A->B is required to be the longest side.
+        val tetraOne = withOrderedPoints(a=this.a, b=midpoint, c=this.c, d=this.d)
+        val tetraTwo = withOrderedPoints(a=midpoint, b=this.b, c=this.c, d=this.d)
         return Pair(tetraOne, tetraTwo)
     }
 }
