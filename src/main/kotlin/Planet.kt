@@ -44,8 +44,8 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                     rightNodes.add(point)
                 }
             }
-            val results = this.getMultipleElevations(leftNodes, leftTetra)
-            results.addAll(this.getMultipleElevations(rightNodes, rightTetra))
+            val results = getMultipleElevations(leftNodes, leftTetra)
+            results.addAll(getMultipleElevations(rightNodes, rightTetra))
             return results
         } else {
             val elevation = current.averageAltitude
