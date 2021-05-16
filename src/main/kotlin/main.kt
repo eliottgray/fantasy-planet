@@ -6,7 +6,7 @@ import kotlin.system.measureTimeMillis
 fun main(args: Array<String>) {
     val timeMillis = measureTimeMillis {
         val seed = Random.nextDouble()
-        val writer = H3Writer(h3Depth=3, seed=seed)
+        val writer = H3Writer(h3Depth=4, seed=seed)
         writer.collectAndWrite("test_out.csv")
     }
     print(timeMillis)

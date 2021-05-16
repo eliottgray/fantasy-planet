@@ -20,7 +20,7 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
             if (subOne.contains(point)){
                 current = subOne
             } else {
-                assert(subTwo.contains(point))  // TODO: only enable during testing, or not have this at all.
+                assert(subTwo.contains(point))
                 current = subTwo
             }
         }
@@ -40,7 +40,7 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                 if (leftTetra.contains(point)){
                     leftNodes.add(point)
                 } else {
-                    assert(rightTetra.contains(point))  // TODO: only enable during testing, or not have this at all.
+                    assert(rightTetra.contains(point))
                     rightNodes.add(point)
                 }
             }
@@ -49,11 +49,9 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
             return results
         } else {
             val elevation = current.averageAltitude
-            for (point in points) {
-                // While it is often better to avoid side effects, this way we reuse the current object.
-                point.alt = elevation
-            }
-            return points
+            return ArrayList(points.map {
+                it.copy(alt=elevation)
+            })
         }
     }
 }

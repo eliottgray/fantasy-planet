@@ -1,7 +1,7 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
 
-data class Point(val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0, var alt: Double = 0.0) {
+data class Point(val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0, val alt: Double = 0.0) {
 
     companion object{
         fun fromSpherical(lat: Double, lon: Double, initialAlt: Double = 0.0, seed: Double = Defaults.SEED, altSeed: Double = 0.0): Point {
