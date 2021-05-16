@@ -52,7 +52,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
             }
             val localPlanet = Planet(seed = seed, resolution = (edgeLength * 0.6).roundToInt())
             val result = async (Dispatchers.Default) {
-                localPlanet.getMultipleElevationsRecursiveAsync(allPoints)
+                localPlanet.getMultipleElevations(allPoints)
             }
             results.add(result)
         }

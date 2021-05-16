@@ -44,40 +44,12 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                     rightNodes.add(point)
                 }
             }
-            val results = getMultipleElevations(leftNodes, leftTetra)
-            results.addAll(getMultipleElevations(rightNodes, rightTetra))
+            val results = this.getMultipleElevations(leftNodes, leftTetra)
+            results.addAll(this.getMultipleElevations(rightNodes, rightTetra))
             return results
         } else {
             val elevation = current.averageAltitude
             return ArrayList(points.map {
-                it.copy(alt=elevation)
-            })
-        }
-    }
-
-    suspend fun getMultipleElevationsRecursiveAsync(points: ArrayList<Point>, current: Tetrahedron = this.tetra): ArrayList<Point> {
-        if (points.isEmpty()){
-            return points
-        }
-        if (current.longestSide > resolution) {
-            val (leftTetra, rightTetra) = current.subdivide()
-            // TODO: Avoid needing to create an arrayList for each tetrahedron created. Expensive!
-            val leftNodes = ArrayList<Point>()
-            val rightNodes = ArrayList<Point>()
-            for (point in points) {
-                if (leftTetra.contains(point)){
-                    leftNodes.add(point)
-                } else {
-                    assert(rightTetra.contains(point))
-                    rightNodes.add(point)
-                }
-            }
-            val results = getMultipleElevationsRecursiveAsync(leftNodes, leftTetra)
-            results.addAll(getMultipleElevationsRecursiveAsync(rightNodes, rightTetra))
-            return results
-        } else {
-            val elevation = current.averageAltitude
-            return ArrayList(points.map{
                 it.copy(alt=elevation)
             })
         }
