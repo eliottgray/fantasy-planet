@@ -37,8 +37,8 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     }
 
     suspend fun collectAndWrite(filepath: String) = coroutineScope {
-        val results: ArrayList<Deferred<ArrayList<Point>>> = ArrayList()
         val res0 = h3Core.res0Indexes
+        val deferredResults: ArrayList<Deferred<ArrayList<Point>>> = ArrayList()
 
         for (chunkedNodes in res0.chunked( 10)) {
             val allPoints = ArrayList<Point>()
@@ -54,7 +54,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
             val result = async (Dispatchers.Default) {
                 localPlanet.getMultipleElevations(allPoints)
             }
-            results.add(result)
+            deferredResults.add(result)
         }
 
         launch (Dispatchers.IO){
@@ -68,7 +68,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
             val bufferedWriter = file.bufferedWriter()
             bufferedWriter.write("lat,lon,alt\n")
 
-            for (newPoint in results.awaitAll().flatten()) {
+            for (newPoint in deferredResults.awaitAll().flatten()) {
                 val csvRow = toCSVRow(newPoint)
                 bufferedWriter.write(csvRow)
             }
