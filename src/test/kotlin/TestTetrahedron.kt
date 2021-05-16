@@ -103,10 +103,10 @@ class RotateTetrahedronTest {
 
     @Test
     fun test_rotate_around_y_axis_90_degrees(){
-        val a = this.tetra.a.rotateAroundYAxis(90.0)
-        val b = this.tetra.b.rotateAroundYAxis(90.0)
-        val c = this.tetra.c.rotateAroundYAxis(90.0)
-        val d = this.tetra.d.rotateAroundYAxis(90.0)
+        val a = Point(x=1.0, y=0.0, z=0.0, alt=1.0)
+        val c = Point(x=-1.0, y=1.0, z=1.0, alt=0.8)
+        val d = Point(x=-1.0, y=-1.0, z=1.0, alt=0.7)
+        val b = Point(x=-1.0, y=0.0, z=-1.0, alt=0.9)
         val expected = Tetrahedron.withOrderedPoints(a=a, b=b, c=c, d=d)
         val actual = this.tetra.rotateAroundYAxis(90.0)
         testTetrahedronsAlmostEqual(expected=expected, actual=actual)

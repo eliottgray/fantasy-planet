@@ -137,7 +137,7 @@ data class Tetrahedron private constructor(val a: Point, val b: Point, val c: Po
         val newB = this.b.rotateAroundYAxis(degrees)
         val newC = this.c.rotateAroundYAxis(degrees)
         val newD = this.d.rotateAroundYAxis(degrees)
-        return withOrderedPoints(a = newA, b = newB, c = newC, d = newD)
+        return Tetrahedron(a = newA, b = newB, c = newC, d = newD, longestSide=this.longestSide)
     }
 
     fun subdivide(): Pair<Tetrahedron, Tetrahedron> {

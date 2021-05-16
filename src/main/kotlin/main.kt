@@ -7,7 +7,7 @@ import kotlin.system.measureTimeMillis
 fun main(args: Array<String>) = runBlocking() {
     val timeMillis = measureTimeMillis {
         val seed = Random.nextDouble()
-        val writer = H3Writer(h3Depth=5, seed=seed)
+        val writer = H3Writer(h3Depth=4, seed=seed)
         writer.collectAndWrite("test_out.csv")
     }
     print(timeMillis)
