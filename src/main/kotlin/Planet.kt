@@ -1,7 +1,5 @@
 package com.eliottgray.kotlin
 
-import kotlinx.coroutines.channels.Channel
-
 class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RESOLUTION_METERS){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
@@ -57,9 +55,9 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
         }
     }
 
-    suspend fun getMultipleElevationsRecursiveAsync(points: ArrayList<Point>, channel: Channel<Point>, current: Tetrahedron = this.tetra) {
+    suspend fun getMultipleElevationsRecursiveAsync(points: ArrayList<Point>, current: Tetrahedron = this.tetra): ArrayList<Point> {
         if (points.isEmpty()){
-            return
+            return points
         }
         if (current.longestSide > resolution) {
             val (leftTetra, rightTetra) = current.subdivide()
@@ -74,15 +72,14 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                     rightNodes.add(point)
                 }
             }
-            getMultipleElevationsRecursiveAsync(leftNodes, channel, leftTetra)
-            getMultipleElevationsRecursiveAsync(rightNodes, channel, rightTetra)
-            return
+            val results = getMultipleElevationsRecursiveAsync(leftNodes, leftTetra)
+            results.addAll(getMultipleElevationsRecursiveAsync(rightNodes, rightTetra))
+            return results
         } else {
             val elevation = current.averageAltitude
-            for (point in points) {
-                // While it is often better to avoid side effects, this way we reuse the current object.
-                channel.send(point.copy(alt=elevation))
-            }
+            return ArrayList(points.map{
+                it.copy(alt=elevation)
+            })
         }
     }
 }
