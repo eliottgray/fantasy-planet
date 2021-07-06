@@ -5,4 +5,4 @@ jobs:
       - image: cimg/openjdk:8.0.275
     steps:
       - checkout
-      - run: ./gradlew clean test
+      - run: ./gradlew test
