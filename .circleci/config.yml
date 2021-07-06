@@ -5,4 +5,6 @@ jobs:
       - image: cimg/openjdk:16.0.0
     steps:
       - checkout
+      - run: chmod +x gradlew
+      - run: chmod +x gradle/wrapper/gradle-wrapper.jar
       - run: ./gradlew clean test build
