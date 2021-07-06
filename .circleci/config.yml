@@ -2,8 +2,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:16.0.0
+      - image: cimg/openjdk:8.0.275
     steps:
       - checkout
-#      - run: chmod +x gradle/wrapper/gradle-wrapper.jar
       - run: ./gradlew clean test
