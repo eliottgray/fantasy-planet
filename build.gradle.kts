@@ -25,14 +25,14 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-    testLogging {
-        events(PASSED, SKIPPED, FAILED)
-        exceptionFormat = FULL
-        showStandardStreams = false
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-    }
+//    testLogging {
+//        events(PASSED, SKIPPED, FAILED)
+//        exceptionFormat = FULL
+//        showStandardStreams = false
+//        showExceptions = true
+//        showCauses = true
+//        showStackTraces = true
+//    }
 }
 
 tasks.withType<KotlinCompile>() {
