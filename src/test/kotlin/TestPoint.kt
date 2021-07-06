@@ -34,7 +34,7 @@ class FromSphericalTest {
         // Spherical coordinates must have been stored without being transformed.
         assertEquals(lat, actualPoint.lat)
         assertEquals(lon, actualPoint.lon)
-        assertNotEquals(alt, actualPoint.alt)
+        assertEquals(alt, actualPoint.alt)
     }
 
     @Test
