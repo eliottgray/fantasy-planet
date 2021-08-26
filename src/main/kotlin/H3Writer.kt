@@ -37,16 +37,15 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     }
 
     suspend fun collectAndWrite(filepath: String) = coroutineScope {
-        val res0 = h3Core.res0Indexes
         val deferredResults: ArrayList<Deferred<ArrayList<Point>>> = ArrayList()
 
-        for (chunkedNodes in res0.chunked( 10)) {
+        for (chunkedRes0Indexes in h3Core.res0Indexes.chunked( 10)) {
             val allPoints = ArrayList<Point>()
-            for (res0Node in chunkedNodes) {
+            for (res0Node in chunkedRes0Indexes) {
                 val children = h3Core.h3ToChildren(res0Node, h3Depth)
                 for (child in children) {
-                    val geo = h3Core.h3ToGeo(child)
-                    val point = Point.fromSpherical(lat = geo.lat, lon = geo.lng)
+                    val geoCoordinates = h3Core.h3ToGeo(child)
+                    val point = Point.fromSpherical(lat = geoCoordinates.lat, lon = geoCoordinates.lng)
                     allPoints.add(point)
                 }
             }
@@ -64,9 +63,12 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
                 file.delete()
             }
 
+            // Header row
             val bufferedWriter = file.bufferedWriter()
-            bufferedWriter.write("lat,lon,alt\n")
+            val headerRow = "lat,lon,alt\n"
+            bufferedWriter.write(headerRow)
 
+            // Data rows
             for (newPoint in deferredResults.awaitAll().flatten()) {
                 val csvRow = toCSVRow(newPoint)
                 bufferedWriter.write(csvRow)
