@@ -22,8 +22,13 @@
         animation: false,
 
         // TODO: Replace with fantasy planet tile.
-        imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-            url : 'https://a.tile.openstreetmap.org/'
+        // imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+        //     url : 'https://a.tile.openstreetmap.org/'
+        // })
+
+        // Local test.
+        imageryProvider: new Cesium.UrlTemplateImageryProvider({
+          url : 'http://127.0.0.1:5000/tiles/{z}/{x}/{y}.png'
         })
     });    
 
