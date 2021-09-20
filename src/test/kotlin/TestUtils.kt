@@ -1,9 +1,11 @@
 import com.eliottgray.kotlin.mutateSeed
+import com.eliottgray.kotlin.xyzToNWCorner
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.math.round
 import kotlin.random.Random
+import kotlin.test.assertEquals
 
 class MutateSeedTest {
 
@@ -43,6 +45,16 @@ class MutateSeedTest {
         assertFalse(resultSet.contains(1.1))
         assertFalse(resultSet.contains(-1.1))
     }
+}
 
+class XyzToNWCornerTest {
+    @Test
+    fun test_level_zero() {
+        val nw = xyzToNWCorner(0, 0, 0)
+        val nwLon = nw.first
+        val nwLat = nw.second
 
+        assertEquals(nwLon, -180.0)
+        assertEquals(nwLat, 85.051128, 0.000001)
+    }
 }
