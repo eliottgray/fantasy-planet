@@ -43,7 +43,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         return planet.getMultipleElevations(allPoints)
     }
 
-    fun writePNG(topTile: MapTile = this) {
+    suspend fun writePNG(topTile: MapTile = this) {
         val oldRange = topTile.maxElev - topTile.minElev
         val newRange = 255
 
