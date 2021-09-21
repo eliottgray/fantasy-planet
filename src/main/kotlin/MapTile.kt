@@ -10,6 +10,8 @@ import javax.imageio.ImageIO
 class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double = Defaults.SEED) {
 
     private val sortedPoints = generate().sortedWith(compareBy( {-it.lat}, {it.lon}))
+    val maxElev: Double = this.sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
+    val minElev: Double = this.sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
 
     companion object {
         const val MAP_TILE_WIDTH_PIXELS = 256
@@ -41,15 +43,12 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         return planet.getMultipleElevations(allPoints)
     }
 
-    fun writePNG() {
-        val maxElev: Double = this.sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
-        val minElev: Double = this.sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
-
-        val oldRange = maxElev - minElev
+    fun writePNG(topTile: MapTile = this) {
+        val oldRange = topTile.maxElev - topTile.minElev
         val newRange = 255
 
         val aByteArray: ByteArray = this.sortedPoints.map{ point ->
-            val newValue = (((point.alt - minElev) * newRange) / oldRange) -128
+            val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange) -128
             if (newValue < 0) {
                 arrayListOf(0.toByte(), 0.toByte(), (-newValue.toInt()).toByte())
             } else {
