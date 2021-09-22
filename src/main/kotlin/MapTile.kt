@@ -50,8 +50,8 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
 
         // TODO: bounding box of tile becomes class properties, reference them instead of Pair.first, Pair.second.
         // TODO: Use N or S side of tile, depending on which is closer to the poles.
-        val first = Point.fromSpherical(lon = nwCorner.first, lat = seCorner.second)
-        val second = Point.fromSpherical(lon = seCorner.first, lat = seCorner.second)
+        val first = Point.fromSpherical(lon = 0.0, lat = seCorner.second)
+        val second = Point.fromSpherical(lon = lonDelta, lat = seCorner.second)
         val widthOfPixelMeters = first.distance(second)
 
         val planet = Planet(seed=seed, resolution = ceil(widthOfPixelMeters * 0.6).toInt())
@@ -62,21 +62,14 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         val oldRange = topTile.maxElev - topTile.minElev
         val newRange = 255
 
-        val aByteArray: ByteArray = ByteArray(3 * this.sortedPoints.size)
-        for (i in 0 until this.sortedPoints.size){
-            val point = this.sortedPoints[0]
+        val aByteArray: ByteArray = this.sortedPoints.map{ point ->
             val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange) -128
-            val byteIndex = 3 * i
             if (newValue < 0) {
-                aByteArray[byteIndex + 0] = 0.toByte()
-                aByteArray[byteIndex + 1] = 0.toByte()
-                aByteArray[byteIndex + 2] = (-newValue.toInt()).toByte()
+                arrayListOf(0.toByte(), 0.toByte(), (-newValue.toInt()).toByte())
             } else {
-                aByteArray[byteIndex + 0] = newValue.toInt().toByte()
-                aByteArray[byteIndex + 1] = 0.toByte()
-                aByteArray[byteIndex + 2] = 0.toByte()
+                arrayListOf(newValue.toInt().toByte(), 0.toByte(), 0.toByte())
             }
-        }
+        }.flatten().toByteArray()
 
         val buffer: DataBuffer = DataBufferByte(aByteArray, aByteArray.size)
 
