@@ -41,12 +41,3 @@ fun sphericalToECEF(lat: Double, lon: Double, alt: Double): Triple<Double, Doubl
     val z = ((minorSquared / majorSquared) * primeVerticalRadiusOfCurvature + alt) * sinLat
     return Triple(x, y, z)
 }
-
-// Taken from OSM docs on xyz/latLon interchange: https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
-fun xyzToNWCorner(zTile: Int, xTile: Int, yTile: Int): Pair<Double, Double> {
-    val n = 2.0.pow(zTile)
-    val nwLon = xTile / n * 360.0 - 180.0
-    val nwLatRad =  atan(sinh(PI * (1 - 2 * yTile / n)))
-    val nwLat = nwLatRad * (180/PI) // TODO: use built-in rad->degree conversion rather than PI over 180?
-    return Pair(nwLon, nwLat)  // TODO: Create a data class to avoid ordering ambiguity.
-}

@@ -29,7 +29,6 @@ suspend fun collectAndWrite(seed: Double) = coroutineScope {
         val rowColCount = 2.0.pow(z).toInt()
         for (x in 0 until rowColCount){
             for (y in 0 until rowColCount){
-                println("Z $z X $x Y $y")
                 val result = async (Dispatchers.Default) {
                     MapTile(z, x, y, seed=seed)
                 }

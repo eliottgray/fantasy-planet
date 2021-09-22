@@ -40,7 +40,6 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
                 if (leftTetra.contains(point)){
                     leftNodes.add(point)
                 } else {
-                    assert(rightTetra.contains(point))
                     rightNodes.add(point)
                 }
             }
