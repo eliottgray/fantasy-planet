@@ -15,40 +15,68 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
     private val minElev: Double = this.sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
 
     companion object {
-        const val MAP_TILE_WIDTH_PIXELS = 256
-        const val MAP_TILE_HEIGHT_PIXELS = 256
+        const val TILE_SIZE = 256
 
-        private fun xyzToNWCorner(z: Int, x: Int, y: Int): MapTileCorner {
+        // 156543.03392804062 for tileSize 256 Pixels
+        private const val INITIAL_RESOLUTION = 2 * PI * 6378137 / TILE_SIZE
+
+        // 20037508.342789244
+        private const val ORIGIN_SHIFT = 2 * PI * 6378137 / 2.0
+
+        private const val DEGREES_TO_RAD = 180 / PI
+
+        private fun xyzToNWCorner(z: Int, x: Int, y: Int): MapTileCoordinate {
             // Taken from OSM docs on xyz/latLon interchange: https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
             val n = 2.0.pow(z)
             val nwLon = x / n * 360.0 - 180.0
             val nwLatRad =  atan(sinh(PI * (1 - 2 * y / n)))
-            val nwLat = nwLatRad * (180/ PI) // TODO: use built-in rad->degree conversion rather than PI over 180?
-            return MapTileCorner(latitude = nwLat, longitude = nwLon)
+            val nwLat = nwLatRad * DEGREES_TO_RAD
+            return MapTileCoordinate(latitude = nwLat, longitude = nwLon)
+        }
+
+        fun pixelsToLatLon(px: Double, py: Double, zoom: Int): MapTileCoordinate {
+            val res: Double = resolution(zoom)
+            val mx = px * res - ORIGIN_SHIFT
+            val my = -py * res + ORIGIN_SHIFT
+
+            val lon: Double = mx / ORIGIN_SHIFT * 180.0
+            var lat: Double = my / ORIGIN_SHIFT * 180.0
+            lat = 180 / Math.PI * (2 * atan(exp(lat * Math.PI / 180.0)) - Math.PI / 2.0)
+            return MapTileCoordinate(latitude = lat, longitude = lon)
+        }
+
+        private fun resolution(zoomLevel: Int): Double {
+            return INITIAL_RESOLUTION / matrixSize(zoomLevel)
+        }
+
+        private fun matrixSize(zoomLevel: Int): Int {
+            return 1 shl zoomLevel
         }
     }
 
     fun generate(): ArrayList<Point> {
         val nwCorner = nwCorner()
         val seCorner = seCorner()
-        val lonDelta = (seCorner.longitude - nwCorner.longitude) / MAP_TILE_WIDTH_PIXELS
-        val latDelta = (nwCorner.latitude - seCorner.latitude) / MAP_TILE_HEIGHT_PIXELS
+        val lonDelta = (seCorner.longitude - nwCorner.longitude) / TILE_SIZE
+
+        val xPixelStart = (xTile * TILE_SIZE) + 1
+        val xPixelEnd = xPixelStart + TILE_SIZE
+
+        val yPixelStart = (yTile * TILE_SIZE) + 1
+        val yPixelEnd = yPixelStart + TILE_SIZE
 
         val allPoints = ArrayList<Point>()
-        var currentLat = nwCorner.latitude
-        for (xPixel in 1..MAP_TILE_WIDTH_PIXELS){
-            var currentLon = nwCorner.longitude
-            for (yPixel in 1..MAP_TILE_HEIGHT_PIXELS){
-                val point = Point.fromSpherical(lat=currentLat, lon=currentLon)
+        for (xPixel in xPixelStart until xPixelEnd){
+            for (yPixel in yPixelStart until yPixelEnd){
+                val tileCoordinate = pixelsToLatLon(px=xPixel.toDouble(), py=yPixel.toDouble(), zoom=zTile)
+                val point = Point.fromSpherical(lat=tileCoordinate.latitude, lon=tileCoordinate.longitude)
                 allPoints.add(point)
-                currentLon += lonDelta
             }
-            currentLat -= latDelta
         }
 
-        assert(allPoints.size == MAP_TILE_HEIGHT_PIXELS * MAP_TILE_WIDTH_PIXELS)
+        assert(allPoints.size == TILE_SIZE * TILE_SIZE)
 
-        // TODO: Use N or S side of tile, depending on which is closer to the poles.
+        // TODO: Use middle of tile to determine depth.
         val first = Point.fromSpherical(lon = 0.0, lat = seCorner.latitude)
         val second = Point.fromSpherical(lon = lonDelta, lat = seCorner.latitude)
         val widthOfPixelMeters = first.distance(second)
@@ -75,9 +103,9 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         // 3 bytes per pixel: red, green, blue
         val raster = Raster.createInterleavedRaster(
             buffer,
-            MAP_TILE_WIDTH_PIXELS,
-            MAP_TILE_HEIGHT_PIXELS,
-            3 * MAP_TILE_WIDTH_PIXELS,
+            TILE_SIZE,
+            TILE_SIZE,
+            3 * TILE_SIZE,
             3,
             intArrayOf(0, 1, 2),
             null as java.awt.Point?
@@ -103,11 +131,11 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         }
     }
 
-    fun nwCorner(): MapTileCorner {
+    fun nwCorner(): MapTileCoordinate {
         return xyzToNWCorner(zTile, xTile, yTile)
     }
 
-    fun seCorner(): MapTileCorner {
+    fun seCorner(): MapTileCoordinate {
         return xyzToNWCorner(zTile, xTile + 1, yTile + 1)
     }
 }
