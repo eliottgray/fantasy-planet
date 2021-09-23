@@ -55,10 +55,6 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
     }
 
     fun generate(): ArrayList<Point> {
-        val nwCorner = nwCorner()
-        val seCorner = seCorner()
-        val lonDelta = (seCorner.longitude - nwCorner.longitude) / TILE_SIZE
-
         val xPixelStart = (xTile * TILE_SIZE) + 1
         val xPixelEnd = xPixelStart + TILE_SIZE
 
@@ -76,13 +72,23 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
 
         assert(allPoints.size == TILE_SIZE * TILE_SIZE)
 
-        // TODO: Use middle of tile to determine depth.
-        val first = Point.fromSpherical(lon = 0.0, lat = seCorner.latitude)
-        val second = Point.fromSpherical(lon = lonDelta, lat = seCorner.latitude)
-        val widthOfPixelMeters = first.distance(second)
+        val middleXPixel = xPixelStart + (TILE_SIZE / 2)
+        val middleYPixel = yPixelStart + (TILE_SIZE / 2)
+        val widthOfPixelMeters = longitudinalPixelLengthInMeters(middleXPixel.toDouble(), middleYPixel.toDouble())
 
+        // TODO: Each Pixel should have its own depth, rather than relying on the tile center for all.
         val planet = Planet(seed=seed, resolution = ceil(widthOfPixelMeters * 0.6).toInt())
         return planet.getMultipleElevations(allPoints)
+    }
+
+    private fun longitudinalPixelLengthInMeters(px: Double, py: Double): Double {
+        val middleCoordinate = pixelsToLatLon(px=px, py=py, zoom=zTile)
+        val neighborCoordinate = pixelsToLatLon(px=1+px, py=py, zoom=zTile)
+
+        // TODO: Just use Haversine formula instead of using ECEF distance.  Overkill!
+        val first = Point.fromSpherical(lon = middleCoordinate.longitude, lat = middleCoordinate.latitude)
+        val second = Point.fromSpherical(lon = neighborCoordinate.longitude, lat = neighborCoordinate.latitude)
+        return first.distance(second)
     }
 
     suspend fun writePNG(topTile: MapTile = this) {

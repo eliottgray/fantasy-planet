@@ -11,15 +11,15 @@ class MapTileTest {
         val mapTile = MapTile(0, 0, 0)
 
         val nw = mapTile.nwCorner()
-        val nwLon = nw.first
-        val nwLat = nw.second
+        val nwLon = nw.longitude
+        val nwLat = nw.latitude
 
         assertEquals(nwLon, -180.0)
         assertEquals(nwLat, 85.051128, tolerance)
 
         val se = mapTile.seCorner()
-        val seLon = se.first
-        val seLat = se.second
+        val seLon = se.longitude
+        val seLat = se.latitude
 
         assertEquals(seLon, 180.0)
         assertEquals(seLat, -85.051128, tolerance)
@@ -30,15 +30,15 @@ class MapTileTest {
         val mapTile = MapTile(0, 0, 0)
 
         val nw = mapTile.nwCorner()
-        val nwLon = nw.first
-        val nwLat = nw.second
+        val nwLon = nw.longitude
+        val nwLat = nw.latitude
 
         assertEquals(nwLon, -180.0)
         assertEquals(nwLat, 85.051128, tolerance)
 
         val se = mapTile.seCorner()
-        val seLon = se.first
-        val seLat = se.second
+        val seLon = se.longitude
+        val seLat = se.latitude
 
         assertEquals(seLon, 180.0)
         assertEquals(seLat, -85.051128, tolerance)
