@@ -52,16 +52,24 @@ class GetMultipleElevationsTest {
     fun test_multiple_points(){
         val points = arrayListOf(
             Point.fromSpherical(lat=-10.0, lon=-43.0, resolution=100000),
-            Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000)
-        )
+            Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000),
+            Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000),
+            Point.fromSpherical(lat=0.0, lon=0.0, resolution=9876),
+            )
         val results = planet.getMultipleElevations(points)
-
         for (point in results){
-            if (point.lat == -10.0) {
-                assertEquals(-2206.5303409091907, point.alt, 1.0E-7)
-            } else {
-                assertEquals(point.lat, 45.0)
-                assertEquals(-1272.5419541701758, point.alt)
+            when (point.lat) {
+                -10.0 -> {
+                    assertEquals(-2206.5303409091907, point.alt, 1.0E-7)
+                }
+                45.0 -> {
+                    assertEquals(point.lat, 45.0)
+                    assertEquals(-1272.5419541701758, point.alt, 1.0E-7)
+                }
+                else -> {
+                    assertEquals(point.lat, 0.0)
+                    assertEquals(2175.729900945921, point.alt, 1.0E-7)
+                }
             }
         }
     }
