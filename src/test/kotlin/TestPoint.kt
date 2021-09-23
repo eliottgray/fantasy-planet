@@ -24,13 +24,13 @@ class PointConstructorTest {
     @Test
     fun test_negative_resolution(){
         val invalidResolution = -1
-        assertThrows(PlanetError::class.java) { Point(x = 0.0, y = 0.0, z = 0.0, resolution = invalidResolution) }
+        assertThrows(PointError::class.java) { Point(x = 0.0, y = 0.0, z = 0.0, resolution = invalidResolution) }
     }
 
     @Test
     fun test_zero_resolution(){
         val invalidResolution = 0
-        assertThrows(PlanetError::class.java) { Point(x = 0.0, y = 0.0, z = 0.0, resolution = invalidResolution) }
+        assertThrows(PointError::class.java) { Point(x = 0.0, y = 0.0, z = 0.0, resolution = invalidResolution) }
     }
 }
 

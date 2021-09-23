@@ -6,7 +6,7 @@ data class Point(val x: Double, val y: Double, val z: Double, val seed: Double =
 
     init {
         if (this.resolution <= 0){
-            throw PlanetError("Illegal resolution encountered: $resolution. Resolution must be a positive, non-zero integer.")
+            throw PointError("Illegal resolution encountered: $resolution. Resolution must be a positive, non-zero integer.")
         }
     }
 
