@@ -57,11 +57,11 @@ class MapTileTest {
 
         val actualBytes = imageToBytes(ImageIO.read(actualFile))
         val expectedBytes = imageToBytes(ImageIO.read(expectedFile))
-        assertEquals(expectedBytes.size, actualBytes.size, "Size of image bytes should be equal!")
+        assertEquals(expectedBytes.size, actualBytes.size, "Length of test image ${actualFile.path} failed to match expected image ${expectedFile.path}.")
         for (i in actualBytes.indices) {
             val expectedByte = expectedBytes[i]
             val actualByte = actualBytes[i]
-            assertEquals(expectedByte, actualByte, "Index $i out of ${actualBytes.size}")
+            assertEquals(expectedByte, actualByte, "Test image ${actualFile.path} failed to match expected image ${expectedFile.path} at byte index $i.")
         }
     }
     private fun imageToBytes(bi: BufferedImage): ByteArray {
