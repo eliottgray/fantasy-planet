@@ -20,7 +20,6 @@ class PointConstructorTest {
         assertEquals(Defaults.SEED, point.seed)
     }
 
-
     @Test
     fun test_negative_resolution(){
         val invalidResolution = -1

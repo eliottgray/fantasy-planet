@@ -14,8 +14,8 @@ fun main(args: Array<String>) = runBlocking() {
 //        writer.collectAndWrite("test_out.csv")
 
         // The client would be requesting map tiles. For now, lets write them to disk.
-        val writer = MapTileWriter(tileDepth = 3, seed=seed)
-        writer.collectAndWrite(seed)
+        val mapTileWriter = MapTileWriter(tileDepth = 3, seed=seed)
+        mapTileWriter.collectAndWrite(seed)
     }
     print(timeMillis)
 }

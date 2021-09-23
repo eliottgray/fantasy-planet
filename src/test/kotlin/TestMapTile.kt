@@ -1,5 +1,9 @@
 import com.eliottgray.kotlin.MapTile
 import org.junit.jupiter.api.Test
+import java.awt.image.BufferedImage
+import java.awt.image.DataBufferByte
+import java.io.File
+import javax.imageio.ImageIO
 import kotlin.test.assertEquals
 
 
@@ -43,4 +47,25 @@ class MapTileTest {
         assertEquals(seLon, 180.0)
         assertEquals(seLat, -85.051128, tolerance)
     }
+
+    @Test
+    fun test_specific_tile_and_seed(){
+        val seed = 762391.0
+        val mapTile = MapTile(2, 1, 1, seed)
+        val actualFile = mapTile.writePNG(mapTile)
+        val expectedFile = File("src/test/resources/canaryTile.png")
+
+        val actualBytes = imageToBytes(ImageIO.read(actualFile))
+        val expectedBytes = imageToBytes(ImageIO.read(expectedFile))
+        assertEquals(expectedBytes.size, actualBytes.size, "Size of image bytes should be equal!")
+        for (i in actualBytes.indices) {
+            val expectedByte = expectedBytes[i]
+            val actualByte = actualBytes[i]
+            assertEquals(expectedByte, actualByte, "Index $i out of ${actualBytes.size}")
+        }
+    }
+    private fun imageToBytes(bi: BufferedImage): ByteArray {
+        return (bi.data.dataBuffer as DataBufferByte).data
+    }
 }
+

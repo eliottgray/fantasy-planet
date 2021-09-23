@@ -75,6 +75,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
     }
 
     fun generate(): ArrayList<Point> {
+        println("Generating $zTile $xTile $yTile")
         val xPixelStart = (xTile * TILE_SIZE) + 1
         val xPixelEnd = xPixelStart + TILE_SIZE
 
@@ -108,7 +109,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         return haversineDistanceMeters(startCoordinate, neighborCoordinate)
     }
 
-    suspend fun writePNG(topTile: MapTile = this) {
+    fun writePNG(topTile: MapTile = this): File {
         val oldRange = topTile.maxElev - topTile.minElev
         val newRange = 255
 
@@ -147,11 +148,14 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         if (!dir.exists()){
             dir.mkdirs()
         }
+        val mapFile = File(path)
         try {
-            ImageIO.write(image, "png", File(path))
+            println("Writing $path")
+            ImageIO.write(image, "png", mapFile)
         } catch (e: IOException) {
             e.printStackTrace()
         }
+        return mapFile
     }
 
     fun nwCorner(): MapTileCoordinate {

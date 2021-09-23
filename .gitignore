@@ -3,3 +3,6 @@
 # Kotlin
 .gradle/
 build/
+
+# Map data
+web/tiles/*
