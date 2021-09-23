@@ -4,8 +4,8 @@ class Planet(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
 
-    fun getElevationAt(lat: Double, lon: Double, resolution: Int): Double {
-        val point = Point.fromSpherical(lat = lat, lon = lon)
+    fun getElevationAt(lat: Double, lon: Double, resolution: Int): Point {
+        val point = Point.fromSpherical(lat = lat, lon = lon, resolution = resolution)
         var current = this.tetra
         var subdivisions = 0
         while (current.longestSide > resolution){
@@ -18,7 +18,7 @@ class Planet(val seed: Double = Defaults.SEED){
                 current = subTwo
             }
         }
-        return current.averageAltitude
+        return point.copy(alt=current.averageAltitude)
     }
 
     fun getMultipleElevations(points: ArrayList<Point>, current: Tetrahedron = this.tetra): ArrayList<Point> {
