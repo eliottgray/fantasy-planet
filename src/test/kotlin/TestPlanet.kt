@@ -13,44 +13,31 @@ class PlanetConstructorTest {
     fun test_positive_case(){
         val planet = Planet()
         assertEquals(Defaults.SEED, planet.seed)
-        assertEquals(Defaults.RESOLUTION_METERS, planet.resolution)
     }
 
     @Test
     fun test_custom_params(){
         val seed = 999183.0
         val resolution = 99
-        val planet = Planet(seed=seed, resolution = resolution)
+        val planet = Planet(seed=seed)
         assertEquals(seed, planet.seed)
-        assertEquals(resolution, planet.resolution)
     }
 
-    @Test
-    fun test_negative_resolution(){
-        val invalidResolution = -1
-        assertThrows(PlanetError::class.java) { Planet(resolution = invalidResolution) }
-    }
-
-    @Test
-    fun test_zero_resolution(){
-        val invalidResolution = 0
-        assertThrows(PlanetError::class.java) { Planet(resolution = invalidResolution) }
-    }
 }
 
 class GetElevationAtCoordinateTest {
 
     @Test
     fun test_low_resolution(){
-        val planet = Planet(seed=99987.0, resolution=100000)
-        val elevation = planet.getElevationAt(lat=-10.0, lon=-43.0)
+        val planet = Planet(seed=99987.0)
+        val elevation = planet.getElevationAt(lat=-10.0, lon=-43.0, resolution=100000)
         assertEquals(-2206.5303409091907, elevation)
     }
 
     @Test
     fun test_high_resolution(){
-        val planet = Planet(seed=54399875.0, resolution=50)
-        val elevation = planet.getElevationAt(lat=45.0, lon=23.0)
+        val planet = Planet(seed=54399875.0)
+        val elevation = planet.getElevationAt(lat=45.0, lon=23.0, resolution=50)
         assertEquals(160.4482471060341, elevation)
     }
 }
@@ -61,14 +48,14 @@ class GetMultipleElevationsTest {
 
     @BeforeEach
     fun setUp(){
-        planet = Planet(seed=99987.0, resolution=100000)
+        planet = Planet(seed=99987.0)
     }
 
     @Test
     fun test_multiple_points(){
         val points = arrayListOf(
-            Point.fromSpherical(lat=-10.0, lon=-43.0),
-            Point.fromSpherical(lat=45.0, lon=23.0)
+            Point.fromSpherical(lat=-10.0, lon=-43.0, resolution=100000),
+            Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000)
         )
         val results = planet.getMultipleElevations(points)
 

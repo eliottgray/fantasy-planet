@@ -1,16 +1,10 @@
 package com.eliottgray.kotlin
 
-class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RESOLUTION_METERS){
+class Planet(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
 
-    init {
-        if (this.resolution <= 0){
-            throw PlanetError("Illegal resolution encountered: $resolution. Resolution must be a positive, non-zero integer.")
-        }
-    }
-
-    fun getElevationAt(lat: Double, lon: Double): Double {
+    fun getElevationAt(lat: Double, lon: Double, resolution: Int): Double {
         val point = Point.fromSpherical(lat = lat, lon = lon)
         var current = this.tetra
         var subdivisions = 0
@@ -31,26 +25,27 @@ class Planet(val seed: Double = Defaults.SEED, val resolution: Int = Defaults.RE
         if (points.isEmpty()){
             return points
         }
-        if (current.longestSide > resolution) {
-            val (leftTetra, rightTetra) = current.subdivide()
-            // TODO: Avoid needing to create an arrayList for each tetrahedron created. Expensive!
-            val leftNodes = ArrayList<Point>()
-            val rightNodes = ArrayList<Point>()
-            for (point in points) {
-                if (leftTetra.contains(point)){
+
+        val (leftTetra, rightTetra) = current.subdivide()
+        // TODO: Avoid needing to create multiple arrayList for each tetrahedron created. Expensive!
+        val results = ArrayList<Point>()
+        val leftNodes = ArrayList<Point>()
+        val rightNodes = ArrayList<Point>()
+        for (point in points) {
+            when {
+                current.longestSide <= point.resolution -> {
+                    results.add(point.copy(alt=current.averageAltitude))
+                }
+                leftTetra.contains(point) -> {
                     leftNodes.add(point)
-                } else {
+                }
+                else -> {
                     rightNodes.add(point)
                 }
             }
-            val results = getMultipleElevations(leftNodes, leftTetra)
-            results.addAll(getMultipleElevations(rightNodes, rightTetra))
-            return results
-        } else {
-            val elevation = current.averageAltitude
-            return ArrayList(points.map {
-                it.copy(alt=elevation)
-            })
         }
+        results.addAll(getMultipleElevations(leftNodes, leftTetra))
+        results.addAll(getMultipleElevations(rightNodes, rightTetra))
+        return results
     }
 }

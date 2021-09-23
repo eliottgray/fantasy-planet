@@ -65,19 +65,16 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         for (xPixel in xPixelStart until xPixelEnd){
             for (yPixel in yPixelStart until yPixelEnd){
                 val tileCoordinate = pixelsToLatLon(px=xPixel.toDouble(), py=yPixel.toDouble(), zoom=zTile)
-                val point = Point.fromSpherical(lat=tileCoordinate.latitude, lon=tileCoordinate.longitude)
+                val widthOfPixelMeters = longitudinalPixelLengthInMeters(xPixel.toDouble(), yPixel.toDouble())
+                val point = Point.fromSpherical(lat=tileCoordinate.latitude, lon=tileCoordinate.longitude,  resolution = ceil(widthOfPixelMeters * 0.6).toInt())
                 allPoints.add(point)
             }
         }
 
         assert(allPoints.size == TILE_SIZE * TILE_SIZE)
 
-        val middleXPixel = xPixelStart + (TILE_SIZE / 2)
-        val middleYPixel = yPixelStart + (TILE_SIZE / 2)
-        val widthOfPixelMeters = longitudinalPixelLengthInMeters(middleXPixel.toDouble(), middleYPixel.toDouble())
-
-        // TODO: Each Pixel should have its own depth, rather than relying on the tile center for all.
-        val planet = Planet(seed=seed, resolution = ceil(widthOfPixelMeters * 0.6).toInt())
+        // TODO: Map tile should not generate the planet.
+        val planet = Planet(seed=seed)
         return planet.getMultipleElevations(allPoints)
     }
 
@@ -85,9 +82,11 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         val middleCoordinate = pixelsToLatLon(px=px, py=py, zoom=zTile)
         val neighborCoordinate = pixelsToLatLon(px=1+px, py=py, zoom=zTile)
 
-        // TODO: Just use Haversine formula instead of using ECEF distance.  Overkill!
-        val first = Point.fromSpherical(lon = middleCoordinate.longitude, lat = middleCoordinate.latitude)
-        val second = Point.fromSpherical(lon = neighborCoordinate.longitude, lat = neighborCoordinate.latitude)
+        val longitudeDelta = neighborCoordinate.longitude - middleCoordinate.longitude
+
+        // TODO: Just use Haversine formula instead of using ECEF distance.  This is Overkill!
+        val first = Point.fromSpherical(lon = 0.0, lat = middleCoordinate.latitude)
+        val second = Point.fromSpherical(lon = longitudeDelta, lat = middleCoordinate.latitude)
         return first.distance(second)
     }
 
