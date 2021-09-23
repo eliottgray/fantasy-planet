@@ -26,8 +26,8 @@ fun sphericalToECEF(lat: Double, lon: Double, alt: Double): Triple<Double, Doubl
     if (lon > 180 || lon < -180){
         throw CoordinateError("Invalid longitude encountered: $lon")
     }
-    val radLat = lat * (PI/180) // TODO: does compilation optimize away multiple divisions of PI?
-    val radLon = lon * (PI/180)
+    val radLat = Math.toRadians(lat)
+    val radLon = Math.toRadians(lon)
     val cosLat = cos(radLat)
     val sinLat = sin(radLat)
     val cosLon = cos(radLon)
