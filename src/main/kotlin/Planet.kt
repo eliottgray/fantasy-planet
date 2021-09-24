@@ -4,6 +4,30 @@ class Planet(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
 
+    private companion object {
+
+        fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
+            // Sorts all records that return TRUE by the comparator to the front of the list, and
+            //   returns the index of the first record that returns FALSE.
+            var pointerOne = 0
+            var pointerTwo = this.size - 1
+            while (true) {
+                while (pointerOne < this.size && compareFunc(this[pointerOne])) {
+                    pointerOne++
+                }
+                while (pointerTwo >= 0 && !compareFunc(this[pointerTwo])) {
+                    pointerTwo--
+                }
+                if (pointerOne >= pointerTwo) {
+                    break
+                }
+                // Using .also{} to swap! https://stackoverflow.com/questions/45377802/swap-function-in-kotlin
+                this[pointerOne] = this[pointerTwo].also { this[pointerTwo] = this[pointerOne] }
+            }
+            return pointerOne
+        }
+    }
+
     fun getElevationAt(lat: Double, lon: Double, resolution: Int): Point {
         val point = Point.fromSpherical(lat = lat, lon = lon, resolution = resolution)
         var current = this.tetra
@@ -54,30 +78,4 @@ class Planet(val seed: Double = Defaults.SEED){
         getMultipleElevations(rightPoints, rightTetra)
         return points
     }
-
-}
-
-fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
-
-    var pointerOne = 0
-    var pointerTwo = this.size - 1
-
-    while (true) {
-
-        while (pointerOne < this.size && compareFunc(this[pointerOne])) {
-            pointerOne++
-        }
-
-        while (pointerTwo >= 0 && !compareFunc(this[pointerTwo])) {
-            pointerTwo--
-        }
-
-        if (pointerOne >= pointerTwo) {
-            break
-        }
-        // Using .also{} to swap! https://stackoverflow.com/questions/45377802/swap-function-in-kotlin
-        this[pointerOne] = this[pointerTwo].also { this[pointerTwo] = this[pointerOne] }
-    }
-
-    return pointerOne
 }
