@@ -7,7 +7,7 @@ data class Tetrahedron private constructor(val a: Point, val b: Point, val c: Po
     companion object {
 
         fun buildDefault(seed: Double, alt: Double=25_000_000.0): Tetrahedron{
-            // Creates a Tetrahedron with default orientation and altitudes
+            // Creates a Tetrahedron with default orientation and altitudes.
             val aSeed = mutateSeed(seed, seed)
             val bSeed = mutateSeed(seed, aSeed)
             val cSeed = mutateSeed(seed, bSeed)

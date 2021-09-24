@@ -83,7 +83,7 @@ class RotateTetrahedronTest {
 
     @BeforeEach
     fun setUp(){
-        val a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)   // "Top" of pyramid.
+        val a = Point(x=0.0, y=0.0, z=1.0, alt=1.0)   // Top of pyramid.
         val b = Point(x=1.0, y=0.0, z=-1.0, alt=0.9)
         val c = Point(x=-1.0, y=1.0, z=-1.0, alt=0.8)
         val d = Point(x=-1.0, y=-1.0, z=-1.0, alt=0.7)
@@ -175,7 +175,6 @@ class SubdivideTest{
         val subdividedB = Tetrahedron.withOrderedPoints(a=midpoint, b=d, c=b, d=c)
         run_test(tetra, subdividedA, subdividedB)
     }
-    // TODO: Validate that, in the case of equal sides, edges are preferred in a guaranteed order.
 }
 
 

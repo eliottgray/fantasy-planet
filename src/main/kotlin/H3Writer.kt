@@ -45,7 +45,11 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
                 val children = h3Core.h3ToChildren(res0Node, h3Depth)
                 for (child in children) {
                     val geoCoordinates = h3Core.h3ToGeo(child)
-                    val point = Point.fromSpherical(lat = geoCoordinates.lat, lon = geoCoordinates.lng, resolution = (edgeLength * 0.6).roundToInt())
+                    val point = Point.fromSpherical(
+                        lat = geoCoordinates.lat,
+                        lon = geoCoordinates.lng,
+                        resolution = (edgeLength * 0.6).roundToInt()
+                    )
                     allPoints.add(point)
                 }
             }

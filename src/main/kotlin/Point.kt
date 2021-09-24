@@ -1,17 +1,32 @@
 package com.eliottgray.kotlin
 import kotlin.math.*
 
-data class Point(val x: Double, val y: Double, val z: Double, val seed: Double = Defaults.SEED, val lat: Double = 0.0, val lon: Double = 0.0, val alt: Double = 0.0, val resolution: Int = Defaults.RESOLUTION_METERS) {
-
+data class Point(
+    val x: Double,
+    val y: Double,
+    val z: Double,
+    val seed: Double = Defaults.SEED,
+    val lat: Double = 0.0,
+    val lon: Double = 0.0,
+    val alt: Double = 0.0,
+    val resolution: Int = Defaults.RESOLUTION_METERS
+) {
 
     init {
         if (this.resolution <= 0){
-            throw PointError("Illegal resolution encountered: $resolution. Resolution must be a positive, non-zero integer.")
+            throw PointError("Illegal resolution encountered: $resolution; must be a positive and non-zero Integer.")
         }
     }
 
     companion object{
-        fun fromSpherical(lat: Double, lon: Double, initialAlt: Double = 0.0, seed: Double = Defaults.SEED, altSeed: Double = 0.0, resolution: Int = Defaults.RESOLUTION_METERS): Point {
+        fun fromSpherical(
+            lat: Double,
+            lon: Double,
+            initialAlt: Double = 0.0,
+            seed: Double = Defaults.SEED,
+            altSeed: Double = 0.0,
+            resolution: Int = Defaults.RESOLUTION_METERS
+        ): Point {
             val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = initialAlt)
             return Point(alt=altSeed, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon, resolution=resolution)
         }
