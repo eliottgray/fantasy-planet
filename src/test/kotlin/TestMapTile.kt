@@ -1,4 +1,5 @@
 import com.eliottgray.kotlin.MapTile
+import com.eliottgray.kotlin.Planet
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
@@ -52,7 +53,7 @@ class MapTileTest {
     @Test
     fun test_specific_tile_and_seed(){
         val seed = 762391.0
-        val mapTile = MapTile(2, 1, 1, seed)
+        val mapTile = MapTile(2, 1, 1, Planet(seed))
         val actualFile = mapTile.writePNG(mapTile)
         val expectedFile = File("src/test/resources/canaryTile.png")
 

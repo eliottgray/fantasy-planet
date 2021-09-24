@@ -56,7 +56,6 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
         }
 
         launch (Dispatchers.IO){
-            // TODO: handle errors related to IO.
 
             val file = File(filepath)
             if (file.exists()){

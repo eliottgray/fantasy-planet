@@ -8,9 +8,9 @@ import javax.imageio.ImageIO
 import kotlin.math.*
 
 
-class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double = Defaults.SEED) {
+class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = Planet(Defaults.SEED)) {
 
-    private val sortedPoints = generate().sortedWith(compareBy( {-it.lat}, {it.lon}))
+    private val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))
     private val maxElev: Double = this.sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
     private val minElev: Double = this.sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
 
@@ -74,7 +74,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
         }
     }
 
-    fun generate(): MutableList<Point> {
+    private fun generate(planet: Planet): MutableList<Point> {
         println("Generating $zTile $xTile $yTile")
         val xPixelStart = (xTile * TILE_SIZE) + 1
         val xPixelEnd = xPixelStart + TILE_SIZE
@@ -98,8 +98,6 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, val seed: Double 
 
         assert(allPoints.size == TILE_SIZE * TILE_SIZE)
 
-        // TODO: Map tile should not generate the planet.
-        val planet = Planet(seed=seed)
         return planet.getMultipleElevations(allPoints)
     }
 
