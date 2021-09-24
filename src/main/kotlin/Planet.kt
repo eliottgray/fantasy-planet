@@ -50,26 +50,24 @@ class Planet(val seed: Double = Defaults.SEED){
             return points
         }
 
+        // Since some of the points may not require any further recursion, we can filter them out and set elevation.
+        val doneIndex: Int = points.partitionInPlaceBy { point ->  current.longestSide <= point.resolution }
+        for (i in 0 until doneIndex) {
+            points[i] = points[i].copy(alt=current.averageAltitude)
+        }
+
+        // If we've identified all points as done, no need to subdivide and recurse.
+        if (doneIndex == points.size) {
+            return points
+        }
+
+        // All remaining points must be sorted into the tetrahedron they are contained within.
         val (leftTetra, rightTetra) = current.subdivide()
 
-        val resolutionComparator = fun(point: Point): Boolean {
-            return current.longestSide <= point.resolution
-        }
-
-        val doneIndex: Int = points.partitionInPlaceBy(resolutionComparator)
-
-        // All the points sorted to the front of the list can now have their altitude set.
-        val donePoints = points.subList(0, doneIndex)
-        for (i in 0 until doneIndex) {
-            donePoints[i] = donePoints[i].copy(alt=current.averageAltitude)
-        }
-
-        val containmentComparator = fun(point: Point): Boolean {
-            return leftTetra.contains(point)
-        }
-        // All remaining points must be sorted into the tetrahedron they are contained within.
         val pendingPoints = points.subList(doneIndex, points.size)
-        val containmentIndex = pendingPoints.partitionInPlaceBy(containmentComparator)
+        val containmentIndex = pendingPoints.partitionInPlaceBy { point ->
+            leftTetra.contains(point)
+        }
 
         val leftPoints = pendingPoints.subList(0, containmentIndex)
         val rightPoints = pendingPoints.subList(containmentIndex, pendingPoints.size)
