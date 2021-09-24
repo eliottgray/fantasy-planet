@@ -37,7 +37,7 @@ class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
     }
 
     suspend fun collectAndWrite(filepath: String) = coroutineScope {
-        val deferredResults: ArrayList<Deferred<ArrayList<Point>>> = ArrayList()
+        val deferredResults: ArrayList<Deferred<MutableList<Point>>> = ArrayList()
 
         for (chunkedRes0Indexes in h3Core.res0Indexes.chunked( 10)) {
             val allPoints = ArrayList<Point>()

@@ -21,31 +21,63 @@ class Planet(val seed: Double = Defaults.SEED){
         return point.copy(alt=current.averageAltitude)
     }
 
-    fun getMultipleElevations(points: ArrayList<Point>, current: Tetrahedron = this.tetra): ArrayList<Point> {
+    fun getMultipleElevations(points: MutableList<Point>, current: Tetrahedron = this.tetra): MutableList<Point> {
         if (points.isEmpty()){
             return points
         }
 
         val (leftTetra, rightTetra) = current.subdivide()
-        // TODO: Avoid needing to create multiple arrayList for each tetrahedron created. Expensive!
-        val results = ArrayList<Point>()
-        val leftNodes = ArrayList<Point>()
-        val rightNodes = ArrayList<Point>()
-        for (point in points) {
-            when {
-                current.longestSide <= point.resolution -> {
-                    results.add(point.copy(alt=current.averageAltitude))
-                }
-                leftTetra.contains(point) -> {
-                    leftNodes.add(point)
-                }
-                else -> {
-                    rightNodes.add(point)
-                }
-            }
+
+        val resolutionComparator = fun(point: Point): Boolean {
+            return current.longestSide <= point.resolution
         }
-        results.addAll(getMultipleElevations(leftNodes, leftTetra))
-        results.addAll(getMultipleElevations(rightNodes, rightTetra))
-        return results
+
+        val doneIndex: Int = points.partitionInPlaceBy(resolutionComparator)
+
+        // All the points sorted to the front of the list can now have their altitude set.
+        val donePoints = points.subList(0, doneIndex)
+        for (i in 0 until doneIndex) {
+            donePoints[i] = donePoints[i].copy(alt=current.averageAltitude)
+        }
+
+        val containmentComparator = fun(point: Point): Boolean {
+            return leftTetra.contains(point)
+        }
+        // All remaining points must be sorted into the tetrahedron they are contained within.
+        val pendingPoints = points.subList(doneIndex, points.size)
+        val containmentIndex = pendingPoints.partitionInPlaceBy(containmentComparator)
+
+        val leftPoints = pendingPoints.subList(0, containmentIndex)
+        val rightPoints = pendingPoints.subList(containmentIndex, pendingPoints.size)
+
+        getMultipleElevations(leftPoints, leftTetra)
+        getMultipleElevations(rightPoints, rightTetra)
+        return points
     }
+
+}
+
+fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
+
+    var pointerOne = 0
+    var pointerTwo = this.size - 1
+
+    while (true) {
+
+        while (pointerOne < this.size && compareFunc(this[pointerOne])) {
+            pointerOne++
+        }
+
+        while (pointerTwo >= 0 && !compareFunc(this[pointerTwo])) {
+            pointerTwo--
+        }
+
+        if (pointerOne >= pointerTwo) {
+            break
+        }
+        // Using .also{} to swap! https://stackoverflow.com/questions/45377802/swap-function-in-kotlin
+        this[pointerOne] = this[pointerTwo].also { this[pointerTwo] = this[pointerOne] }
+    }
+
+    return pointerOne
 }

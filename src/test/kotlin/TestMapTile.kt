@@ -10,6 +10,7 @@ import kotlin.test.assertEquals
 class MapTileTest {
 
     val tolerance = 0.000001
+
     @Test
     fun test_level_zero_corners() {
         val mapTile = MapTile(0, 0, 0)
