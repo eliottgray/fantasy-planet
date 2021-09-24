@@ -23,6 +23,9 @@ dependencies {
     implementation("io.ktor:ktor-server-core:1.6.3")
     implementation("io.ktor:ktor-server-netty:1.6.3")
     implementation("ch.qos.logback:logback-classic:1.2.5")
+
+    // Caching
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
 }
 
 tasks.test {

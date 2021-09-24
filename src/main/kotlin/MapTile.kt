@@ -2,6 +2,7 @@ package com.eliottgray.kotlin
 
 import java.awt.Transparency
 import java.awt.image.*
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
@@ -9,6 +10,8 @@ import kotlin.math.*
 
 
 class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = Planet(Defaults.SEED)) {
+
+    constructor(mapTileKey: MapTileKey) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y, Planet(mapTileKey.seed))
 
     private val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))
     private val maxElev: Double = this.sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
@@ -107,7 +110,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
         return haversineDistanceMeters(startCoordinate, neighborCoordinate)
     }
 
-    fun writePNG(topTile: MapTile = this): File {
+    fun toBufferedImage(topTile: MapTile = this): BufferedImage {
         val oldRange = topTile.maxElev - topTile.minElev
         val newRange = 255
 
@@ -139,7 +142,18 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
             Transparency.OPAQUE,
             DataBuffer.TYPE_BYTE
         )
-        val image = BufferedImage(cm, raster, true, null)
+        return BufferedImage(cm, raster, true, null)
+    }
+
+    fun writeBytes(topTile: MapTile = this): ByteArray {
+        val image = toBufferedImage(topTile)
+        val outputStream = ByteArrayOutputStream()
+        ImageIO.write(image, "png", outputStream)
+        return outputStream.toByteArray()
+    }
+
+    fun writePNG(topTile: MapTile = this): File {
+        val image = toBufferedImage(topTile)
 
         val path = "web/tiles/$zTile/$xTile/$yTile.png"
         val dir = File("web/tiles/$zTile/$xTile/")

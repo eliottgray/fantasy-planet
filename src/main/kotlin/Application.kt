@@ -1,6 +1,7 @@
 package com.eliottgray.kotlin
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
@@ -11,12 +12,12 @@ fun main() {
     embeddedServer(Netty, port = 8080) {
         routing {
             get("/tiles/{z}/{x}/{y}.png") {
-                val z = call.parameters["z"]
-                val x = call.parameters["x"]
-                val y = call.parameters["y"]
+                val z = call.parameters["z"]!!
+                val x = call.parameters["x"]!!
+                val y = call.parameters["y"]!!
                 call.application.environment.log.info("Requesting tile $z/$x/$y.png")  // TODO: Debug rather than info.
-                val file = File("web/tiles/$z/$x/$y.png")
-                call.respondFile(file)  // TODO: Fetch from cache.
+                val byteArray = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt()))
+                call.respondBytes(byteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }
             get("/") {
                 // TODO: Serve statically instead?  Or describe the HTML in code instead?  Templating engine?  :shrug:
