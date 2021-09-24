@@ -4,8 +4,5 @@
 .gradle/
 build/
 
-# Python
-__pycache__
-
 # Map data
 web/tiles/*
