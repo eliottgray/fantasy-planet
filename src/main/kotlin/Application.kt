@@ -11,12 +11,14 @@ import java.io.File
 fun main() {
     embeddedServer(Netty, port = 8080) {
         routing {
-            get("/tiles/{z}/{x}/{y}.png") {
+            get("/tiles/{seed}/{z}/{x}/{y}.png") {
+                // TODO: Validate these params.
+                val seed = call.parameters["seed"]!!
                 val z = call.parameters["z"]!!
                 val x = call.parameters["x"]!!
                 val y = call.parameters["y"]!!
                 call.application.environment.log.info("Requesting tile $z/$x/$y.png")  // TODO: Debug rather than info.
-                val byteArray = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt()))
+                val byteArray = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt(), seed.toDouble()))
                 call.respondBytes(byteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }
             get("/") {

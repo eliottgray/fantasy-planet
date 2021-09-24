@@ -78,7 +78,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
     }
 
     private fun generate(planet: Planet): MutableList<Point> {
-        println("Generating $zTile $xTile $yTile")
+        println("Generating $zTile $xTile $yTile for seed ${planet.seed}")
         val xPixelStart = (xTile * TILE_SIZE) + 1
         val xPixelEnd = xPixelStart + TILE_SIZE
 

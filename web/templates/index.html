@@ -10,9 +10,11 @@
   <div id="cesiumContainer"></div>
   <script>
 
+    var seed = Math.random()
+
     const viewer = new Cesium.Viewer('cesiumContainer', {
         // Base layers include helpfully pre-populated, but unnecessary for our use case, real world data.
-        //  Some of the available layers additionally require a Cesium Ion API key, and trigger a nag.
+        // Some of the available layers additionally require a Cesium Ion API key, and trigger a nag.
         baseLayerPicker : false,
 
         // Geocoder relates to real world data, and also triggers nag regarding api key.
@@ -21,14 +23,15 @@
         // TODO: enable a default spinning animation.
         animation: false,
 
-        // TODO: Replace with fantasy planet tile.
-        // imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-        //     url : 'https://a.tile.openstreetmap.org/'
-        // })
-
         // Local test.
         imageryProvider: new Cesium.UrlTemplateImageryProvider({
-          url : 'http://127.0.0.1:8080/tiles/{z}/{x}/{y}.png'
+          url : 'http://127.0.0.1:8080/tiles/{seed}/{z}/{x}/{y}.png',
+      
+          customTags : {
+            seed: function(imageryProvider, x, y, level) {
+              return seed
+            }
+          }
         })
     });    
 
