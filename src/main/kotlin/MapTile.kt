@@ -9,10 +9,9 @@ import javax.imageio.ImageIO
 import kotlin.math.*
 
 
-class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = Planet(Defaults.SEED), topTile: MapTile? = null) {
+class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = Planet(Defaults.SEED), maxElev: Double? = null, minElev: Double? = null) {
 
-    constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y, Planet(mapTileKey.seed), topTile)
-
+    constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y, Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
 
     val pngByteArray: ByteArray
     private val maxElev: Double
@@ -20,9 +19,9 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
 
     init {
         val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))
-        maxElev = sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
-        minElev = sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
-        pngByteArray = writePNGBytes(sortedPoints, topTile ?: this)
+        this.maxElev = maxElev ?: sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
+        this.minElev = minElev ?: sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
+        pngByteArray = writePNGBytes(sortedPoints)
     }
 
     companion object {
@@ -118,13 +117,13 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
         return haversineDistanceMeters(startCoordinate, neighborCoordinate)
     }
 
-    fun toBufferedImage(sortedPoints: List<Point>, topTile: MapTile = this): BufferedImage {
-        val oldRange = topTile.maxElev - topTile.minElev
+    fun toBufferedImage(sortedPoints: List<Point>): BufferedImage {
+        val oldRange = maxElev - minElev
         // TODO: ColorMap should be a param for the map tile.
         val newRange = ColorMap.ELEVATION_RANGE
 
         val aByteArray: ByteArray = sortedPoints.map{ point ->
-            val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange)
+            val newValue = (((point.alt - minElev) * newRange) / oldRange)
             ColorMap.getColorForElevation(newValue.toInt())
         }.flatten().toByteArray()
 
@@ -150,8 +149,8 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
         return BufferedImage(cm, raster, true, null)
     }
 
-    private fun writePNGBytes(sortedPoints: List<Point>, topTile: MapTile = this): ByteArray {
-        val image = toBufferedImage(sortedPoints, topTile)
+    private fun writePNGBytes(sortedPoints: List<Point>): ByteArray {
+        val image = toBufferedImage(sortedPoints)
         val outputStream = ByteArrayOutputStream()
         ImageIO.write(image, "png", outputStream)
         return outputStream.toByteArray()

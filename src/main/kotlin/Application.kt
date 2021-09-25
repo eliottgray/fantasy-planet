@@ -13,12 +13,13 @@ fun main() {
         routing {
             get("/tiles/{seed}/{z}/{x}/{y}.png") {
                 // TODO: Validate these params.
-                val seed = call.parameters["seed"]!!
-                val z = call.parameters["z"]!!
-                val x = call.parameters["x"]!!
-                val y = call.parameters["y"]!!
+                val seed = call.parameters["seed"]!!.toDouble()
+                val z = call.parameters["z"]!!.toInt()
+                val x = call.parameters["x"]!!.toInt()
+                val y = call.parameters["y"]!!.toInt()
                 call.application.environment.log.debug("Requesting tile $z/$x/$y.png")
-                val mapTile = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt(), seed.toDouble()))
+                val mapTileKey = MapTileKey(z, x, y, seed)
+                val mapTile = MapTileCache.getTile(mapTileKey)
                 call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }
             get("/") {
