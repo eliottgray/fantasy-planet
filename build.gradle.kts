@@ -37,5 +37,5 @@ tasks.withType<KotlinCompile>() {
 }
 
 application {
-    mainClass.set("MainKT")
+    mainClass.set("com.eliottgray.kotlin.ApplicationKt")
 }
