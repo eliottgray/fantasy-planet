@@ -2,3 +2,6 @@
 
 # fantasy-planet
 Generate, populate, and display procedurally-generated fantasy worlds.
+
+# Running
+Run the web application with the gradle application plugin: `./gradlew run`

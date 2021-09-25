@@ -17,7 +17,7 @@ fun main() {
                 val z = call.parameters["z"]!!
                 val x = call.parameters["x"]!!
                 val y = call.parameters["y"]!!
-                call.application.environment.log.info("Requesting tile $z/$x/$y.png")  // TODO: Debug rather than info.
+                call.application.environment.log.debug("Requesting tile $z/$x/$y.png")
                 val byteArray = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt(), seed.toDouble()))
                 call.respondBytes(byteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }

@@ -117,9 +117,6 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
 
         val aByteArray: ByteArray = this.sortedPoints.map{ point ->
             val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange)
-            if (newValue < 1 || newValue > 250){
-                println("break!")
-            }
             ColorMap.getColorForElevation(newValue.toInt())
         }.flatten().toByteArray()
 
