@@ -16,12 +16,12 @@ class MapTileCache {
         fun getTile(mapTileKey: MapTileKey): MapTile {
             // Unfortunately top tile is needed to ensure consistent coloring of elevation ranges.
             val topKey = mapTileKey.copy(z=0,x=0,y=0)
-            val top = mapTiles.get(topKey) { key -> MapTile(key) }.get()!!
+            val topTile = mapTiles.get(topKey) { key -> MapTile(key) }.get()!!
             return if (mapTileKey == topKey) {
                 // TODO: If key is 0/0/0, pre-populate top-level data, THEN return the desired result.
-                top
+                topTile
             } else {
-                return mapTiles.get(mapTileKey) { key -> MapTile(key) }.get()!!
+                return mapTiles.get(mapTileKey) { key -> MapTile(key, topTile) }.get()!!
             }
         }
     }
