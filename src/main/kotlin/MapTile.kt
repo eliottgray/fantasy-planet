@@ -112,15 +112,15 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
 
     fun toBufferedImage(topTile: MapTile = this): BufferedImage {
         val oldRange = topTile.maxElev - topTile.minElev
-        val newRange = 255
+        // TODO: ColorMap should be a param for the map tile.
+        val newRange = ColorMap.ELEVATION_RANGE
 
         val aByteArray: ByteArray = this.sortedPoints.map{ point ->
-            val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange) -128
-            if (newValue < 0) {
-                arrayListOf(0.toByte(), 0.toByte(), (-newValue.toInt()).toByte())
-            } else {
-                arrayListOf(newValue.toInt().toByte(), 0.toByte(), 0.toByte())
+            val newValue = (((point.alt - topTile.minElev) * newRange) / oldRange)
+            if (newValue < 1 || newValue > 250){
+                println("break!")
             }
+            ColorMap.getColorForElevation(newValue.toInt())
         }.flatten().toByteArray()
 
         val buffer: DataBuffer = DataBufferByte(aByteArray, aByteArray.size)
