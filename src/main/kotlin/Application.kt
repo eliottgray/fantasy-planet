@@ -18,8 +18,8 @@ fun main() {
                 val x = call.parameters["x"]!!
                 val y = call.parameters["y"]!!
                 call.application.environment.log.debug("Requesting tile $z/$x/$y.png")
-                val byteArray = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt(), seed.toDouble()))
-                call.respondBytes(byteArray, ContentType.Image.PNG, HttpStatusCode.OK)
+                val mapTile = MapTileCache.getTile(MapTileKey(z.toInt(), x.toInt(), y.toInt(), seed.toDouble()))
+                call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }
             get("/") {
                 // TODO: Serve statically instead?  Or describe the HTML in code instead?  Templating engine?  :shrug:

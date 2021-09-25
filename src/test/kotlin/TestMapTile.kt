@@ -54,7 +54,7 @@ class MapTileTest {
     fun test_specific_tile_and_seed(){
         val seed = 762391.0
         val mapTile = MapTile(2, 1, 1, Planet(seed))
-        val actualFile = mapTile.writePNG(mapTile)
+        val actualFile = mapTile.writePNG()
         val expectedFile = File("src/test/resources/canaryTile.png")
 
         val actualBytes = imageToBytes(ImageIO.read(actualFile))
