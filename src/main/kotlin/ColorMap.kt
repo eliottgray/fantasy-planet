@@ -11,8 +11,11 @@ class ColorMap {
             1 to rgbToByteList(0, 53, 83),
             85 to rgbToByteList(5, 70, 107,),
             100 to rgbToByteList(17, 85, 124),
+            110 to rgbToByteList(60, 130, 160),  // Interpolated
             120 to rgbToByteList(104, 176, 196),
-            125 to rgbToByteList(179, 214, 224),
+            122 to rgbToByteList(141, 195, 210),  // Interpolated
+            124 to rgbToByteList(160, 204, 217),  // Interpolated
+            // 125 to rgbToByteList(179, 214, 224),  // Removed from the original map as the color seemed too bright.
             126 to rgbToByteList( 8, 68, 34),
             155 to rgbToByteList( 50, 101, 50),
             185 to rgbToByteList( 118, 141, 69),
