@@ -26,6 +26,14 @@ class MapTileTest {
             assertEquals(expectedByte, actualByte, "Test image ${actualFile.path} failed to match expected image ${expectedFile.path} at byte index $i.")
         }
     }
+
+    @Test
+    fun test_longitudinal_width_of_pixel(){
+        val expected = 11119.492664455875
+        val actual = MapTile.longitudinalWidthOfPixelMeters(0.0, 0.1)
+        assertEquals(expected, actual)
+    }
+
     private fun imageToBytes(bi: BufferedImage): ByteArray {
         return (bi.data.dataBuffer as DataBufferByte).data
     }

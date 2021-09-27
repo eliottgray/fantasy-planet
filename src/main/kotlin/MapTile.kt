@@ -9,8 +9,14 @@ import javax.imageio.ImageIO
 import kotlin.math.*
 
 
-class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = Planet(Defaults.SEED), maxElev: Double? = null, minElev: Double? = null) {
-
+class MapTile (
+    val zTile: Int,
+    val xTile: Int,
+    val yTile: Int,
+    planet: Planet = Planet(Defaults.SEED),
+    maxElev: Double? = null,
+    minElev: Double? = null
+) {
     constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y, Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
 
     val pngByteArray: ByteArray
@@ -49,6 +55,13 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
             val c = 2 * asin(sqrt(a))
             return rad * c
         }
+
+        fun longitudinalWidthOfPixelMeters(pixelLat: Double, pixelLongitudeWidth: Double): Double {
+            return haversineDistanceMeters(
+                MapTileCoordinate(pixelLat, 0.0),
+                MapTileCoordinate(pixelLat, pixelLongitudeWidth)
+            )
+        }
     }
 
     private fun generate(planet: Planet): MutableList<Point> {
@@ -63,10 +76,7 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
 
             // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
             // varies by latitude. Do this once for each discrete latitude in the tile.
-            val widthOfPixelMeters = haversineDistanceMeters(
-                MapTileCoordinate(currentLat, 0.0),
-                MapTileCoordinate(currentLat, lonDelta)
-            )
+            val widthOfPixelMeters = longitudinalWidthOfPixelMeters(currentLat, lonDelta)
 
             var currentLon = tileBounds.west
             while (currentLon < tileBounds.east) {
