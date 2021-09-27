@@ -52,16 +52,14 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
     }
 
     private fun generate(planet: Planet): MutableList<Point> {
-        val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(zTile, xTile, yTile)
-
-        val lonDelta = (tileBounds.east - tileBounds.west) / TILE_SIZE
-        val latDelta = (tileBounds.north - tileBounds.south) / TILE_SIZE
-
+        println("Generating $zTile $xTile $yTile for seed ${planet.seed}")
         val allPoints = ArrayList<Point>()
 
+        val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(zTile, xTile, yTile)
+        val lonDelta = (tileBounds.east - tileBounds.west) / TILE_SIZE
+        val latDelta = (tileBounds.north - tileBounds.south) / TILE_SIZE
         var currentLat = tileBounds.north
         while (currentLat > tileBounds.south) {
-
 
             // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
             // varies by latitude. Do this once for each discrete latitude in the tile.
@@ -72,38 +70,18 @@ class MapTile (val zTile: Int, val xTile: Int, val yTile: Int, planet: Planet = 
 
             var currentLon = tileBounds.west
             while (currentLon < tileBounds.east) {
-
-
-                val point = Point.fromSpherical(lat=currentLat, lon=currentLon,  resolution = ceil(widthOfPixelMeters * 0.6).toInt())
-                allPoints.add(point)
+                allPoints.add(
+                    Point.fromSpherical(
+                        lat=currentLat,
+                        lon=currentLon,
+                        resolution = ceil(widthOfPixelMeters * 0.6).toInt()
+                    )
+                )
                 currentLon += lonDelta
             }
             currentLat -= latDelta
         }
-
-        println("Generating $zTile $xTile $yTile for seed ${planet.seed}")
-//        val xPixelStart = (xTile * TILE_SIZE) + 1
-//        val xPixelEnd = xPixelStart + TILE_SIZE
-//
-//        val yPixelStart = (yTile * TILE_SIZE) + 1
-//        val yPixelEnd = yPixelStart + TILE_SIZE
-//
-//        val allPoints = ArrayList<Point>()
-//        for (yPixel in yPixelStart until yPixelEnd){
-//
-//            // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
-//            // varies by latitude. Do this once for each discrete latitude in the tile.
-//            val widthOfPixelMeters = longitudinalPixelLengthInMeters(yPixel.toDouble())
-//
-//            for (xPixel in xPixelStart until xPixelEnd){
-//                val tileCoordinate = pixelsToLatLon(px=xPixel.toDouble(), py=yPixel.toDouble(), zoom=zTile)
-//                val point = Point.fromSpherical(lat=tileCoordinate.latitude, lon=tileCoordinate.longitude,  resolution = ceil(widthOfPixelMeters * 0.6).toInt())
-//                allPoints.add(point)
-//            }
-//        }
-
         assert(allPoints.size == TILE_SIZE * TILE_SIZE)
-
         return planet.getMultipleElevations(allPoints)
     }
 
