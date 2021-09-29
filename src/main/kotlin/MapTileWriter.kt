@@ -27,8 +27,8 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
         }
 
         launch(Dispatchers.IO) {
-            for (mapTile in deferredResults.awaitAll()) {
-                mapTile.writePNG()
+            for (deferred in deferredResults) {
+                deferred.await().writePNG()
             }
         }
     }
