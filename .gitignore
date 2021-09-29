@@ -5,4 +5,4 @@
 build/
 
 # Map data
-web/tiles/*
+app/web/tiles/*
