@@ -28,7 +28,7 @@ data class Point(
             resolution: Int = Defaults.RESOLUTION_METERS
         ): Point {
             val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = initialAlt)
-            return Point(alt=altSeed, x=x, y=y, z=z, seed=seed, lat=lat, lon=lon, resolution=resolution)
+            return Point(alt = altSeed, x = x, y = y, z = z, seed = seed, lat = lat, lon = lon, resolution = resolution)
         }
     }
 
@@ -38,7 +38,7 @@ data class Point(
         val cosRad = cos(radians)
         val newY = this.y * cosRad - this.z * sinRad
         val newZ = this.z * cosRad + this.y * sinRad
-        return Point(x=this.x, y=newY, z=newZ, alt=this.alt, seed=this.seed)
+        return Point(x = this.x, y = newY, z = newZ, alt = this.alt, seed = this.seed)
     }
 
     fun rotateAroundYAxis(degrees: Double): Point {
@@ -47,7 +47,7 @@ data class Point(
         val cosRad = cos(radians)
         val newX = this.x * cosRad + this.z * sinRad
         val newZ = -sinRad * this.x + this.z * cosRad
-        return Point(x=newX, y=this.y, z=newZ, alt=this.alt, seed=this.seed)
+        return Point(x = newX, y = this.y, z = newZ, alt = this.alt, seed = this.seed)
     }
 
     fun distance(other: Point): Double {
@@ -91,6 +91,6 @@ data class Point(
         val lengthWeight = 0.65
         val lengthPow = 0.47
         val alt = (this.alt + other.alt) / 2 + newSeed * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newSeed * lengthWeight * length.pow(lengthPow)
-        return Point(x=x, y=y, z=z, alt=alt, seed=newSeed)
+        return Point(x = x, y = y, z = z, alt = alt, seed = newSeed)
     }
 }

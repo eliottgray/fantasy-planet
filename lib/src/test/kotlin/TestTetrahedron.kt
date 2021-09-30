@@ -98,7 +98,7 @@ class RotateTetrahedronTest {
         val d = Point(x=-1.0, y=1.0, z=-1.0, alt=0.7)
         val expected = Tetrahedron.withOrderedPoints(a=a, b=b, c=c, d=d)
         val actual = this.tetra.rotateAroundXAxis(90.0)
-        testTetrahedronsAlmostEqual(expected=expected, actual=actual)
+        testTetrahedronsAlmostEqual(expected = expected, actual = actual)
     }
 
     @Test
@@ -109,7 +109,7 @@ class RotateTetrahedronTest {
         val b = Point(x=-1.0, y=0.0, z=-1.0, alt=0.9)
         val expected = Tetrahedron.withOrderedPoints(a=a, b=b, c=c, d=d)
         val actual = this.tetra.rotateAroundYAxis(90.0)
-        testTetrahedronsAlmostEqual(expected=expected, actual=actual)
+        testTetrahedronsAlmostEqual(expected = expected, actual = actual)
     }
 }
 

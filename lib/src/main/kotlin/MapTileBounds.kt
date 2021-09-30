@@ -14,7 +14,7 @@ data class MapTileBounds(val north: Double, val south: Double, val east: Double,
             val yTileHeight = 180.0 / yTiles
             val north = 90.0 - y * yTileHeight
             val south = 90.0 - (y + 1) * yTileHeight
-            return MapTileBounds(north=north, south=south, east=east, west=west)
+            return MapTileBounds(north = north, south = south, east = east, west = west)
         }
     }
 }

@@ -17,7 +17,8 @@ class MapTile (
     maxElev: Double? = null,
     minElev: Double? = null
 ) {
-    constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y, Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
+    constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
+        Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
 
     val pngByteArray: ByteArray
     private val maxElev: Double
@@ -82,8 +83,8 @@ class MapTile (
             while (currentLon < tileBounds.east) {
                 allPoints.add(
                     Point.fromSpherical(
-                        lat=currentLat,
-                        lon=currentLon,
+                        lat = currentLat,
+                        lon = currentLon,
                         resolution = ceil(widthOfPixelMeters * 0.6).toInt()
                     )
                 )
@@ -127,7 +128,7 @@ class MapTile (
         return BufferedImage(cm, raster, true, null)
     }
 
-    private fun writePNGBytes(sortedPoints: List<Point>): ByteArray {
+    fun writePNGBytes(sortedPoints: List<Point>): ByteArray {
         val image = toBufferedImage(sortedPoints)
         val outputStream = ByteArrayOutputStream()
         ImageIO.write(image, "png", outputStream)
