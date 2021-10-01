@@ -11,11 +11,12 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) = runBlocking {
 
-    val isDemo = environment.config.propertyOrNull("ktor.demo")?.getString()?.toBooleanStrictOrNull() ?: true  // We want to default to demo behavior.
+    val isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull() ?: true  // We want to default to demo behavior.
     if (isDemo) {
         log.info("Demo mode initializing.")
+        val depth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1  // We want to default to demo behavior.
         val demoSeed = 0.12345
-        val writer =  MapTileWriter(6, demoSeed)
+        val writer =  MapTileWriter(depth, demoSeed)
         writer.collectAndWrite(demoSeed)
         log.info("Demo mode inizialization complete.")
     }
