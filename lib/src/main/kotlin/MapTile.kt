@@ -21,8 +21,8 @@ class MapTile (
         Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
 
     val pngByteArray: ByteArray
-    private val maxElev: Double
-    private val minElev: Double
+    val maxElev: Double
+    val minElev: Double
 
     init {
         val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))

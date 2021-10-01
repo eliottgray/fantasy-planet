@@ -7,3 +7,4 @@ build/
 # Map data
 web/tiles/*
 lib/web/tiles/*
+app/web/tiles/*
