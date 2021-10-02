@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.5.0"
     application
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "com.eliottgray"
@@ -35,4 +36,12 @@ tasks.withType<KotlinCompile>() {
 
 application {
     mainClass.set("com.eliottgray.kotlin.ApplicationKt")
+}
+
+tasks{
+    shadowJar {
+        manifest {
+            attributes(Pair("Main-Class", "com.example.ApplicationKt"))
+        }
+    }
 }
