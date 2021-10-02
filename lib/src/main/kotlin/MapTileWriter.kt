@@ -1,6 +1,8 @@
 package com.eliottgray.kotlin
 import kotlinx.coroutines.*
 import java.lang.RuntimeException
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 
 class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
@@ -19,10 +21,10 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
         val planet = Planet(seed)
         val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 
-        // Top tile is required first, to ensure consistent coloring of all other tiles.
-        // TODO: Determine the elevation range using BOTH tiles.
+        // Top tiles are required first, to ensure consistent coloring of all other tiles.
         val topTile = MapTile(0, 0, 0, planet)
         val topTile2 = MapTile(0, 1, 0, planet)
+        val tileElevations = MapTileElevations.fromTopTiles(topTile, topTile2)
 
         topTile.writePNG()
         topTile2.writePNG()
@@ -33,7 +35,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
             for (x in 0 until rowColCount * 2) {
                 for (y in 0 until rowColCount) {
                     val result = async(Dispatchers.Default) {
-                        MapTile(z, x, y, planet, maxElev = topTile.maxElev, minElev = topTile.minElev)
+                        MapTile(z, x, y, planet, tileElevations)
                     }
                     deferredResults.add(result)
                 }

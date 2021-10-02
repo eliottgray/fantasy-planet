@@ -14,11 +14,10 @@ class MapTile (
     val xTile: Int,
     val yTile: Int,
     planet: Planet = Planet(Defaults.SEED),
-    maxElev: Double? = null,
-    minElev: Double? = null
+    elevations: MapTileElevations? = null
 ) {
-    constructor(mapTileKey: MapTileKey, topTile: MapTile? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
-        Planet(mapTileKey.seed), topTile?.maxElev, topTile?.minElev)
+    constructor(mapTileKey: MapTileKey, elevations: MapTileElevations? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
+        Planet(mapTileKey.seed), elevations)
 
     val pngByteArray: ByteArray
     val maxElev: Double
@@ -26,8 +25,8 @@ class MapTile (
 
     init {
         val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))
-        this.maxElev = maxElev ?: sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
-        this.minElev = minElev ?: sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
+        this.maxElev = elevations?.maxElevation ?: sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
+        this.minElev = elevations?.minElevation ?: sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
         pngByteArray = writePNGBytes(sortedPoints)
     }
 
@@ -66,7 +65,6 @@ class MapTile (
     }
 
     private fun generate(planet: Planet): MutableList<Point> {
-        println("Generating $zTile $xTile $yTile for seed ${planet.seed}")
         val allPoints = ArrayList<Point>()
 
         val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(zTile, xTile, yTile)
