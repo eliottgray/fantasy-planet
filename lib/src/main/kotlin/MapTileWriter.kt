@@ -35,7 +35,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
             for (x in 0 until rowColCount * 2) {
                 for (y in 0 until rowColCount) {
                     val result = async(Dispatchers.Default) {
-                        MapTile(z, x, y, planet, tileElevations.maxElevation, tileElevations.minElevation)
+                        MapTile(z, x, y, planet, tileElevations)
                     }
                     deferredResults.add(result)
                 }
