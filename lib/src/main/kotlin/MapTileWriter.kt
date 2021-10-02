@@ -24,8 +24,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
         // Top tiles are required first, to ensure consistent coloring of all other tiles.
         val topTile = MapTile(0, 0, 0, planet)
         val topTile2 = MapTile(0, 1, 0, planet)
-        val maxElev = max(topTile.maxElev, topTile2.maxElev)
-        val minElev = min(topTile.minElev, topTile2.minElev)
+        val tileElevations = MapTileElevations.fromTopTiles(topTile, topTile2)
 
         topTile.writePNG()
         topTile2.writePNG()
@@ -36,7 +35,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
             for (x in 0 until rowColCount * 2) {
                 for (y in 0 until rowColCount) {
                     val result = async(Dispatchers.Default) {
-                        MapTile(z, x, y, planet, maxElev, minElev)
+                        MapTile(z, x, y, planet, tileElevations.maxElevation, tileElevations.minElevation)
                     }
                     deferredResults.add(result)
                 }

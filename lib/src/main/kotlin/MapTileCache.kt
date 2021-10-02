@@ -33,9 +33,7 @@ class MapTileCache {
             // Unfortunately, the top tiles are needed to ensure consistent coloring of elevation ranges.
             val topTileOne = mapTiles.get(MapTileKey(0, 0, 0, seed)) { key -> MapTile(key) }.get()!!
             val topTileTwo = mapTiles.get(MapTileKey(0, 1, 0, seed)) { key -> MapTile(key) }.get()!!
-            val minElev = min(topTileOne.minElev, topTileTwo.minElev)
-            val maxElev = max(topTileOne.maxElev, topTileTwo.maxElev)
-            return MapTileElevations(minElevation = minElev, maxElevation = maxElev)
+            return MapTileElevations.fromTopTiles(topTileOne, topTileTwo)
         }
     }
 }
