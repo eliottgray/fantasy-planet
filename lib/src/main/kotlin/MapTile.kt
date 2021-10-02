@@ -66,7 +66,6 @@ class MapTile (
     }
 
     private fun generate(planet: Planet): MutableList<Point> {
-        println("Generating $zTile $xTile $yTile for seed ${planet.seed}")
         val allPoints = ArrayList<Point>()
 
         val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(zTile, xTile, yTile)

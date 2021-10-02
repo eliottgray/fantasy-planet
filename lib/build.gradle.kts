@@ -14,6 +14,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
+
     implementation("com.uber:h3:3.7.0")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
