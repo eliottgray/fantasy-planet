@@ -27,7 +27,7 @@
 
         // Local test.
         imageryProvider: new Cesium.UrlTemplateImageryProvider({
-          url : 'http://127.0.0.1:8080/tiles/{seed}/{z}/{x}/{y}.png',
+          url : 'http://127.0.0.1:5000/tiles/{seed}/{z}/{x}/{y}.png',
           maximumLevel: maxDepth,
           tilingScheme : new Cesium.GeographicTilingScheme(),
           customTags : {
