@@ -37,3 +37,11 @@ tasks.withType<KotlinCompile>() {
 application {
     mainClass.set("com.eliottgray.kotlin.ApplicationKt")
 }
+
+tasks{
+    shadowJar {
+        manifest {
+            attributes(Pair("Main-Class", "com.eliottgray.kotlin.ApplicationKt"))
+        }
+    }
+}
