@@ -5,7 +5,9 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.runBlocking
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -40,8 +42,9 @@ fun Application.module(testing: Boolean = false) = runBlocking {
         }
         get("/") {
             // TODO: Serve statically instead?  Or describe the HTML in code instead?  Templating engine?  :shrug:
-            val index = File("web/templates/index.html")
-            call.respondFile(index)
+            val inputStream = javaClass.getResourceAsStream("/index.html")!!
+            val htmlString = BufferedReader(InputStreamReader(inputStream)).readText()
+            call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { htmlString }
         }
     }
 }
