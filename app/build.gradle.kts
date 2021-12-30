@@ -18,9 +18,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
 
     // Web Frameworks  // TODO: Break out ktor version into global project variable.
-    implementation("io.ktor:ktor-server-core:1.6.3")
-    implementation("io.ktor:ktor-server-netty:1.6.3")
-    testImplementation("io.ktor:ktor-server-test-host:1.6.3")
+    implementation("io.ktor:ktor-server-core:1.6.7")
+    implementation("io.ktor:ktor-server-netty:1.6.7")
+    implementation("io.ktor:ktor-html-builder:1.6.7")
+    testImplementation("io.ktor:ktor-server-test-host:1.6.7")
     implementation("ch.qos.logback:logback-classic:1.2.5")
 
     implementation(project(":lib"))
