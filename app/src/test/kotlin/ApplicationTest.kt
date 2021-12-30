@@ -27,6 +27,7 @@ class ApplicationTest {
             dir.deleteRecursively()
         }
     }
+
     @Test
     fun testRoot() {
         withApplication(testAppEnv) {
@@ -36,7 +37,6 @@ class ApplicationTest {
             }
         }
     }
-
 
     @Test
     fun testTile() {
@@ -51,10 +51,54 @@ class ApplicationTest {
     }
 
     @Test
-    fun testInvalidTile() {
+    fun testTileIndexOutOfBounds() {
         withApplication(testAppEnv) {
             val invalidYCoordinate = 9999
             handleRequest(HttpMethod.Get, "/tiles/762391.0/0/0/$invalidYCoordinate.png").apply {
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
+            }
+        }
+    }
+
+    @Test
+    fun testTileSeedNotNumeric() {
+        withApplication(testAppEnv) {
+            val notNumeric = "foo"
+            handleRequest(HttpMethod.Get, "/tiles/$notNumeric/0/0/0.png").apply {
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
+            }
+        }
+    }
+
+    @Test
+    fun testTileZNotNumeric() {
+        withApplication(testAppEnv) {
+            val notNumeric = "foo"
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/$notNumeric/0/0.png").apply {
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
+            }
+        }
+    }
+
+    @Test
+    fun testTileXNotNumeric() {
+        withApplication(testAppEnv) {
+            val notNumeric = "foo"
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/0/$notNumeric/0.png").apply {
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
+            }
+        }
+    }
+
+    @Test
+    fun testTileYNotNumeric() {
+        withApplication(testAppEnv) {
+            val notNumeric = "foo"
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/0/0/$notNumeric.png").apply {
                 assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
                 assertEquals(HttpStatusCode.BadRequest, response.status())
             }
@@ -78,7 +122,6 @@ class ApplicationTest {
         }
     }
 
-
     @Test
     fun testDemoTile() {
         withApplication(testDemoEnv) {
@@ -101,5 +144,4 @@ class ApplicationTest {
             }
         }
     }
-
 }

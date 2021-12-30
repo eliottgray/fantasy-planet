@@ -1,5 +1,10 @@
 package com.eliottgray.kotlin
 
+import arrow.core.Either
+import arrow.core.computations.either
+import arrow.core.flatMap
+import arrow.core.left
+import arrow.core.right
 import io.ktor.application.*
 import io.ktor.html.*
 import io.ktor.http.*
@@ -28,31 +33,26 @@ fun Application.module(testing: Boolean = false) = runBlocking {
     routing {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
             // TODO: Validate these params.
-            val seed = call.parameters["seed"]!!.toDouble()
-            val z = call.parameters["z"]!!.toInt()
-            val x = call.parameters["x"]!!.toInt()
-            val y = call.parameters["y"]!!.toInt()
-            call.application.environment.log.debug("Requesting tile $z/$x/$y.png")
-            if (isDemo) {
-                val tileFile = File("web/tiles/$z/$x/$y.png")
-                if (tileFile.exists()){
-                    call.respondFile(tileFile)
-                } else {
-                    val errorMessage = "Demo tile not found: $z/$x/$y.png"
-                    log.error(errorMessage)
-                    call.respond(HttpStatusCode.NotFound, errorMessage)
+            buildMapTileKey(call.parameters)
+                .flatMap { mapTileKey -> mapTileKey.validate() }
+                .flatMap { mapTileKey ->
+                    val keyPath = "${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}"
+                    call.application.environment.log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
+                    if (isDemo) {
+                        val demoTileFile = File("web/tiles/$keyPath.png")
+                        if (demoTileFile.exists()){
+                            call.respondFile(demoTileFile).right()
+                        } else {
+                            Pair(HttpStatusCode.NotFound, "Demo tile not found: $keyPath.png").left()
+                        }
+                    } else {
+                        val mapTile = MapTileCache.getTile(mapTileKey)
+                        call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK).right()
+                    }
+                }.mapLeft { errorPair ->
+                    log.error(errorPair.second)
+                    call.respond(errorPair.first, errorPair.second)
                 }
-            } else {
-                val mapTileKey = MapTileKey(z, x, y, seed)
-                if (mapTileKey.isValid()){
-                    val mapTile = MapTileCache.getTile(mapTileKey)
-                    call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
-                } else {
-                    val errorMessage = "Invalid tile request: $z/$x/$y.png"
-                    log.debug(errorMessage)
-                    call.respond(HttpStatusCode.BadRequest, errorMessage)
-                }
-            }
         }
 
         get("/") {
@@ -114,5 +114,39 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
                 }
             }
         }
+    }
+}
+
+private suspend fun buildMapTileKey(callParameters: Parameters): Either<Pair<HttpStatusCode, String>, MapTileKey> {
+    return either {
+        val seed = (callParameters["seed"]!!.toDoubleOrNull()?.right() ?: Pair(
+            HttpStatusCode.BadRequest,
+            "Seed must be a number."
+        ).left()).bind()
+        val z = (callParameters["z"]!!.toIntOrNull()?.right() ?: Pair(
+            HttpStatusCode.BadRequest,
+            "Z must be a number."
+        ).left()).bind()
+        val x = (callParameters["x"]!!.toIntOrNull()?.right() ?: Pair(
+            HttpStatusCode.BadRequest,
+            "X must be a number."
+        ).left()).bind()
+        val y = (callParameters["y"]!!.toIntOrNull()?.right() ?: Pair(
+            HttpStatusCode.BadRequest,
+            "Y must be a number."
+        ).left()).bind()
+        MapTileKey(z, x, y, seed)
+    }
+}
+
+private fun MapTileKey.validate(): Either<Pair<HttpStatusCode, String>, MapTileKey> {
+    return if (this.isValid()) {
+        this.right()
+    } else {
+        val pair: Pair<HttpStatusCode, String> = Pair(
+            HttpStatusCode.BadRequest,
+            "Invalid tile request: ${this.z}/${this.x}/${this.y}.png"
+            )
+        pair.left()
     }
 }

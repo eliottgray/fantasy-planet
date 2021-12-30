@@ -25,6 +25,9 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.2.5")
 
+    // Arrow-kt for functional error handling
+    implementation("io.arrow-kt:arrow-core:1.0.1")
+
     implementation(project(":lib"))
 }
 
