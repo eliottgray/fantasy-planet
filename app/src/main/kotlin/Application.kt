@@ -14,12 +14,12 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) = runBlocking {
 
     val isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
-        ?: true  // We want to default to demo behavior.
+        ?: true  // We want to default to demo behavior to be safe, and avoid undesired computation.
+    val demoDepth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
+    val demoSeed = environment.config.propertyOrNull("ktor.demo.seed")?.getString()?.toDoubleOrNull() ?: 0.12345
     if (isDemo) {
         log.info("Demo mode initializing.")
-        val depth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
-        val demoSeed = 0.12345
-        val writer = MapTileWriter(depth, demoSeed)
+        val writer = MapTileWriter(demoDepth, demoSeed)
         // TODO: Don't block demo page while files are being written to disk.
         writer.collectAndWrite(demoSeed)
         log.info("Demo mode initialization complete.")
@@ -50,6 +50,8 @@ fun Application.module(testing: Boolean = false) = runBlocking {
         }
 
         get("/") {
+            val randomOrDemoSeed = if (isDemo) demoSeed.toString() else "Math.random()"
+            val maxDepth = if (isDemo && demoDepth < 20) demoDepth.toString() else 20.toString()
             call.respondHtml(HttpStatusCode.OK) {
                 lang = "en"
                 head {
@@ -73,8 +75,8 @@ fun Application.module(testing: Boolean = false) = runBlocking {
                         unsafe {
                             raw("""
 // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
-var seed = Math.random()
-var maxDepth = 20;  // TODO: 20 is OSM lowest, choose based on size per pixel per zoom level.
+var seed = $randomOrDemoSeed
+var maxDepth = $maxDepth;  // TODO: 20 is OSM lowest, choose based on size per pixel per zoom level.
 
 const viewer = new Cesium.Viewer('cesiumContainer', {
     // Base layers include helpfully pre-populated, but unnecessary for our use case, real world data.
