@@ -142,6 +142,7 @@ class MapTile (
         }
         val mapFile = File(path)
         try {
+            // TODO: Log instead of println.
             println("Writing $path")
             mapFile.writeBytes(pngByteArray)
         } catch (e: IOException) {

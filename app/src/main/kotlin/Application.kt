@@ -44,8 +44,14 @@ fun Application.module(testing: Boolean = false) = runBlocking {
                 }
             } else {
                 val mapTileKey = MapTileKey(z, x, y, seed)
-                val mapTile = MapTileCache.getTile(mapTileKey)
-                call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
+                if (mapTileKey.isValid()){
+                    val mapTile = MapTileCache.getTile(mapTileKey)
+                    call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
+                } else {
+                    val errorMessage = "Invalid tile: $z/$x/$y.png"
+                    log.warn(errorMessage)
+                    call.respond(HttpStatusCode.BadRequest, errorMessage)
+                }
             }
         }
 

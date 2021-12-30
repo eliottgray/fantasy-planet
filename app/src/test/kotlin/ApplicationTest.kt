@@ -50,6 +50,17 @@ class ApplicationTest {
         }
     }
 
+    @Test
+    fun testInvalidTile() {
+        withApplication(testAppEnv) {
+            val invalidYCoordinate = 9999
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/0/0/$invalidYCoordinate.png").apply {
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
+            }
+        }
+    }
+
     private val testDemoEnv = createTestEnvironment {
         config = HoconApplicationConfig(appConfig
             .withValue("ktor.demo.enabled", ConfigValueFactory.fromAnyRef(true))
@@ -85,9 +96,7 @@ class ApplicationTest {
         withApplication(testDemoEnv) {
             val invalidDepth = 1
             handleRequest(HttpMethod.Get, "/tiles/762391.0/$invalidDepth/1/0.png").apply {
-                assertEquals(
-                    ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType()
-                )
+                assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
                 assertEquals(HttpStatusCode.NotFound, response.status())
             }
         }
