@@ -48,8 +48,8 @@ fun Application.module(testing: Boolean = false) = runBlocking {
                     val mapTile = MapTileCache.getTile(mapTileKey)
                     call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
                 } else {
-                    val errorMessage = "Invalid tile: $z/$x/$y.png"
-                    log.warn(errorMessage)
+                    val errorMessage = "Invalid tile request: $z/$x/$y.png"
+                    log.debug(errorMessage)
                     call.respond(HttpStatusCode.BadRequest, errorMessage)
                 }
             }
