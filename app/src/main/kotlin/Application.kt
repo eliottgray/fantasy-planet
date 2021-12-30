@@ -20,6 +20,7 @@ fun Application.module(testing: Boolean = false) = runBlocking {
         val depth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
         val demoSeed = 0.12345
         val writer = MapTileWriter(depth, demoSeed)
+        // TODO: Don't block demo page while files are being written to disk.
         writer.collectAndWrite(demoSeed)
         log.info("Demo mode initialization complete.")
     }
@@ -34,13 +35,20 @@ fun Application.module(testing: Boolean = false) = runBlocking {
             call.application.environment.log.debug("Requesting tile $z/$x/$y.png")
             if (isDemo) {
                 val tileFile = File("web/tiles/$z/$x/$y.png")
-                call.respondFile(tileFile)
+                if (tileFile.exists()){
+                    call.respondFile(tileFile)
+                } else {
+                    val errorMessage = "Demo tile not found: $z/$x/$y.png"
+                    log.error(errorMessage)
+                    call.respond(HttpStatusCode.NotFound, errorMessage)
+                }
             } else {
                 val mapTileKey = MapTileKey(z, x, y, seed)
                 val mapTile = MapTileCache.getTile(mapTileKey)
                 call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }
         }
+
         get("/") {
             call.respondHtml(HttpStatusCode.OK) {
                 lang = "en"

@@ -77,7 +77,20 @@ class ApplicationTest {
                 assertTrue((response.byteContent?.size ?: 0) > 0)
                 assertEquals(HttpStatusCode.OK, response.status())
             }
-            // TODO: Test requests for tiles at depths not handled by the demo.
         }
     }
+
+    @Test
+    fun testDemoTileNotFound() {
+        withApplication(testDemoEnv) {
+            val invalidDepth = 1
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/$invalidDepth/1/0.png").apply {
+                assertEquals(
+                    ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType()
+                )
+                assertEquals(HttpStatusCode.NotFound, response.status())
+            }
+        }
+    }
+
 }
