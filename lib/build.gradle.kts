@@ -21,12 +21,15 @@ dependencies {
 
     // Caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
+
+    // Logging
+    implementation("org.slf4j:slf4j-api:1.7.32")
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }

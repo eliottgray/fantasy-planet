@@ -1,20 +1,20 @@
 package com.eliottgray.kotlin
 import kotlinx.coroutines.*
 import java.lang.RuntimeException
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.pow
 
 class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
 
-    private val DEPTH_MINIMUM = 0
-    private val DEPTH_MAXIMUM = 20
     init {
         if (DEPTH_MINIMUM > tileDepth || tileDepth > DEPTH_MAXIMUM) {
             throw RuntimeException("Tile depth between $DEPTH_MINIMUM and $DEPTH_MAXIMUM expected, but was $tileDepth.")
         }
     }
 
+    private companion object {
+        private const val DEPTH_MINIMUM = 0
+        private const val DEPTH_MAXIMUM = 20
+    }
 
     suspend fun collectAndWrite(seed: Double) = coroutineScope {
 

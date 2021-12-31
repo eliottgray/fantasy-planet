@@ -7,7 +7,7 @@ import org.json.simple.JSONObject
 import java.io.File
 import kotlin.math.roundToInt
 
-class H3Writer(val h3Depth: Int, val seed: Double = Defaults.SEED) {
+class H3Writer(private val h3Depth: Int, val seed: Double = Defaults.SEED) {
     private val h3Core: H3Core = H3Core.newInstance()
     private val edgeLength = h3Core.edgeLength(h3Depth, LengthUnit.m)
     private val planet = Planet.get(seed = seed)

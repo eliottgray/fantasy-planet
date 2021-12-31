@@ -1,5 +1,6 @@
 package com.eliottgray.kotlin
 
+import org.slf4j.LoggerFactory
 import java.awt.Transparency
 import java.awt.image.*
 import java.io.ByteArrayOutputStream
@@ -10,9 +11,9 @@ import kotlin.math.*
 
 
 class MapTile (
-    val zTile: Int,
-    val xTile: Int,
-    val yTile: Int,
+    private val zTile: Int,
+    private val xTile: Int,
+    private val yTile: Int,
     planet: Planet = Planet.get(Defaults.SEED),
     elevations: MapTileElevations? = null
 ) {
@@ -31,9 +32,10 @@ class MapTile (
     }
 
     companion object {
+        private val logger = LoggerFactory.getLogger(MapTile::class.java)
         const val TILE_SIZE = 256
 
-        fun haversineDistanceMeters(
+        private fun haversineDistanceMeters(
             coordinateOne: MapTileCoordinate,
             coordinateTwo: MapTileCoordinate,
         ): Double {
@@ -142,8 +144,7 @@ class MapTile (
         }
         val mapFile = File(path)
         try {
-            // TODO: Log instead of println.
-            println("Writing $path")
+            logger.info("Writing $path")
             mapFile.writeBytes(pngByteArray)
         } catch (e: IOException) {
             e.printStackTrace()

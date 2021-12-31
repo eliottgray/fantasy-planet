@@ -1,6 +1,6 @@
 package com.eliottgray.kotlin
 
-data class Tetrahedron private constructor(val a: Point, val b: Point, val c: Point, val d: Point, val longestSide: Double) {
+data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val d: Point, val longestSide: Double) {
 
     val averageAltitude = (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
 

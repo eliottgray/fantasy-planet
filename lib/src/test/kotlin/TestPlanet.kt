@@ -41,7 +41,7 @@ class GetElevationAtCoordinateTest {
 
 class GetMultipleElevationsTest {
 
-    lateinit var planet: Planet
+    private lateinit var planet: Planet
 
     @BeforeEach
     fun setUp(){

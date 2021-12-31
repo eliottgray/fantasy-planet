@@ -42,7 +42,6 @@ class ApplicationTest {
     fun testTile() {
         withApplication(testAppEnv) {
             handleRequest(HttpMethod.Get, "/tiles/762391.0/2/1/1.png").apply {
-                // TODO: Compare saved expected file to returned bytes.
                 assertEquals(ContentType.Image.PNG, response.contentType())
                 assertTrue((response.byteContent?.size ?: 0) > 0)
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -126,7 +125,6 @@ class ApplicationTest {
     fun testDemoTile() {
         withApplication(testDemoEnv) {
             handleRequest(HttpMethod.Get, "/tiles/762391.0/0/1/0.png").apply {
-                // TODO: Compare saved expected file to returned bytes.
                 assertEquals(ContentType.Image.PNG, response.contentType())
                 assertTrue((response.byteContent?.size ?: 0) > 0)
                 assertEquals(HttpStatusCode.OK, response.status())

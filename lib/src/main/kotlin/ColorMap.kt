@@ -9,7 +9,7 @@ class ColorMap {
         // Ranges taken from "Lefevbre2" color map of Planet Generator: http://hjemmesider.diku.dk/~torbenm/Planet/
         private val COLOR_RANGES: HashMap<Int, List<Byte>> = hashMapOf(
             1 to rgbToByteList(0, 53, 83),
-            85 to rgbToByteList(5, 70, 107,),
+            85 to rgbToByteList(5, 70, 107),
             100 to rgbToByteList(17, 85, 124),
             110 to rgbToByteList(60, 130, 160),  // Interpolated
             120 to rgbToByteList(104, 176, 196),

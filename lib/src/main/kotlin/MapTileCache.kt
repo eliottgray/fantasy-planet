@@ -3,8 +3,6 @@ package com.eliottgray.kotlin
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.time.Duration
-import kotlin.math.max
-import kotlin.math.min
 
 
 class MapTileCache {

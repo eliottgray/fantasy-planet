@@ -25,19 +25,17 @@ fun Application.module(testing: Boolean = false) = runBlocking {
     if (isDemo) {
         log.info("Demo mode initializing.")
         val writer = MapTileWriter(demoDepth, demoSeed)
-        // TODO: Don't block demo page while files are being written to disk.
         writer.collectAndWrite(demoSeed)
         log.info("Demo mode initialization complete.")
     }
 
     routing {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
-            // TODO: Validate these params.
             buildMapTileKey(call.parameters)
                 .flatMap { mapTileKey -> mapTileKey.validate() }
                 .flatMap { mapTileKey ->
                     val keyPath = "${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}"
-                    call.application.environment.log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
+                    log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
                     if (isDemo) {
                         val demoTileFile = File("web/tiles/$keyPath.png")
                         if (demoTileFile.exists()){
