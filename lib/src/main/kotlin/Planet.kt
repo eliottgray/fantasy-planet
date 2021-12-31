@@ -1,12 +1,25 @@
 package com.eliottgray.kotlin
 
-class Planet(val seed: Double = Defaults.SEED){
+import com.github.benmanes.caffeine.cache.AsyncCache
+import com.github.benmanes.caffeine.cache.Caffeine
+import java.time.Duration
+
+class Planet private constructor(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
 
-    private companion object {
+    companion object {
 
-        fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
+        private val planetsCache: AsyncCache<Double, Planet> = Caffeine.newBuilder()
+            .maximumSize(10000)
+            .expireAfterAccess(Duration.ofMinutes(60))
+            .buildAsync()
+
+        fun get(seed: Double): Planet {
+            return planetsCache.get(seed) { it -> Planet(it) }.get()!!
+        }
+
+        private fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
             // Sorts all records that return TRUE by the comparator to the front of the list, and
             //   returns the index of the first record that returns FALSE.
             var pointerOne = 0
@@ -35,11 +48,11 @@ class Planet(val seed: Double = Defaults.SEED){
         while (current.longestSide > resolution){
             subdivisions += 1
             val (subOne, subTwo) = current.subdivide()
-            if (subOne.contains(point)){
-                current = subOne
+            current = if (subOne.contains(point)){
+                subOne
             } else {
                 assert(subTwo.contains(point))
-                current = subTwo
+                subTwo
             }
         }
         return point.copy(alt=current.averageAltitude)
@@ -50,7 +63,7 @@ class Planet(val seed: Double = Defaults.SEED){
             return points
         }
 
-        // Since some of the points may not require any further recursion, we can filter them out and set elevation.
+        // Since some points may not require any further recursion, we can filter them out and set elevation.
         val doneIndex: Int = points.partitionInPlaceBy { point ->  current.longestSide <= point.resolution }
         for (i in 0 until doneIndex) {
             points[i] = points[i].copy(alt=current.averageAltitude)

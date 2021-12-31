@@ -13,7 +13,7 @@ class MapTileTest {
     @Test
     fun test_specific_tile_and_seed(){
         val seed = 762391.0
-        val mapTile = MapTile(2, 1, 1, Planet(seed))
+        val mapTile = MapTile(2, 1, 1, Planet.get(seed))
         val actualFile = mapTile.writePNG()
         val expectedFile = File("src/test/resources/canaryTile.png")
 

@@ -9,14 +9,14 @@ class PlanetConstructorTest {
 
     @Test
     fun test_positive_case(){
-        val planet = Planet()
+        val planet = Planet.get(Defaults.SEED)
         assertEquals(Defaults.SEED, planet.seed)
     }
 
     @Test
     fun test_custom_params(){
         val seed = 999183.0
-        val planet = Planet(seed=seed)
+        val planet = Planet.get(seed=seed)
         assertEquals(seed, planet.seed)
     }
 
@@ -26,14 +26,14 @@ class GetElevationAtCoordinateTest {
 
     @Test
     fun test_low_resolution(){
-        val planet = Planet(seed=99987.0)
+        val planet = Planet.get(seed=99987.0)
         val elevation = planet.getElevationAt(lat=-10.0, lon=-43.0, resolution=100000).alt
         assertEquals(-2206.5303409091907, elevation)
     }
 
     @Test
     fun test_high_resolution(){
-        val planet = Planet(seed=54399875.0)
+        val planet = Planet.get(seed=54399875.0)
         val elevation = planet.getElevationAt(lat=45.0, lon=23.0, resolution=50).alt
         assertEquals(160.4482471060341, elevation)
     }
@@ -45,7 +45,7 @@ class GetMultipleElevationsTest {
 
     @BeforeEach
     fun setUp(){
-        planet = Planet(seed=99987.0)
+        planet = Planet.get(seed=99987.0)
     }
 
     @Test

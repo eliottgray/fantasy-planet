@@ -18,7 +18,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
 
     suspend fun collectAndWrite(seed: Double) = coroutineScope {
 
-        val planet = Planet(seed)
+        val planet = Planet.get(seed)
         val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 
         // Top tiles are required first, to ensure consistent coloring of all other tiles.

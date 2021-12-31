@@ -13,11 +13,11 @@ class MapTile (
     val zTile: Int,
     val xTile: Int,
     val yTile: Int,
-    planet: Planet = Planet(Defaults.SEED),
+    planet: Planet = Planet.get(Defaults.SEED),
     elevations: MapTileElevations? = null
 ) {
     constructor(mapTileKey: MapTileKey, elevations: MapTileElevations? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
-        Planet(mapTileKey.seed), elevations)
+        Planet.get(mapTileKey.seed), elevations)
 
     val pngByteArray: ByteArray
     val maxElev: Double
@@ -34,13 +34,13 @@ class MapTile (
         const val TILE_SIZE = 256
 
         fun haversineDistanceMeters(
-            coordOne: MapTileCoordinate,
-            coordTwo: MapTileCoordinate,
+            coordinateOne: MapTileCoordinate,
+            coordinateTwo: MapTileCoordinate,
         ): Double {
-            var lat1 = coordOne.latitude
-            var lat2 = coordTwo.latitude
+            var lat1 = coordinateOne.latitude
+            var lat2 = coordinateTwo.latitude
             val dLat = Math.toRadians(lat2 - lat1)
-            val dLon = Math.toRadians(coordTwo.longitude - coordOne.longitude)
+            val dLon = Math.toRadians(coordinateTwo.longitude - coordinateOne.longitude)
 
             // convert to radians
             lat1 = Math.toRadians(lat1)
@@ -94,7 +94,7 @@ class MapTile (
         return planet.getMultipleElevations(allPoints)
     }
 
-    fun toBufferedImage(sortedPoints: List<Point>): BufferedImage {
+    private fun toBufferedImage(sortedPoints: List<Point>): BufferedImage {
         val oldRange = maxElev - minElev
         // TODO: ColorMap should be a param for the map tile.
         val newRange = ColorMap.ELEVATION_RANGE
@@ -126,7 +126,7 @@ class MapTile (
         return BufferedImage(cm, raster, true, null)
     }
 
-    fun writePNGBytes(sortedPoints: List<Point>): ByteArray {
+    private fun writePNGBytes(sortedPoints: List<Point>): ByteArray {
         val image = toBufferedImage(sortedPoints)
         val outputStream = ByteArrayOutputStream()
         ImageIO.write(image, "png", outputStream)
