@@ -5,7 +5,9 @@ import arrow.core.computations.either
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
+import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
+import io.ktor.freemarker.*
 import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.response.*
@@ -17,7 +19,11 @@ import java.io.File
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) = runBlocking {
-
+    // FreeMarker is a Java templating engine.
+    install(FreeMarker) {
+        val templatesFolder = "templates"
+        templateLoader = ClassTemplateLoader(this::class.java.classLoader, templatesFolder)
+    }
     val isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
         ?: true  // We want to default to demo behavior to be safe, and avoid undesired computation.
     val demoDepth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
@@ -54,63 +60,13 @@ fun Application.module(testing: Boolean = false) = runBlocking {
         }
 
         get("/") {
-            val randomOrDemoSeed = if (isDemo) demoSeed.toString() else "Math.random()"
-            val maxDepth = if (isDemo && demoDepth < 20) demoDepth.toString() else 20.toString()
-            call.respondHtml(HttpStatusCode.OK) {
-                lang = "en"
-                head {
-                    meta { charset = "utf-8" }
-                    script(type = ScriptType.textJavaScript) {
-                        src="https://cesium.com/downloads/cesiumjs/releases/1.85/Build/Cesium/Cesium.js"
-                    }
-                    link {
-                        href="https://cesium.com/downloads/cesiumjs/releases/1.85/Build/Cesium/Widgets/widgets.css"
-                        rel="stylesheet"
-                    }
-                    title {
-                        +"Fantasy Planet"
-                    }
-                }
-                body {
-                    div {
-                        id="cesiumContainer"
-                    }
-                    script(type = ScriptType.textJavaScript) {
-                        unsafe {
-                            raw("""
-// TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
-var seed = $randomOrDemoSeed
-var maxDepth = $maxDepth;  // TODO: 20 is OSM lowest, choose based on size per pixel per zoom level.
-
-const viewer = new Cesium.Viewer('cesiumContainer', {
-    // Base layers include helpfully pre-populated, but unnecessary for our use case, real world data.
-    // Some of the available layers additionally require a Cesium Ion API key, and trigger a nag.
-    baseLayerPicker : false,
-
-    // Geocoder relates to real world data, and also triggers nag regarding api key.
-    geocoder: false,
-
-    // TODO: enable a default spinning animation.
-    animation: false,
-
-    // Local test.
-    imageryProvider: new Cesium.UrlTemplateImageryProvider({
-      url : '/tiles/{seed}/{z}/{x}/{y}.png',
-      maximumLevel: maxDepth,
-      tilingScheme : new Cesium.GeographicTilingScheme(),
-      customTags : {
-        seed: function(imageryProvider, x, y, level) {
-          return seed
-        }
-      }
-    })
-});    
-"""
-                            )
-                        }
-                    }
-                }
-            }
+            val randomOrDemoSeed = if (isDemo) demoSeed else Math.random()
+            val maxDepth = if (isDemo && demoDepth < 20) demoDepth else 20
+            val root = mapOf(
+                "seed" to randomOrDemoSeed,
+                "depth" to maxDepth
+            )
+            call.respond(FreeMarkerContent("index.ftl", root))
         }
     }
 }
