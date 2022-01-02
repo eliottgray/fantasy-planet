@@ -8,24 +8,23 @@ import arrow.core.right
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.freemarker.*
-import io.ktor.html.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.html.*
 import java.io.File
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
-fun Application.module(testing: Boolean = false) = runBlocking {
+@Suppress("unused")
+fun Application.module() = runBlocking {
     // FreeMarker is a Java templating engine.
     install(FreeMarker) {
         val templatesFolder = "templates"
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, templatesFolder)
     }
     val isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
-        ?: true  // We want to default to demo behavior to be safe, and avoid undesired computation.
+        ?: true  // We want to avoid undesired computation by defaulting to demo behavior.
     val demoDepth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
     val demoSeed = environment.config.propertyOrNull("ktor.demo.seed")?.getString()?.toDoubleOrNull() ?: 0.12345
     if (isDemo) {
@@ -60,8 +59,11 @@ fun Application.module(testing: Boolean = false) = runBlocking {
         }
 
         get("/") {
+            // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
             val randomOrDemoSeed = if (isDemo) demoSeed else Math.random()
-            val maxDepth = if (isDemo && demoDepth < 20) demoDepth else 20
+            // TODO: Parameterize non-demo max zoom.
+            val defaultMaxZoom = 18  // TODO: 20 is OSM lowest; is this a good maximum zoom?
+            val maxDepth = if (isDemo) minOf(demoDepth, defaultMaxZoom) else defaultMaxZoom
             val root = mapOf(
                 "seed" to randomOrDemoSeed,
                 "depth" to maxDepth

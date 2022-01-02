@@ -10,9 +10,8 @@
   <div id="cesiumContainer"></div>
   <script>
 
-    // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
     var seed = ${seed};
-    var maxDepth = ${depth};  // TODO: 20 is OSM lowest, choose based on size per pixel per zoom level.
+    var maxDepth = ${depth};
 
     const viewer = new Cesium.Viewer('cesiumContainer', {
         // Base layers include helpfully pre-populated, but unnecessary for our use case, real world data.
