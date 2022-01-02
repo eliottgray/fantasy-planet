@@ -4,22 +4,17 @@ import kotlinx.coroutines.*
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis
 
-fun main(args: Array<String>) = runBlocking() {
+fun main() = runBlocking() {
     val timeMillis = measureTimeMillis {
         val seed = Random.nextDouble()
 
-//        // Testing writing H3-derived results.
-//        val writer = H3Writer(h3Depth=1, seed=seed)
-//        writer.collectAndWrite("test_out.csv")
+        // Testing writing H3-derived results.
+        val h3Writer = H3Writer(h3Depth=1, seed=seed)
+        h3Writer.collectAndWrite("test_out.csv")
 
-        // The client would be requesting map tiles. For now, lets write them to disk.
+        // Testing by writing map tiles to disk.
         val mapTileWriter = MapTileWriter(tileDepth = 2, seed = seed)
         mapTileWriter.collectAndWrite(seed)
-
-//        repeat(20) {
-//            val bytes = MapTile(4, 1, 2).pngByteArray
-//            assert(bytes.isNotEmpty())
-//        }
     }
     print(timeMillis)
 }
