@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test
 import io.ktor.config.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import java.io.File
 
 class ApplicationTest {
 
@@ -16,16 +13,6 @@ class ApplicationTest {
 
     private val testAppEnv = createTestEnvironment {
         config = HoconApplicationConfig(appConfig)
-    }
-
-    @AfterEach
-    @BeforeEach
-    fun cleanup() {
-        // Because the demo implementation writes files to disk, it is necessary to clean them up.
-        val dir = File("web/tiles/")
-        if (dir.exists()){
-            dir.deleteRecursively()
-        }
     }
 
     @Test
@@ -108,6 +95,7 @@ class ApplicationTest {
         config = HoconApplicationConfig(appConfig
             .withValue("ktor.demo.enabled", ConfigValueFactory.fromAnyRef(true))
             .withValue("ktor.demo.depth", ConfigValueFactory.fromAnyRef(0))
+            .withValue("ktor.demo.seed", ConfigValueFactory.fromAnyRef(762391.0))
         )
     }
 
@@ -133,12 +121,12 @@ class ApplicationTest {
     }
 
     @Test
-    fun testDemoTileNotFound() {
+    fun testSeedIsNotDemoSeed() {
         withApplication(testDemoEnv) {
-            val invalidDepth = 1
-            handleRequest(HttpMethod.Get, "/tiles/762391.0/$invalidDepth/1/0.png").apply {
+            val notDemoSeed = "00001"
+            handleRequest(HttpMethod.Get, "/tiles/$notDemoSeed/0/1/0.png").apply {
                 assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
-                assertEquals(HttpStatusCode.NotFound, response.status())
+                assertEquals(HttpStatusCode.BadRequest, response.status())
             }
         }
     }

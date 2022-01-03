@@ -10,12 +10,10 @@ class MapTileCache {
     companion object {
         private val mapTiles: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
             .maximumSize(10000)
-            .expireAfterWrite(Duration.ofMinutes(60))
             .buildAsync()
 
         private val mapSeedElevations: AsyncCache<Double, MapTileElevations> = Caffeine.newBuilder()
             .maximumSize(10000)
-            .expireAfterWrite(Duration.ofMinutes(60))
             .buildAsync()
 
         fun getTile(mapTileKey: MapTileKey): MapTile {

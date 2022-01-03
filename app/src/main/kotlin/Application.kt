@@ -12,7 +12,6 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import kotlinx.coroutines.runBlocking
-import java.io.File
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -23,32 +22,24 @@ fun Application.module() = runBlocking {
         val templatesFolder = "templates"
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, templatesFolder)
     }
+    // TODO: Validate config parameters, and terminate early if invalid.
     val isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
         ?: true  // We want to avoid undesired computation by defaulting to demo behavior.
-    val demoDepth = environment.config.propertyOrNull("ktor.demo.depth")?.getString()?.toIntOrNull() ?: -1
     val demoSeed = environment.config.propertyOrNull("ktor.demo.seed")?.getString()?.toDoubleOrNull() ?: 0.12345
-    if (isDemo) {
-        log.info("Demo mode initializing.")
-        val writer = MapTileWriter(demoDepth, demoSeed)
-        writer.collectAndWrite(demoSeed)
-        log.info("Demo mode initialization complete.")
-    }
 
     routing {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
             buildMapTileKey(call.parameters)
                 .flatMap { mapTileKey -> mapTileKey.validate() }
                 .flatMap { mapTileKey ->
-                    val keyPath = "${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}"
-                    log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
-                    if (isDemo) {
-                        val demoTileFile = File("web/tiles/$keyPath.png")
-                        if (demoTileFile.exists()){
-                            call.respondFile(demoTileFile).right()
-                        } else {
-                            Pair(HttpStatusCode.NotFound, "Demo tile not found: $keyPath.png").left()
-                        }
+                    if (isDemo && mapTileKey.seed != demoSeed) {
+                        Pair(
+                            HttpStatusCode.BadRequest,
+                            "Demo mode is active, but seed was not demo seed."
+                        ).left()
                     } else {
+                        val keyPath = "${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}"
+                        log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
                         val mapTile = MapTileCache.getTile(mapTileKey)
                         call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK).right()
                     }
@@ -60,10 +51,8 @@ fun Application.module() = runBlocking {
 
         get("/") {
             // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
-            val randomOrDemoSeed = if (isDemo) demoSeed else Math.random()
-            // TODO: Parameterize non-demo max zoom.
-            val defaultMaxZoom = 18  // TODO: 20 is OSM lowest; is this a good maximum zoom?
-            val maxDepth = if (isDemo) minOf(demoDepth, defaultMaxZoom) else defaultMaxZoom
+            val randomOrDemoSeed = if (isDemo) demoSeed.toString() else Math.random().toString()
+            val maxDepth = environment.config.propertyOrNull("ktor.max_depth")?.getString()?.toInt()
             val root = mapOf(
                 "seed" to randomOrDemoSeed,
                 "depth" to maxDepth

@@ -24,7 +24,6 @@
         // TODO: enable a default spinning animation.
         animation: false,
 
-        // Local test.
         imageryProvider: new Cesium.UrlTemplateImageryProvider({
           url : '/tiles/{seed}/{z}/{x}/{y}.png',
           maximumLevel: maxDepth,

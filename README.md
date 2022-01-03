@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/eliottgray/fantasy-planet/tree/main.svg?style=svg)](https://circleci.com/gh/eliottgray/fantasy-planet/tree/main)
 
 # fantasy-planet
-Generate, populate, and display procedurally-generated fantasy worlds.
+Generate, populate, and display procedurally-generated fantasy worlds. [A limited demo can be found here.](http://fantasy-planet.us-west-1.elasticbeanstalk.com/)
 
 ![Fantasy Planet Viewer](/fantasy-globe.png?raw=true "Fantasy planet viewer.")
 
@@ -21,8 +21,8 @@ Generate, populate, and display procedurally-generated fantasy worlds.
 * This Jar can then be deployed and run with `java -jar path/to/jar`.
 
 # Demo Mode
-* While the application is designed to generate worlds on request, in some instances pre-generating a world to a defined depth is desired.
+* While the application is designed to generate worlds on request, in some instances limiting generation to a specific seed is desired.
 * The following environment variables control activation of demo mode:
-  * DEMO_MODE - defaults to `false`, set to `true` to enable pre-caching of world.
-  * DEMO_DEPTH - defaults to `6`, increase or decrease this number to cache more or less detail, respectively.
-* Example: `DEMO_MODE=true DEMO_DEPTH=5 ./gradlew run`
+  * DEMO_MODE - defaults to `false`, set to `true` to enable limiting of world to a specific seed.
+  * DEMO_SEED - controls the seed to which generation is limited.
+* Example: `DEMO_MODE=true DEMO_SEED=98765 ./gradlew run`
