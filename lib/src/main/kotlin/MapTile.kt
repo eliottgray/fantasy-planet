@@ -17,8 +17,8 @@ class MapTile (
     planet: Planet = Planet.get(Defaults.SEED),
     elevations: MapTileElevations? = null
 ) {
-    constructor(mapTileKey: MapTileKey, elevations: MapTileElevations? = null) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
-        Planet.get(mapTileKey.seed), elevations)
+    constructor(mapTileKey: MapTileKey, elevations: MapTileElevations? = null, planet: Planet = Planet.get(mapTileKey.seed)) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
+        planet, elevations)
 
     val pngByteArray: ByteArray
     val maxElev: Double

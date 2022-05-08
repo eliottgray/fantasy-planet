@@ -3,20 +3,34 @@ package com.eliottgray.kotlin
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.time.Duration
+import kotlin.math.max
+import kotlin.math.min
 
-class Planet private constructor(val seed: Double = Defaults.SEED){
+class Planet constructor(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
+    private var elevations: MapTileElevations
 
+    init {
+        val topTileOne = mapTileCache.get(MapTileKey(0, 0, 0, seed)) { key -> MapTile(key, planet = this) }.get()!!
+        val topTileTwo = mapTileCache.get(MapTileKey(0, 1, 0, seed)) { key -> MapTile(key, planet = this) }.get()!!
+        val minElevation = min(topTileOne.minElev, topTileTwo.minElev)
+        val maxElevation = max(topTileOne.maxElev, topTileTwo.maxElev)
+        elevations = MapTileElevations(minElevation = minElevation, maxElevation = maxElevation)
+    }
     companion object {
 
-        private val planetsCache: AsyncCache<Double, Planet> = Caffeine.newBuilder()
+        private val mapTileCache: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
+            .maximumSize(10000)
+            .buildAsync()
+
+        private val planetCache: AsyncCache<Double, Planet> = Caffeine.newBuilder()
             .maximumSize(10000)
             .expireAfterAccess(Duration.ofMinutes(60))
             .buildAsync()
 
         fun get(seed: Double): Planet {
-            return planetsCache.get(seed) { it -> Planet(it) }.get()!!
+            return planetCache.get(seed) { it -> Planet(it) }.get()!!
         }
 
         private fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
@@ -39,6 +53,9 @@ class Planet private constructor(val seed: Double = Defaults.SEED){
             }
             return pointerOne
         }
+    }
+    fun getMapTile(mapTileKey: MapTileKey): MapTile {
+        return mapTileCache.get(mapTileKey) { key -> MapTile(key, elevations, this) }.get()!!
     }
 
     fun getElevationAt(lat: Double, lon: Double, resolution: Int): Point {

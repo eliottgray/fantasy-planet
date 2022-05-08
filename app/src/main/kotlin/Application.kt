@@ -37,9 +37,9 @@ fun Application.module() = runBlocking {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
             either <Pair<HttpStatusCode, String>, Unit> {
                 val mapTileKey = buildMapTileKey(call.parameters).bind()
-                val keyPath = "${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}"
-                log.debug("Requesting tile ${mapTileKey.seed}/$keyPath.png")
-                val mapTile = MapTileCache.getTile(mapTileKey)
+                log.debug("Requesting tile ${mapTileKey.seed}/${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}.png")
+                val planet = getPlanet(call.parameters).bind()
+                val mapTile = planet.getMapTile(mapTileKey)
                 call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }.mapLeft { errorPair ->
                 log.error(errorPair.second)
