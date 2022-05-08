@@ -1,14 +1,17 @@
 package com.eliottgray.kotlin
 
 import com.github.benmanes.caffeine.cache.AsyncCache
+import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.uber.h3core.H3Core
+import com.uber.h3core.LengthUnit
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
-import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
-class Planet constructor(val seed: Double = Defaults.SEED){
+class HexPlanet constructor(val seed: Double = Defaults.SEED){
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
     private var elevations: MapTileElevations
@@ -43,13 +46,19 @@ class Planet constructor(val seed: Double = Defaults.SEED){
             .maximumSize(10000)
             .buildAsync()
 
-        private val planetCache: AsyncCache<Double, Planet> = Caffeine.newBuilder()
+        private val planetCache: AsyncCache<Double, HexPlanet> = Caffeine.newBuilder()
             .maximumSize(10000)
             .expireAfterAccess(Duration.ofMinutes(60))
             .buildAsync()
 
-        fun get(seed: Double): Planet {
-            return planetCache.get(seed) { it -> Planet(it) }.get()!!
+        private val hexCache: Cache<HexKey, Hex> = Caffeine.newBuilder().build()
+
+        private val h3Core = H3Core.newInstance()
+        private const val h3Res = 7  // TODO: Parameterize
+        private val h3ResMeters = h3Core.edgeLength(h3Res, LengthUnit.m).roundToInt()
+
+        fun get(seed: Double): HexPlanet {
+            return planetCache.get(seed) { it -> HexPlanet(it) }.get()!!
         }
 
         private fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
@@ -140,17 +149,13 @@ class Planet constructor(val seed: Double = Defaults.SEED){
         var currentLat = tileBounds.north
         while (currentLat > tileBounds.south) {
 
-            // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
-            // varies by latitude. Do this once for each discrete latitude in the tile.
-            val widthOfPixelMeters = MapTile.longitudinalWidthOfPixelMeters(currentLat, lonDelta)
-
             var currentLon = tileBounds.west
             while (currentLon < tileBounds.east) {
                 allPoints.add(
                     Point.fromSpherical(
                         lat = currentLat,
                         lon = currentLon,
-                        resolution = ceil(widthOfPixelMeters * 0.6).toInt()
+                        resolution = h3ResMeters
                     )
                 )
                 currentLon += lonDelta
@@ -158,7 +163,39 @@ class Planet constructor(val seed: Double = Defaults.SEED){
             currentLat -= latDelta
         }
         assert(allPoints.size == MapTile.TILE_SIZE * MapTile.TILE_SIZE)
-        return getMultipleElevations(allPoints)
+
+        val hexesToCalculate = allPoints.map {
+            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+            HexKey(h3Index, seed)
+        }.filter{
+            hexCache.getIfPresent(it) == null
+        }.map {
+            val geoCoord = h3Core.h3ToGeo(it.h3Index)
+            val point = Point.fromSpherical(lat = geoCoord.lat, lon = geoCoord.lng, resolution = h3ResMeters)
+            val hex = Hex(it.h3Index, point)
+            hex
+        }
+
+        // For all missing hexes, we can calculate their elevations and then store.
+        if (hexesToCalculate.isNotEmpty()) {
+            hexesToCalculate
+                .map { it.point }
+                .toMutableList()
+                .let { getMultipleElevations(it) }
+                .forEach {
+                    // TODO: Avoid needing to calculate the hexId multiple times. Store in the point? New subclass?
+                    val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+                    val hexKey = HexKey(h3Index, seed)
+                    val hex = Hex(h3Index, it)
+                    hexCache.put(hexKey, hex)
+                }
+        }
+
+        return allPoints.map {
+            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+            val hex = hexCache.getIfPresent(HexKey(h3Index, seed))!!  // TODO: Just store in this planet instead of hoping they're not evicted immediately.
+            it.copy(alt=hex.point.alt)
+        }.toMutableList()
     }
 
 }

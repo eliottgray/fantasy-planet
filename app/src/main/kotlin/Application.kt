@@ -60,7 +60,6 @@ fun Application.module() = runBlocking {
     }
 }
 
-// TODO: Refactor planet to serve map tiles, rather than directly accessing MapTileCache.
 private suspend fun getPlanet(callParameters: Parameters): Either<Pair<HttpStatusCode, String>, Planet> {
     return either {
         val seed = (callParameters["seed"]!!.toDoubleOrNull()?.right() ?: Pair(
