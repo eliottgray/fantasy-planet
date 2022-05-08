@@ -3,6 +3,7 @@ package com.eliottgray.kotlin
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.time.Duration
+import java.util.concurrent.CompletableFuture
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -17,8 +18,11 @@ class Planet constructor(val seed: Double = Defaults.SEED){
         // elevations are used to determine map colors/etc. for all other tiles, to ensure consistency.
         // For now we also don't want to make the full tile objects, because doing so incurs additional work USING
         // the global elevation data we don't have yet.
-        val topTileOnePoints = calculateMapTilePoints(MapTileKey(0, 0, 0, seed))
-        val topTileTwoPoints = calculateMapTilePoints(MapTileKey(0, 1, 0, seed))
+        val topTileOneKey = MapTileKey(0, 0, 0, seed)
+        val topTileTwoKey = MapTileKey(0, 1, 0, seed)
+        // TODO: calculate top tile points asynchronously, to speed up building the planet.
+        val topTileOnePoints = calculateMapTilePoints(topTileOneKey)
+        val topTileTwoPoints = calculateMapTilePoints(topTileTwoKey)
         val minElevation = min(
             topTileOnePoints.minByOrNull { it.alt }?.alt ?: 0.0,
             topTileTwoPoints.minByOrNull { it.alt }?.alt ?: 0.0
@@ -28,6 +32,10 @@ class Planet constructor(val seed: Double = Defaults.SEED){
             topTileTwoPoints.maxByOrNull { it.alt }?.alt ?: 0.0
         )
         elevations = MapTileElevations(minElevation = minElevation, maxElevation = maxElevation)
+        val topTileOne = MapTile(topTileOneKey, topTileOnePoints, elevations)
+        val topTileTwo = MapTile(topTileTwoKey, topTileTwoPoints, elevations)
+        mapTileCache.put(topTileOneKey, CompletableFuture.completedFuture(topTileOne))
+        mapTileCache.put(topTileTwoKey, CompletableFuture.completedFuture(topTileTwo))
     }
     companion object {
 
