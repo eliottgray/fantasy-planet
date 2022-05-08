@@ -14,20 +14,20 @@ class MapTile (
     private val zTile: Int,
     private val xTile: Int,
     private val yTile: Int,
-    planet: Planet = Planet.get(Defaults.SEED),
-    elevations: MapTileElevations? = null
+    unsortedPoints: MutableList<Point>,
+    elevations: MapTileElevations
 ) {
-    constructor(mapTileKey: MapTileKey, elevations: MapTileElevations? = null, planet: Planet = Planet.get(mapTileKey.seed)) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
-        planet, elevations)
+    constructor(mapTileKey: MapTileKey, unsortedPoints: MutableList<Point>, elevations: MapTileElevations) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
+        unsortedPoints, elevations)
 
     val pngByteArray: ByteArray
     val maxElev: Double
     val minElev: Double
 
     init {
-        val sortedPoints = generate(planet).sortedWith(compareBy( {-it.lat}, {it.lon}))
-        this.maxElev = elevations?.maxElevation ?: sortedPoints.maxByOrNull { it.alt }?.alt ?: 0.0
-        this.minElev = elevations?.minElevation ?: sortedPoints.minByOrNull { it.alt }?.alt ?: 0.0
+        val sortedPoints = unsortedPoints.sortedWith(compareBy( {-it.lat}, {it.lon}))
+        this.maxElev = elevations.maxElevation
+        this.minElev = elevations.minElevation
         pngByteArray = writePNGBytes(sortedPoints)
     }
 
@@ -64,36 +64,6 @@ class MapTile (
                 MapTileCoordinate(pixelLat, pixelLongitudeWidth)
             )
         }
-    }
-
-    private fun generate(planet: Planet): MutableList<Point> {
-        val allPoints = ArrayList<Point>()
-
-        val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(zTile, xTile, yTile)
-        val lonDelta = (tileBounds.east - tileBounds.west) / TILE_SIZE
-        val latDelta = (tileBounds.north - tileBounds.south) / TILE_SIZE
-        var currentLat = tileBounds.north
-        while (currentLat > tileBounds.south) {
-
-            // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
-            // varies by latitude. Do this once for each discrete latitude in the tile.
-            val widthOfPixelMeters = longitudinalWidthOfPixelMeters(currentLat, lonDelta)
-
-            var currentLon = tileBounds.west
-            while (currentLon < tileBounds.east) {
-                allPoints.add(
-                    Point.fromSpherical(
-                        lat = currentLat,
-                        lon = currentLon,
-                        resolution = ceil(widthOfPixelMeters * 0.6).toInt()
-                    )
-                )
-                currentLon += lonDelta
-            }
-            currentLat -= latDelta
-        }
-        assert(allPoints.size == TILE_SIZE * TILE_SIZE)
-        return planet.getMultipleElevations(allPoints)
     }
 
     private fun toBufferedImage(sortedPoints: List<Point>): BufferedImage {

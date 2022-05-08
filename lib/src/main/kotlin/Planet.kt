@@ -3,6 +3,7 @@ package com.eliottgray.kotlin
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.time.Duration
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
@@ -12,10 +13,20 @@ class Planet constructor(val seed: Double = Defaults.SEED){
     private var elevations: MapTileElevations
 
     init {
-        val topTileOne = mapTileCache.get(MapTileKey(0, 0, 0, seed)) { key -> MapTile(key, planet = this) }.get()!!
-        val topTileTwo = mapTileCache.get(MapTileKey(0, 1, 0, seed)) { key -> MapTile(key, planet = this) }.get()!!
-        val minElevation = min(topTileOne.minElev, topTileTwo.minElev)
-        val maxElevation = max(topTileOne.maxElev, topTileTwo.maxElev)
+        // We need to know what the points are for the top tiles BEFORE they go in the cache, because their min/max
+        // elevations are used to determine map colors/etc. for all other tiles, to ensure consistency.
+        // For now we also don't want to make the full tile objects, because doing so incurs additional work USING
+        // the global elevation data we don't have yet.
+        val topTileOnePoints = calculateMapTilePoints(MapTileKey(0, 0, 0, seed))
+        val topTileTwoPoints = calculateMapTilePoints(MapTileKey(0, 1, 0, seed))
+        val minElevation = min(
+            topTileOnePoints.minByOrNull { it.alt }?.alt ?: 0.0,
+            topTileTwoPoints.minByOrNull { it.alt }?.alt ?: 0.0
+        )
+        val maxElevation = max(
+            topTileOnePoints.maxByOrNull { it.alt }?.alt ?: 0.0,
+            topTileTwoPoints.maxByOrNull { it.alt }?.alt ?: 0.0
+        )
         elevations = MapTileElevations(minElevation = minElevation, maxElevation = maxElevation)
     }
     companion object {
@@ -55,7 +66,7 @@ class Planet constructor(val seed: Double = Defaults.SEED){
         }
     }
     fun getMapTile(mapTileKey: MapTileKey): MapTile {
-        return mapTileCache.get(mapTileKey) { key -> MapTile(key, elevations, this) }.get()!!
+        return mapTileCache.get(mapTileKey) { key -> buildMapTile(key, elevations) }.get()!!
     }
 
     fun getElevationAt(lat: Double, lon: Double, resolution: Int): Point {
@@ -106,4 +117,39 @@ class Planet constructor(val seed: Double = Defaults.SEED){
         getMultipleElevations(rightPoints, rightTetra)
         return points
     }
+
+    private fun buildMapTile(mapTileKey: MapTileKey, elevations: MapTileElevations): MapTile {
+        val pointsWithElevations = calculateMapTilePoints(mapTileKey)
+        return MapTile(mapTileKey, pointsWithElevations, elevations)
+    }
+    private fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point> {
+        val allPoints = ArrayList<Point>()
+
+        val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(mapTileKey.z, mapTileKey.x, mapTileKey.y)
+        val lonDelta = (tileBounds.east - tileBounds.west) / MapTile.TILE_SIZE
+        val latDelta = (tileBounds.north - tileBounds.south) / MapTile.TILE_SIZE
+        var currentLat = tileBounds.north
+        while (currentLat > tileBounds.south) {
+
+            // It is necessary to determine the appropriate depth to calculate, as the length of a degree of longitude
+            // varies by latitude. Do this once for each discrete latitude in the tile.
+            val widthOfPixelMeters = MapTile.longitudinalWidthOfPixelMeters(currentLat, lonDelta)
+
+            var currentLon = tileBounds.west
+            while (currentLon < tileBounds.east) {
+                allPoints.add(
+                    Point.fromSpherical(
+                        lat = currentLat,
+                        lon = currentLon,
+                        resolution = ceil(widthOfPixelMeters * 0.6).toInt()
+                    )
+                )
+                currentLon += lonDelta
+            }
+            currentLat -= latDelta
+        }
+        assert(allPoints.size == MapTile.TILE_SIZE * MapTile.TILE_SIZE)
+        return getMultipleElevations(allPoints)
+    }
+
 }

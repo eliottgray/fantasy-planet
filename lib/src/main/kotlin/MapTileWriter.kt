@@ -21,21 +21,13 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
         val planet = Planet.get(seed)
         val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 
-        // Top tiles are required first, to ensure consistent coloring of all other tiles.
-        val topTile = MapTile(0, 0, 0, planet)
-        val topTile2 = MapTile(0, 1, 0, planet)
-        val tileElevations = MapTileElevations.fromTopTiles(topTile, topTile2)
-
-        topTile.writePNG()
-        topTile2.writePNG()
-
         // Get everything but the top level async.
-        for (z in 1..tileDepth) {
+        for (z in 0..tileDepth) {
             val rowColCount = 2.0.pow(z).toInt()
             for (x in 0 until rowColCount * 2) {
                 for (y in 0 until rowColCount) {
                     val result = async(Dispatchers.Default) {
-                        MapTile(z, x, y, planet, tileElevations)
+                        planet.getMapTile(MapTileKey(z, x, y, seed))
                     }
                     deferredResults.add(result)
                 }
