@@ -13,8 +13,9 @@ fun main() = runBlocking() {
         h3Writer.collectAndWrite("test_out.csv")
 
         // Testing by writing map tiles to disk.
-        val mapTileWriter = MapTileWriter(tileDepth = 2, seed = seed)
-        mapTileWriter.collectAndWrite(seed)
+        val planet = Planet.get(seed)
+        val mapTileWriter = MapTileWriter(tileDepth = 2, planet = planet)
+        mapTileWriter.collectAndWrite()
     }
     print(timeMillis)
 }
