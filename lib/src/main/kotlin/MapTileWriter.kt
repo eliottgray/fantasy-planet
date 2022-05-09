@@ -1,9 +1,10 @@
 package com.eliottgray.kotlin
+import com.eliottgray.kotlin.planet.Planet
 import kotlinx.coroutines.*
 import java.lang.RuntimeException
 import kotlin.math.pow
 
-class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
+class MapTileWriter(val tileDepth: Int, val planet: Planet) {
 
     init {
         if (DEPTH_MINIMUM > tileDepth || tileDepth > DEPTH_MAXIMUM) {
@@ -16,9 +17,8 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
         private const val DEPTH_MAXIMUM = 20
     }
 
-    suspend fun collectAndWrite(seed: Double) = coroutineScope {
+    suspend fun collectAndWrite() = coroutineScope {
 
-        val planet = Planet.get(seed)
         val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 
         // Get everything but the top level async.
@@ -27,7 +27,7 @@ class MapTileWriter(val tileDepth: Int, val seed: Double = Defaults.SEED) {
             for (x in 0 until rowColCount * 2) {
                 for (y in 0 until rowColCount) {
                     val result = async(Dispatchers.Default) {
-                        planet.getMapTile(MapTileKey(z, x, y, seed))
+                        planet.getMapTile(MapTileKey(z, x, y, planet.seed))
                     }
                     deferredResults.add(result)
                 }

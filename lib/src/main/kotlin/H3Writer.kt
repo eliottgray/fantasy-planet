@@ -1,4 +1,5 @@
 package com.eliottgray.kotlin
+import com.eliottgray.kotlin.planet.Planet
 import com.uber.h3core.H3Core
 import com.uber.h3core.LengthUnit
 import kotlinx.coroutines.*
@@ -7,10 +8,9 @@ import org.json.simple.JSONObject
 import java.io.File
 import kotlin.math.roundToInt
 
-class H3Writer(private val h3Depth: Int, val seed: Double = Defaults.SEED) {
+class H3Writer(private val h3Depth: Int, val planet: Planet) {
     private val h3Core: H3Core = H3Core.newInstance()
     private val edgeLength = h3Core.edgeLength(h3Depth, LengthUnit.m)
-    private val planet = Planet.get(seed = seed)
 
     private fun toGeoJSONFeature(point: Point): JSONObject {
         val properties = JSONObject()
