@@ -1,5 +1,6 @@
-package com.eliottgray.kotlin
+package com.eliottgray.kotlin.planet
 
+import com.eliottgray.kotlin.*
 import com.github.benmanes.caffeine.cache.AsyncCache
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -10,7 +11,6 @@ import java.util.concurrent.CompletableFuture
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.properties.Delegates
 
 class HexPlanet constructor(seed: Double = Defaults.SEED): AbstractPlanet(seed) {
     private var elevations: MapTileElevations

@@ -1,5 +1,6 @@
 package com.eliottgray.kotlin
 
+import com.eliottgray.kotlin.planet.Planet
 import kotlinx.coroutines.*
 import kotlin.random.Random
 import kotlin.system.measureTimeMillis

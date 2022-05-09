@@ -1,5 +1,5 @@
 import com.eliottgray.kotlin.Defaults
-import com.eliottgray.kotlin.Planet
+import com.eliottgray.kotlin.planet.Planet
 import com.eliottgray.kotlin.Point
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach

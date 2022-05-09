@@ -1,4 +1,6 @@
-package com.eliottgray.kotlin
+package com.eliottgray.kotlin.planet
+
+import com.eliottgray.kotlin.*
 
 abstract class AbstractPlanet(val seed: Double) {
     private val squishedSeed = squishSeed(seed)

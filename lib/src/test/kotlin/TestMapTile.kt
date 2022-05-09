@@ -1,6 +1,6 @@
 import com.eliottgray.kotlin.MapTile
 import com.eliottgray.kotlin.MapTileKey
-import com.eliottgray.kotlin.Planet
+import com.eliottgray.kotlin.planet.Planet
 import org.junit.jupiter.api.Test
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
