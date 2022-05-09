@@ -5,6 +5,9 @@ import arrow.core.computations.either
 import arrow.core.flatMap
 import arrow.core.left
 import arrow.core.right
+import com.eliottgray.kotlin.planet.Planet
+import com.eliottgray.kotlin.planet.HexPlanet
+import com.eliottgray.kotlin.planet.FractalPlanet
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.freemarker.*
@@ -19,6 +22,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 object Config {
     var isDemo by Delegates.notNull<Boolean>()
     var demoSeed by Delegates.notNull<Double>()
+    var hexMap by Delegates.notNull<Boolean>()
 }
 
 @Suppress("unused")
@@ -32,6 +36,10 @@ fun Application.module() = runBlocking {
     Config.isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
         ?: true  // We want to avoid undesired computation by defaulting to demo behavior.
     Config.demoSeed = environment.config.propertyOrNull("ktor.demo.seed")?.getString()?.toDoubleOrNull() ?: 0.12345
+    Config.hexMap = environment.config.propertyOrNull("ktor.hex_map")?.getString()?.toBooleanStrictOrNull() ?: false
+    log.info("Demo mode: ${Config.isDemo}")
+    log.info("Demo seed: ${Config.demoSeed}")
+    log.info("Use Hex Map: ${Config.hexMap}")
 
     routing {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
@@ -66,7 +74,11 @@ private suspend fun getPlanet(callParameters: Parameters): Either<Pair<HttpStatu
             HttpStatusCode.BadRequest,
             "Seed must be a number."
         ).left()).bind()
-        Planet.get(seed)
+        if (Config.hexMap) {
+            HexPlanet.get(seed)
+        } else {
+            FractalPlanet.get(seed)
+        }
     }
 }
 
