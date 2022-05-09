@@ -8,7 +8,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-class Planet constructor(val seed: Double = Defaults.SEED){
+class Planet constructor(val seed: Double = Defaults.SEED): AbstractPlanet() {
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
     private var elevations: MapTileElevations
@@ -73,7 +73,7 @@ class Planet constructor(val seed: Double = Defaults.SEED){
             return pointerOne
         }
     }
-    fun getMapTile(mapTileKey: MapTileKey): MapTile {
+    override fun getMapTile(mapTileKey: MapTileKey): MapTile {
         return mapTileCache.get(mapTileKey) { key -> buildMapTile(key, elevations) }.get()!!
     }
 

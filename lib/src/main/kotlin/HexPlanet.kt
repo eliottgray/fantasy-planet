@@ -11,7 +11,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class HexPlanet constructor(val seed: Double = Defaults.SEED){
+class HexPlanet constructor(val seed: Double = Defaults.SEED): AbstractPlanet() {
     private val squishedSeed = squishSeed(seed)
     private val tetra = Tetrahedron.buildDefault(squishedSeed)
     private var elevations: MapTileElevations
@@ -51,10 +51,11 @@ class HexPlanet constructor(val seed: Double = Defaults.SEED){
             .expireAfterAccess(Duration.ofMinutes(60))
             .buildAsync()
 
+        // TODO: Configure this cache, maxsize, expiration rules, etc.
         private val hexCache: Cache<HexKey, Hex> = Caffeine.newBuilder().build()
 
         private val h3Core = H3Core.newInstance()
-        private const val h3Res = 7  // TODO: Parameterize
+        private const val h3Res = 6  // TODO: Parameterize
         private val h3ResMeters = h3Core.edgeLength(h3Res, LengthUnit.m).roundToInt()
 
         fun get(seed: Double): HexPlanet {
@@ -82,7 +83,7 @@ class HexPlanet constructor(val seed: Double = Defaults.SEED){
             return pointerOne
         }
     }
-    fun getMapTile(mapTileKey: MapTileKey): MapTile {
+    override fun getMapTile(mapTileKey: MapTileKey): MapTile {
         return mapTileCache.get(mapTileKey) { key -> buildMapTile(key, elevations) }.get()!!
     }
 
@@ -193,7 +194,7 @@ class HexPlanet constructor(val seed: Double = Defaults.SEED){
 
         return allPoints.map {
             val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
-            val hex = hexCache.getIfPresent(HexKey(h3Index, seed))!!  // TODO: Just store in this planet instead of hoping they're not evicted immediately.
+            val hex = hexCache.getIfPresent(HexKey(h3Index, seed))!!  // TODO: Retrieve from just-calculated values
             it.copy(alt=hex.point.alt)
         }.toMutableList()
     }
