@@ -12,7 +12,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
+class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resolution: Int): Planet(seed) {
     private var elevations: MapTileElevations
 
     init {
@@ -52,13 +52,10 @@ class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
 
         // TODO: Configure this cache, maxsize, expiration rules, etc.
         private val hexCache: Cache<HexKey, Hex> = Caffeine.newBuilder().build()
-
         private val h3Core = H3Core.newInstance()
-        private const val h3Res = 5  // TODO: Parameterize
-        private val h3ResMeters = h3Core.edgeLength(h3Res, LengthUnit.m).roundToInt()
 
-        fun get(seed: Double): HexPlanet {
-            return planetCache.get(seed) { it -> HexPlanet(it) }.get()!!
+        fun get(seed: Double, h3Resolution: Int): HexPlanet {
+            return planetCache.get(seed) { it -> HexPlanet(it, h3Resolution) }.get()!!
         }
     }
     override fun getMapTile(mapTileKey: MapTileKey): MapTile {
@@ -67,6 +64,7 @@ class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
 
     override fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point> {
         val allPoints = ArrayList<Point>()
+        val h3ResMeters = h3Core.edgeLength(h3Resolution, LengthUnit.m).roundToInt()
 
         val tileBounds: MapTileBounds = MapTileBounds.fromGeographicTileXYZ(mapTileKey.z, mapTileKey.x, mapTileKey.y)
         val lonDelta = (tileBounds.east - tileBounds.west) / MapTile.TILE_SIZE
@@ -90,7 +88,7 @@ class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
         assert(allPoints.size == MapTile.TILE_SIZE * MapTile.TILE_SIZE)
 
         val hexesToCalculate = allPoints.map {
-            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
             HexKey(h3Index, seed)
         }.filter{
             hexCache.getIfPresent(it) == null
@@ -109,7 +107,7 @@ class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
                 .let { getMultipleElevations(it) }
                 .forEach {
                     // TODO: Avoid needing to calculate the hexId multiple times. Store in the point? New subclass?
-                    val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+                    val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
                     val hexKey = HexKey(h3Index, seed)
                     val hex = Hex(h3Index, it)
                     hexCache.put(hexKey, hex)
@@ -117,7 +115,7 @@ class HexPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
         }
 
         return allPoints.map {
-            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Res)
+            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
             val hex = hexCache.getIfPresent(HexKey(h3Index, seed))!!  // TODO: Retrieve from just-calculated values
             it.copy(alt=hex.point.alt)
         }.toMutableList()

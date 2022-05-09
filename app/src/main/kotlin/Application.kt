@@ -20,9 +20,10 @@ import kotlin.properties.Delegates
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 object Config {
-    var isDemo by Delegates.notNull<Boolean>()
+    var demoEnabled by Delegates.notNull<Boolean>()
     var demoSeed by Delegates.notNull<Double>()
-    var hexMap by Delegates.notNull<Boolean>()
+    var hexEnabled by Delegates.notNull<Boolean>()
+    var hexResolution by Delegates.notNull<Int>()
 }
 
 @Suppress("unused")
@@ -33,13 +34,15 @@ fun Application.module() = runBlocking {
         templateLoader = ClassTemplateLoader(this::class.java.classLoader, templatesFolder)
     }
     // TODO: Validate config parameters, and terminate early if invalid.
-    Config.isDemo = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
+    Config.demoEnabled = environment.config.propertyOrNull("ktor.demo.enabled")?.getString()?.toBooleanStrictOrNull()
         ?: true  // We want to avoid undesired computation by defaulting to demo behavior.
     Config.demoSeed = environment.config.propertyOrNull("ktor.demo.seed")?.getString()?.toDoubleOrNull() ?: 0.12345
-    Config.hexMap = environment.config.propertyOrNull("ktor.hex_map")?.getString()?.toBooleanStrictOrNull() ?: false
-    log.info("Demo mode: ${Config.isDemo}")
+    Config.hexEnabled = environment.config.propertyOrNull("ktor.hex.enabled")?.getString()?.toBooleanStrictOrNull() ?: false
+    Config.hexResolution = environment.config.propertyOrNull("ktor.hex.resolution")?.getString()?.toIntOrNull() ?: 0
+    log.info("Demo enabled: ${Config.demoEnabled}")
     log.info("Demo seed: ${Config.demoSeed}")
-    log.info("Use Hex Map: ${Config.hexMap}")
+    log.info("Hex enabled: ${Config.hexEnabled}")
+    log.info("Hex resolution: ${Config.hexResolution}")
 
     routing {
         get("/tiles/{seed}/{z}/{x}/{y}.png") {
@@ -57,7 +60,7 @@ fun Application.module() = runBlocking {
 
         get("/") {
             // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
-            val randomOrDemoSeed = if (Config.isDemo) Config.demoSeed.toString() else Math.random().toString()
+            val randomOrDemoSeed = if (Config.demoEnabled) Config.demoSeed.toString() else Math.random().toString()
             val maxDepth = environment.config.propertyOrNull("ktor.max_depth")?.getString()?.toInt()
             val root = mapOf(
                 "seed" to randomOrDemoSeed,
@@ -74,8 +77,8 @@ private suspend fun getPlanet(callParameters: Parameters): Either<Pair<HttpStatu
             HttpStatusCode.BadRequest,
             "Seed must be a number."
         ).left()).bind()
-        if (Config.hexMap) {
-            HexPlanet.get(seed)
+        if (Config.hexEnabled) {
+            HexPlanet.get(seed, Config.hexResolution)
         } else {
             FractalPlanet.get(seed)
         }
@@ -88,7 +91,7 @@ private suspend fun buildMapTileKey(callParameters: Parameters): Either<Pair<Htt
             HttpStatusCode.BadRequest,
             "Seed must be a number."
         ).left()).flatMap { seed ->
-            if (Config.isDemo && seed != Config.demoSeed) {
+            if (Config.demoEnabled && seed != Config.demoSeed) {
                 Pair(
                     HttpStatusCode.BadRequest,
                     "Demo mode is active, but seed was not demo seed."

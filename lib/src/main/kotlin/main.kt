@@ -10,7 +10,8 @@ import kotlin.system.measureTimeMillis
 fun main() = runBlocking() {
     val seed = Random.nextDouble()
     val fractalPlanet = FractalPlanet.get(seed)
-    val hexPlanet = HexPlanet.get(seed)
+    val h3Resolution = 5
+    val hexPlanet = HexPlanet.get(seed, h3Resolution)
     val tileDepth = 4
 
     // Testing writing H3-derived results.
