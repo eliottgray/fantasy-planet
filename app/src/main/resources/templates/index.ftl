@@ -24,6 +24,11 @@
         // TODO: enable a default spinning animation.
         animation: false,
 
+        // Since our data is static, no timeline is required.
+        timeline: false,
+
+        sceneMode: Cesium.SceneMode.SCENE3D,
+
         imageryProvider: new Cesium.UrlTemplateImageryProvider({
           url : '/tiles/{seed}/{z}/{x}/{y}.png',
           maximumLevel: maxDepth,
