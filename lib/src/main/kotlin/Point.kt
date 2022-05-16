@@ -5,11 +5,12 @@ data class Point(
     val x: Double,
     val y: Double,
     val z: Double,
-    val seed: Double = Defaults.SEED,
+    val seed: Double = Defaults.SEED, // TODO: Restrict this property to a Tetrahedral Point subclass.
     val lat: Double = 0.0,
     val lon: Double = 0.0,
     val alt: Double = 0.0,
-    val resolution: Int = Defaults.RESOLUTION_METERS
+    val resolution: Int = Defaults.RESOLUTION_METERS,  // TODO: Restrict this property to a Map Tile Point subclass.
+    val h3Index: Long? = null  // TODO: Restrict this property to a Map Tile Point subclass.
 ) {
 
     init {
@@ -25,10 +26,11 @@ data class Point(
             initialAlt: Double = 0.0,
             seed: Double = Defaults.SEED,
             altSeed: Double = 0.0,
-            resolution: Int = Defaults.RESOLUTION_METERS
+            resolution: Int = Defaults.RESOLUTION_METERS,
+            h3Index: Long? = null
         ): Point {
             val (x, y, z) = sphericalToECEF(lat = lat, lon = lon, alt = initialAlt)
-            return Point(alt = altSeed, x = x, y = y, z = z, seed = seed, lat = lat, lon = lon, resolution = resolution)
+            return Point(alt = altSeed, x = x, y = y, z = z, seed = seed, lat = lat, lon = lon, resolution = resolution, h3Index = h3Index)
         }
     }
 

@@ -9,7 +9,7 @@ fun main() = runBlocking() {
     val loadOnly = TestCase.fromFile("/profiling/load_globe")
     val zoomTo8 = TestCase.fromFile("/profiling/zoom_in_to_level_8")
     val profiler = Profiler(listOf(loadOnly, zoomTo8))
-    val results = profiler.profileAll(3)
+    val results = profiler.profileAll(5)
     results.forEach{
         println(it)
     }

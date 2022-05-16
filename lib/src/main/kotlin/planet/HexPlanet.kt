@@ -51,7 +51,7 @@ class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resoluti
             .buildAsync()
 
         // TODO: Configure this cache, maxsize, expiration rules, etc.
-        private val hexCache: Cache<HexKey, Hex> = Caffeine.newBuilder().build()
+        private val hexCache: Cache<HexKey, Point> = Caffeine.newBuilder().build()
         private val h3Core = H3Core.newInstance()
 
         fun get(seed: Double, h3Resolution: Int): HexPlanet {
@@ -78,7 +78,8 @@ class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resoluti
                     Point.fromSpherical(
                         lat = currentLat,
                         lon = currentLon,
-                        resolution = h3ResMeters
+                        resolution = h3ResMeters,
+                        h3Index = h3Core.geoToH3(currentLat, currentLon, h3Resolution)
                     )
                 )
                 currentLon += lonDelta
@@ -87,37 +88,27 @@ class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resoluti
         }
         assert(allPoints.size == MapTile.TILE_SIZE * MapTile.TILE_SIZE)
 
-        val hexesToCalculate = allPoints.map {
-            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
-            HexKey(h3Index, seed)
-        }.filter{
-            hexCache.getIfPresent(it) == null
+        val hexesToCalculate = allPoints.filter{
+            hexCache.getIfPresent(HexKey(h3Index = it.h3Index!!, seed)) == null
         }.map {
-            val geoCoord = h3Core.h3ToGeo(it.h3Index)
-            val point = Point.fromSpherical(lat = geoCoord.lat, lon = geoCoord.lng, resolution = h3ResMeters)
-            val hex = Hex(it.h3Index, point)
-            hex
+            val geoCoord = h3Core.h3ToGeo(it.h3Index!!)
+            Point.fromSpherical(lat = geoCoord.lat, lon = geoCoord.lng, resolution = h3ResMeters, h3Index = it.h3Index)
         }
 
         // For all missing hexes, we can calculate their elevations and then store.
         if (hexesToCalculate.isNotEmpty()) {
             hexesToCalculate
-                .map { it.point }
                 .toMutableList()
                 .let { getMultipleElevations(it) }
                 .forEach {
-                    // TODO: Avoid needing to calculate the hexId multiple times. Store in the point? New subclass?
-                    val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
-                    val hexKey = HexKey(h3Index, seed)
-                    val hex = Hex(h3Index, it)
-                    hexCache.put(hexKey, hex)
+                    val hexKey = HexKey(it.h3Index!!, seed)
+                    hexCache.put(hexKey, it)
                 }
         }
 
         return allPoints.map {
-            val h3Index = h3Core.geoToH3(it.lat, it.lon, h3Resolution)
-            val hex = hexCache.getIfPresent(HexKey(h3Index, seed))!!  // TODO: Retrieve from just-calculated values
-            it.copy(alt=hex.point.alt)
+            val hex = hexCache.getIfPresent(HexKey(it.h3Index!!, seed))!!  // TODO: Retrieve from just-calculated values
+            it.copy(alt=hex.alt)
         }.toMutableList()
     }
 
