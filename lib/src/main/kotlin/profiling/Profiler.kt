@@ -42,7 +42,9 @@ class Profiler(private val testCases: List<TestCase>) {
 
         for (mapTileKey: MapTileKey in testCase.mapTileKeyList) {
             val result = async {
-                planet.getMapTile(mapTileKey)
+                // Have to copy the seed because the pre-generated MapTileKey contains an unknown seed.
+                val customTestTile = mapTileKey.copy(seed=seed)
+                planet.getMapTile(customTestTile)
             }
             deferredResults.add(result)
         }
