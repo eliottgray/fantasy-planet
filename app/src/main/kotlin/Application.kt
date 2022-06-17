@@ -86,6 +86,7 @@ private suspend fun getPlanet(callParameters: Parameters): Either<Pair<HttpStatu
 }
 
 private suspend fun buildMapTileKey(callParameters: Parameters): Either<Pair<HttpStatusCode, String>, MapTileKey> {
+    // TODO: Validate that z/x/y are valid, e.g. zoom level 0 only includes x/y of zero, etc.
     return either {
         val seed = (callParameters["seed"]!!.toDoubleOrNull()?.right() ?: Pair(
             HttpStatusCode.BadRequest,

@@ -32,7 +32,7 @@
         imageryProvider: new Cesium.UrlTemplateImageryProvider({
           url : '/tiles/{seed}/{z}/{x}/{y}.png',
           maximumLevel: maxDepth,
-          tilingScheme : new Cesium.GeographicTilingScheme(),
+          tilingScheme : new Cesium.GeographicTilingScheme({numberOfLevelZeroTilesX: 1}),
           customTags : {
             seed: function(imageryProvider, x, y, level) {
               return seed

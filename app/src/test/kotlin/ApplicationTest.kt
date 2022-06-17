@@ -112,7 +112,7 @@ class ApplicationTest {
     @Test
     fun testDemoTile() {
         withApplication(testDemoEnv) {
-            handleRequest(HttpMethod.Get, "/tiles/762391.0/0/1/0.png").apply {
+            handleRequest(HttpMethod.Get, "/tiles/762391.0/0/0/0.png").apply {
                 assertEquals(ContentType.Image.PNG, response.contentType())
                 assertTrue((response.byteContent?.size ?: 0) > 0)
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -124,7 +124,7 @@ class ApplicationTest {
     fun testSeedIsNotDemoSeed() {
         withApplication(testDemoEnv) {
             val notDemoSeed = "00001"
-            handleRequest(HttpMethod.Get, "/tiles/$notDemoSeed/0/1/0.png").apply {
+            handleRequest(HttpMethod.Get, "/tiles/$notDemoSeed/0/0/0.png").apply {
                 assertEquals(ContentType.Text.Plain.withParameter("charset", "UTF-8"), response.contentType())
                 assertEquals(HttpStatusCode.BadRequest, response.status())
             }

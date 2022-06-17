@@ -4,7 +4,7 @@ data class MapTileBounds(val north: Double, val south: Double, val east: Double,
 
     companion object {
         fun fromGeographicTileXYZ(z: Int, x: Int, y: Int): MapTileBounds {
-            val xTiles = 2 shl z
+            val xTiles = 1 shl z
             val yTiles = 1 shl z
 
             val xTileWidth = 360.0 / xTiles
