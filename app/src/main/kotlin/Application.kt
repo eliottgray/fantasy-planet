@@ -8,6 +8,8 @@ import arrow.core.right
 import com.eliottgray.kotlin.planet.Planet
 import com.eliottgray.kotlin.planet.HexPlanet
 import com.eliottgray.kotlin.planet.FractalPlanet
+import com.github.benmanes.caffeine.cache.AsyncCache
+import com.github.benmanes.caffeine.cache.Caffeine
 import freemarker.cache.ClassTemplateLoader
 import io.ktor.application.*
 import io.ktor.freemarker.*
@@ -24,6 +26,9 @@ object Config {
     var demoSeed by Delegates.notNull<Double>()
     var hexEnabled by Delegates.notNull<Boolean>()
     var hexResolution by Delegates.notNull<Int>()
+    val mapTileCache: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
+        .maximumSize(10000)
+        .buildAsync()
 }
 
 @Suppress("unused")
@@ -50,7 +55,7 @@ fun Application.module() = runBlocking {
                 val mapTileKey = buildMapTileKey(call.parameters).bind()
                 log.debug("Requesting tile ${mapTileKey.seed}/${mapTileKey.z}/${mapTileKey.x}/${mapTileKey.y}.png")
                 val planet = getPlanet(call.parameters).bind()
-                val mapTile = planet.getMapTile(mapTileKey)
+                val mapTile = getCachedMapTile(mapTileKey, planet)
                 call.respondBytes(mapTile.pngByteArray, ContentType.Image.PNG, HttpStatusCode.OK)
             }.mapLeft { errorPair ->
                 log.error(errorPair.second)
@@ -78,9 +83,9 @@ private suspend fun getPlanet(callParameters: Parameters): Either<Pair<HttpStatu
             "Seed must be a number."
         ).left()).bind()
         if (Config.hexEnabled) {
-            HexPlanet.get(seed, Config.hexResolution)
+            HexPlanet(seed, Config.hexResolution)
         } else {
-            FractalPlanet.get(seed)
+            FractalPlanet(seed)
         }
     }
 }
@@ -127,4 +132,8 @@ private fun MapTileKey.validate(): Either<Pair<HttpStatusCode, String>, MapTileK
             )
         pair.left()
     }
+}
+
+private fun getCachedMapTile(mapTileKey: MapTileKey, planet: Planet): MapTile {
+    return Config.mapTileCache.get(mapTileKey) { key -> planet.getMapTile(key) }.get()!!
 }

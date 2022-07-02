@@ -1,31 +1,10 @@
 package com.eliottgray.kotlin.planet
 
 import com.eliottgray.kotlin.*
-import com.github.benmanes.caffeine.cache.AsyncCache
-import com.github.benmanes.caffeine.cache.Caffeine
-import java.time.Duration
-import java.util.concurrent.CompletableFuture
 import kotlin.math.ceil
 
 class FractalPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
-    companion object {
 
-        private val mapTileCache: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .buildAsync()
-
-        private val fractalPlanetCache: AsyncCache<Double, FractalPlanet> = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .expireAfterAccess(Duration.ofMinutes(60))
-            .buildAsync()
-
-        fun get(seed: Double): FractalPlanet {
-            return fractalPlanetCache.get(seed) { it -> FractalPlanet(it) }.get()!!
-        }
-    }
-    override fun getMapTile(mapTileKey: MapTileKey): MapTile {
-        return mapTileCache.get(mapTileKey) { key -> buildMapTile(key) }.get()!!
-    }
     override fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point> {
         val allPoints = ArrayList<Point>()
 

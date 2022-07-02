@@ -9,34 +9,34 @@ class HexPlanetTest {
 
     @Test
     fun test_positive_case(){
-        val hexPlanet = HexPlanet.get(Defaults.SEED, h3Resolution)
+        val hexPlanet = HexPlanet(Defaults.SEED, h3Resolution)
         assertEquals(Defaults.SEED, hexPlanet.seed)
     }
 
     @Test
     fun test_custom_params(){
         val seed = 999183.0
-        val hexPlanet = HexPlanet.get(seed=seed, h3Resolution)
+        val hexPlanet = HexPlanet(seed=seed, h3Resolution)
         assertEquals(seed, hexPlanet.seed)
     }
 
     @Test
     fun test_low_resolution(){
-        val hexPlanet = HexPlanet.get(seed=99987.0, h3Resolution)
+        val hexPlanet = HexPlanet(seed=99987.0, h3Resolution)
         val elevation = hexPlanet.getElevationAt(lat=-10.0, lon=-43.0, resolution=100000).alt
         assertEquals(-2206.5303409091907, elevation)
     }
 
     @Test
     fun test_high_resolution(){
-        val hexPlanet = HexPlanet.get(seed=54399875.0, h3Resolution)
+        val hexPlanet = HexPlanet(seed=54399875.0, h3Resolution)
         val elevation = hexPlanet.getElevationAt(lat=45.0, lon=23.0, resolution=50).alt
         assertEquals(160.4482471060341, elevation)
     }
 
     @Test
     fun test_multiple_points(){
-        val hexPlanet = HexPlanet.get(seed=99987.0, h3Resolution)
+        val hexPlanet = HexPlanet(seed=99987.0, h3Resolution)
         val points = arrayListOf(
             Point.fromSpherical(lat=-10.0, lon=-43.0, resolution=100000),
             Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000),

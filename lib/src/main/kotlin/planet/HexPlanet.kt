@@ -1,37 +1,13 @@
 package com.eliottgray.kotlin.planet
 
 import com.eliottgray.kotlin.*
-import com.github.benmanes.caffeine.cache.AsyncCache
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
 import com.uber.h3core.H3Core
 import com.uber.h3core.LengthUnit
-import java.time.Duration
-import java.util.concurrent.CompletableFuture
 import kotlin.math.roundToInt
 
 class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resolution: Int): Planet(seed) {
     companion object {
-
-        private val mapTileCache: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .buildAsync()
-
-        private val planetCache: AsyncCache<Double, HexPlanet> = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .expireAfterAccess(Duration.ofMinutes(60))
-            .buildAsync()
-
-        // TODO: Configure this cache, maxsize, expiration rules, etc.
-        private val hexCache: Cache<HexKey, Point> = Caffeine.newBuilder().build()
         private val h3Core = H3Core.newInstance()
-
-        fun get(seed: Double, h3Resolution: Int): HexPlanet {
-            return planetCache.get(seed) { it -> HexPlanet(it, h3Resolution) }.get()!!
-        }
-    }
-    override fun getMapTile(mapTileKey: MapTileKey): MapTile {
-        return mapTileCache.get(mapTileKey) { key -> buildMapTile(key) }.get()!!
     }
 
     override fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point> {
@@ -60,26 +36,18 @@ class HexPlanet constructor(seed: Double = Defaults.SEED, private val h3Resoluti
         }
         assert(allPoints.size == MapTile.TILE_SIZE * MapTile.TILE_SIZE)
 
-        val hexesToCalculate = allPoints.filter{
-            hexCache.getIfPresent(HexKey(h3Index = it.h3Index!!, seed)) == null
-        }.map {
+        val hexKeyToPointMap = allPoints.map {
             val geoCoord = h3Core.h3ToGeo(it.h3Index!!)
             Point.fromSpherical(lat = geoCoord.lat, lon = geoCoord.lng, resolution = h3ResMeters, h3Index = it.h3Index)
-        }
-
-        // For all missing hexes, we can calculate their elevations and then store.
-        if (hexesToCalculate.isNotEmpty()) {
-            hexesToCalculate
-                .toMutableList()
-                .let { getMultipleElevations(it) }
-                .forEach {
-                    val hexKey = HexKey(it.h3Index!!, seed)
-                    hexCache.put(hexKey, it)
-                }
+        }.toMutableList().let {
+            getMultipleElevations(it)
+        }.associateBy {
+            HexKey(it.h3Index!!, seed)
         }
 
         return allPoints.map {
-            val hex = hexCache.getIfPresent(HexKey(it.h3Index!!, seed))!!  // TODO: Retrieve from just-calculated values
+            val hexKey = HexKey(it.h3Index!!, seed)
+            val hex = hexKeyToPointMap[hexKey]!!
             it.copy(alt=hex.alt)
         }.toMutableList()
     }

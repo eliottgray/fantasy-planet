@@ -20,9 +20,6 @@ dependencies {
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
-    // Caching
-    implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
-
     // Logging
     implementation("org.slf4j:slf4j-api:1.7.32")
 }

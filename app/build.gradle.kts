@@ -29,6 +29,9 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:1.2.5")
 
+    // Caching
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
+
     // Arrow-kt for functional error handling
     implementation("io.arrow-kt:arrow-core:1.0.1")
 
