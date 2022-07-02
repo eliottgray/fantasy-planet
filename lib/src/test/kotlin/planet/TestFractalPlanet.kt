@@ -8,34 +8,34 @@ class FractalPlanetTest {
 
     @Test
     fun test_positive_case(){
-        val fractalPlanet = FractalPlanet.get(Defaults.SEED)
+        val fractalPlanet = FractalPlanet(Defaults.SEED)
         assertEquals(Defaults.SEED, fractalPlanet.seed)
     }
 
     @Test
     fun test_custom_params(){
         val seed = 999183.0
-        val fractalPlanet = FractalPlanet.get(seed=seed)
+        val fractalPlanet = FractalPlanet(seed=seed)
         assertEquals(seed, fractalPlanet.seed)
     }
 
     @Test
     fun test_low_resolution(){
-        val fractalPlanet = FractalPlanet.get(seed=99987.0)
+        val fractalPlanet = FractalPlanet(seed=99987.0)
         val elevation = fractalPlanet.getElevationAt(lat=-10.0, lon=-43.0, resolution=100000).alt
         assertEquals(-2206.5303409091907, elevation)
     }
 
     @Test
     fun test_high_resolution(){
-        val fractalPlanet = FractalPlanet.get(seed=54399875.0)
+        val fractalPlanet = FractalPlanet(seed=54399875.0)
         val elevation = fractalPlanet.getElevationAt(lat=45.0, lon=23.0, resolution=50).alt
         assertEquals(160.4482471060341, elevation)
     }
 
     @Test
     fun test_multiple_points(){
-        val fractalPlanet = FractalPlanet.get(seed=99987.0)
+        val fractalPlanet = FractalPlanet(seed=99987.0)
         val points = arrayListOf(
             Point.fromSpherical(lat=-10.0, lon=-43.0, resolution=100000),
             Point.fromSpherical(lat=45.0, lon=23.0, resolution=100000),

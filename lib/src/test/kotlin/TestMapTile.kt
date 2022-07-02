@@ -15,7 +15,7 @@ class MapTileTest {
     fun test_specific_tile_and_seed(){
         val seed = 762391.0
         val mapTileKey = MapTileKey(2, 1, 1, seed)
-        val mapTile = FractalPlanet.get(seed).getMapTile(mapTileKey)
+        val mapTile = FractalPlanet(seed).getMapTile(mapTileKey)
         val actualFile = mapTile.writePNG()
         val expectedFile = File("src/test/resources/canaryTile.png")
 

@@ -40,7 +40,7 @@ class Profiler(private val testCases: List<TestCase>) {
     private suspend fun profileAsync(testCase: TestCase, seed: Double, useHex: Boolean): SummarizedMapTiles {
         return coroutineScope {
             println("Profiling ${testCase.name} - seed $seed - hex $useHex")
-            val planet = if(useHex) {HexPlanet.get(seed, h3Resolution = 5)} else {FractalPlanet.get(seed)}
+            val planet = if(useHex) {HexPlanet(seed, h3Resolution = 5)} else {FractalPlanet(seed)}
 
             val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 

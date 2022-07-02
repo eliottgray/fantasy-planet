@@ -5,7 +5,9 @@ import com.eliottgray.kotlin.*
 abstract class Planet(val seed: Double) {
     private val squishedSeed = squishSeed(seed)
     private val tetra: Tetrahedron = Tetrahedron.buildDefault(squishedSeed)
-    abstract fun getMapTile(mapTileKey: MapTileKey): MapTile
+    fun getMapTile(mapTileKey: MapTileKey): MapTile {
+       return  buildMapTile(mapTileKey)
+    }
     private fun MutableList<Point>.partitionInPlaceBy(compareFunc: (Point) -> Boolean): Int {
         // Sorts all records that return TRUE by the comparator to the front of the list, and
         //   returns the index of the first record that returns FALSE.
