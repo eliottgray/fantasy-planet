@@ -14,10 +14,12 @@ class Profiler(private val testCases: List<TestCase>) {
         return testCases.map { testCase ->
             val hexTimes = mutableListOf<Long>()
             val fractalTimes = mutableListOf<Long>()
+            val fractalElevations = mutableListOf<SummarizedMapTiles>()
             repeat(repeatCount) {
                 val seed = Random.nextDouble()
                 val fractalMillis = measureTimeMillis {
-                    profileAsync(testCase, seed, false)
+                    val summarizedMapTiles = profileAsync(testCase, seed, false)
+                    fractalElevations.add(summarizedMapTiles)
                 }
                 val hexMillis = measureTimeMillis {
                     profileAsync(testCase, seed, true)
@@ -25,32 +27,55 @@ class Profiler(private val testCases: List<TestCase>) {
                 hexTimes.add(hexMillis)
                 fractalTimes.add(fractalMillis)
             }
-            // TODO: Use median, instead of mean? Median will avoid outliers impacting the results.
             ProfilingResult(
                 testCase.name,
-                fractalTimeMillis = fractalTimes.average(),
-                hexTimeMillis = hexTimes.average()
+                fractalTimeMillis = fractalTimes.map { it.toDouble() }.median(),
+                hexTimeMillis = hexTimes.map { it.toDouble() }.median(),
+                medianMaxElev = fractalElevations.map { it.averageMaximumAlt }.median(),
+                medianMinElev = fractalElevations.map { it.averageMinimumAlt }.median()
             )
         }
     }
 
-    private suspend fun profileAsync(testCase: TestCase, seed: Double, useHex: Boolean) = coroutineScope {
-        println("Profiling ${testCase.name} - seed $seed - hex $useHex")
-        val planet = if(useHex) {HexPlanet.get(seed, h3Resolution = 5)} else {FractalPlanet.get(seed)}
+    private suspend fun profileAsync(testCase: TestCase, seed: Double, useHex: Boolean): SummarizedMapTiles {
+        return coroutineScope {
+            println("Profiling ${testCase.name} - seed $seed - hex $useHex")
+            val planet = if(useHex) {HexPlanet.get(seed, h3Resolution = 5)} else {FractalPlanet.get(seed)}
 
-        val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
+            val deferredResults: ArrayList<Deferred<MapTile>> = ArrayList()
 
-        for (mapTileKey: MapTileKey in testCase.mapTileKeyList) {
-            val result = async {
-                // Have to copy the seed because the pre-generated MapTileKey contains an unknown seed.
-                val customTestTile = mapTileKey.copy(seed=seed)
-                planet.getMapTile(customTestTile)
+            for (mapTileKey: MapTileKey in testCase.mapTileKeyList) {
+                val result = async {
+                    // Have to copy the seed because the pre-generated MapTileKey contains an unknown seed.
+                    val customTestTile = mapTileKey.copy(seed = seed)
+                    planet.getMapTile(customTestTile)
+                }
+                deferredResults.add(result)
             }
-            deferredResults.add(result)
-        }
 
-        for (deferred in deferredResults) {
-            deferred.await()
+            val maximumAlts = mutableListOf<Double>()
+            val minimumAlts = mutableListOf<Double>()
+
+            for (deferred in deferredResults) {
+                val mapTile = deferred.await()
+                maximumAlts.add(mapTile.maxElev)
+                minimumAlts.add(mapTile.minElev)
+            }
+
+            SummarizedMapTiles(averageMaximumAlt = maximumAlts.median(), averageMinimumAlt = minimumAlts.median())
+        }
+    }
+
+    private fun List<Double>.median(): Double {
+        return if (this.size % 2 != 0) {
+            val index = this.size / 2  // Division operator is a floor; 3 / 2 = 1
+            this[index]
+        } else {
+            val a = this.size / 2
+            val b = a - 1
+            val one = this[a]
+            val two = this[b]
+            (one + two) / 2
         }
     }
 }
