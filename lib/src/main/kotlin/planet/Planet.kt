@@ -76,9 +76,9 @@ abstract class Planet(val seed: Double) {
         return points
     }
 
-    protected fun buildMapTile(mapTileKey: MapTileKey, elevations: MapTileElevations): MapTile {
+    protected fun buildMapTile(mapTileKey: MapTileKey): MapTile {
         val pointsWithElevations = calculateMapTilePoints(mapTileKey)
-        return MapTile(mapTileKey, pointsWithElevations, elevations)
+        return MapTile(mapTileKey, pointsWithElevations)
     }
     abstract fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point>
 }
