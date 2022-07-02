@@ -6,25 +6,8 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.math.ceil
-import kotlin.math.max
-import kotlin.math.min
 
 class FractalPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
-    private var elevations: MapTileElevations
-
-    init {
-        // We need to know what the points are for the top tiles BEFORE they go in the cache, because their min/max
-        // elevations are used to determine map colors/etc. for all other tiles, to ensure consistency.
-        // For now we also don't want to make the full tile objects, because doing so incurs additional work USING
-        // the global elevation data we don't have yet.
-        val topTileOneKey = MapTileKey(0, 0, 0, seed)
-        val topTileOnePoints = calculateMapTilePoints(topTileOneKey)
-        val minElevation = topTileOnePoints.minByOrNull { it.alt }?.alt ?: 0.0
-        val maxElevation = topTileOnePoints.maxByOrNull { it.alt }?.alt ?: 0.0
-        elevations = MapTileElevations(minElevation = minElevation, maxElevation = maxElevation)
-        val topTileOne = MapTile(topTileOneKey, topTileOnePoints, elevations)
-        mapTileCache.put(topTileOneKey, CompletableFuture.completedFuture(topTileOne))
-    }
     companion object {
 
         private val mapTileCache: AsyncCache<MapTileKey, MapTile> = Caffeine.newBuilder()
@@ -41,7 +24,7 @@ class FractalPlanet constructor(seed: Double = Defaults.SEED): Planet(seed) {
         }
     }
     override fun getMapTile(mapTileKey: MapTileKey): MapTile {
-        return mapTileCache.get(mapTileKey) { key -> buildMapTile(key, elevations) }.get()!!
+        return mapTileCache.get(mapTileKey) { key -> buildMapTile(key) }.get()!!
     }
     override fun calculateMapTilePoints(mapTileKey: MapTileKey): MutableList<Point> {
         val allPoints = ArrayList<Point>()

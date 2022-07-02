@@ -14,11 +14,10 @@ class MapTile (
     private val zTile: Int,
     private val xTile: Int,
     private val yTile: Int,
-    unsortedPoints: MutableList<Point>,
-    elevations: MapTileElevations
+    unsortedPoints: MutableList<Point>
 ) {
-    constructor(mapTileKey: MapTileKey, unsortedPoints: MutableList<Point>, elevations: MapTileElevations) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
-        unsortedPoints, elevations)
+    constructor(mapTileKey: MapTileKey, unsortedPoints: MutableList<Point>) : this(mapTileKey.z, mapTileKey.x, mapTileKey.y,
+        unsortedPoints)
 
     val pngByteArray: ByteArray
     val maxElev: Double
@@ -26,8 +25,9 @@ class MapTile (
 
     init {
         val sortedPoints = unsortedPoints.sortedWith(compareBy( {-it.lat}, {it.lon}))
-        this.maxElev = elevations.maxElevation
-        this.minElev = elevations.minElevation
+        // TODO: Avoid calculating max and min elevation, since they are not currently used beyond profiling tile stats.
+        this.maxElev = sortedPoints.maxOfOrNull { it.alt }!!
+        this.minElev = sortedPoints.minOfOrNull { it.alt }!!
         pngByteArray = writePNGBytes(sortedPoints)
     }
 
@@ -67,12 +67,12 @@ class MapTile (
     }
 
     private fun toBufferedImage(sortedPoints: List<Point>): BufferedImage {
-        val oldRange = maxElev - minElev
+        val oldRange = Defaults.MAXIMUM_ALTITUDE_METERS - Defaults.MINIMUM_ALTITUDE_METERS
         // TODO: ColorMap should be a param for the map tile.
         val newRange = ColorMap.ELEVATION_RANGE
 
         val aByteArray: ByteArray = sortedPoints.map{ point ->
-            val newValue = (((point.alt - minElev) * newRange) / oldRange)
+            val newValue = (((point.alt - Defaults.MINIMUM_ALTITUDE_METERS) * newRange) / oldRange)
             ColorMap.getColorForElevation(newValue.toInt())
         }.flatten().toByteArray()
 
