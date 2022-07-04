@@ -22,7 +22,7 @@ class Kthandler :
             val seed = event["seed"]!!.toDouble()
 
             val mapTileKey = MapTileKey(z, x, y, seed)
-            val planet = FractalPlanet.get(seed)
+            val planet = FractalPlanet(seed)
             val tile = planet.getMapTile(mapTileKey)
             pngByteArray = tile.pngByteArray
         }
