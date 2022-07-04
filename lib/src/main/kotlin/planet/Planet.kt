@@ -63,8 +63,10 @@ abstract class Planet(val seed: Double) {
         }
 
         // All remaining points must be sorted into the tetrahedron they are contained within.
-        val (leftTetra, rightTetra) = current.subdivide()
-
+        // A->B is required to be the longest side.
+        assert(current.longestSide == current.a.distance(current.b))  // TODO: Write a test to verify, and remove check.
+        val midpoint = current.a.midpoint(current.b, current.longestSide)
+        val leftTetra = Tetrahedron.withOrderedPoints(a = current.a, b = midpoint, c = current.c, d = current.d)
         val pendingPoints = points.subList(doneIndex, points.size)
         val containmentIndex = pendingPoints.partitionInPlaceBy { point ->
             leftTetra.contains(point)
@@ -73,8 +75,12 @@ abstract class Planet(val seed: Double) {
         val leftPoints = pendingPoints.subList(0, containmentIndex)
         val rightPoints = pendingPoints.subList(containmentIndex, pendingPoints.size)
 
+        // All points might be inside the "left" tetrahedron. If so, we can avoid calculating the right one.
         getMultipleElevations(leftPoints, leftTetra)
-        getMultipleElevations(rightPoints, rightTetra)
+        if (rightPoints.size > 0) {
+            val rightTetra = Tetrahedron.withOrderedPoints(a = midpoint, b = current.b, c = current.c, d = current.d)
+            getMultipleElevations(rightPoints, rightTetra)
+        }
         return points
     }
 

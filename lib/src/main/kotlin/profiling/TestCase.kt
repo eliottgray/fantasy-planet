@@ -9,7 +9,7 @@ data class TestCase(val name: String, val mapTileKeyList: List<MapTileKey>, val 
     companion object {
 
         fun fromFile(resourcePath: String, seed: Double = Defaults.SEED): TestCase {
-            val resource = javaClass.getResource(resourcePath)
+            val resource = TestCase::class.java.getResource(resourcePath)
             val mapTileKeyList = resource?.readText()?.split("\n")?.map {
                 val split = it.trim().split(',')
                 val z = split[0].toInt()
