@@ -2,7 +2,34 @@ package com.eliottgray.kotlin
 
 data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val d: Point, val longestSide: Double) {
 
+    var normalABC: Vector
+    var normalABD: Vector
+    var normalACD: Vector
+    var normalDBC: Vector
+
+    var aDotB: Double
+    var aDotC: Double
+    var aDotD: Double
+    var dDotA: Double
+    init {
+        // Normal CrossProduct
+        val ab = a.vectorTo(b)
+        val ac = a.vectorTo(c)
+        val ad = a.vectorTo(d)
+
+        normalABC = ab.crossProduct(ac)
+        normalABD = ab.crossProduct(ad)
+        normalACD = ac.crossProduct(ad)
+        normalDBC = d.vectorTo(b).crossProduct(d.vectorTo(c))
+
+        // DotProduct - 4th Point
+        aDotD = normalABC.dotProduct(ad)
+        aDotB = normalACD.dotProduct(ab)
+        aDotC = normalABD.dotProduct(ac)
+        dDotA = normalDBC.dotProduct(d.vectorTo(a))
+    }
     val averageAltitude = (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
+
     companion object {
 
         fun buildDefault(seed: Double, alt: Double=25_000_000.0): Tetrahedron {
@@ -125,16 +152,38 @@ data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val
             return ((aDotD < 0) == (aDotTested < 0)) || aDotTested == 0.0
 
         }
+
+        fun sameSide(testedDotProduct: Double, comparisonDotProduct: Double): Boolean {
+            return ((comparisonDotProduct < 0) == (testedDotProduct < 0)) || testedDotProduct == 0.0
+        }
     }
+
+
 
     fun contains(point: Point): Boolean {
         // StackOverflow-suggested solution: check if tested point is behind all 3 triangles
         // https://stackoverflow.com/a/25180294
+        val at = a.vectorTo(point)
 
-        return sameSide(this.a, this.b, this.c, this.d, point) &&
-                sameSide(this.d, this.b, this.c, this.a, point) &&
-                sameSide(this.a, this.c, this.d, this.b, point) &&
-                sameSide(this.a, this.b, this.d, this.c, point)
+        val testedABC = normalABC.dotProduct(at)
+        if (!sameSide(testedDotProduct = testedABC, comparisonDotProduct = aDotD)) {
+            return false
+        }
+        val testedABD = normalABD.dotProduct(at)
+        if (!sameSide(testedDotProduct = testedABD, comparisonDotProduct = aDotC)) {
+            return false
+        }
+
+        val testedACD = normalACD.dotProduct(at)
+        if (!sameSide(testedDotProduct = testedACD, comparisonDotProduct = aDotB)) {
+            return false
+        }
+
+        val testedDBC = normalDBC.dotProduct(d.vectorTo(point))
+        if (!sameSide(testedDotProduct = testedDBC, comparisonDotProduct = dDotA)) {
+            return false
+        }
+        return true
     }
 
     fun rotateAroundXAxis(degrees: Double): Tetrahedron {
