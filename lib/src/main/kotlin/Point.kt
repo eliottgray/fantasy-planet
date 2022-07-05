@@ -95,4 +95,12 @@ data class Point(
         val alt = (this.alt + other.alt) / 2 + newSeed * altWeight * (this.alt - other.alt).absoluteValue.pow(altPow) + newSeed * lengthWeight * length.pow(lengthPow)
         return Point(x = x, y = y, z = z, alt = alt, seed = newSeed)
     }
+
+    fun vectorTo(point: Point): Vector {
+        return Vector(
+            x = point.x - this.x,
+            y = point.y - this.y,
+            z = point.z - this.z
+        )
+    }
 }

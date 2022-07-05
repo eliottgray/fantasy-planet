@@ -3,7 +3,6 @@ package com.eliottgray.kotlin
 data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val d: Point, val longestSide: Double) {
 
     val averageAltitude = (this.a.alt + this.b.alt + this.c.alt + this.d.alt) / 4
-
     companion object {
 
         fun buildDefault(seed: Double, alt: Double=25_000_000.0): Tetrahedron {
@@ -108,32 +107,22 @@ data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val
             return Tetrahedron(e1, e2, n1, n2, longest)
         }
 
-        private fun sameSide(one: Point, two: Point, three: Point, four: Point, tested: Point): Boolean {
+        private fun sameSide(a: Point, b: Point, c: Point, d: Point, tested: Point): Boolean {
 
             // Normal CrossProduct
-            val ax = two.x - one.x
-            val ay = two.y - one.y
-            val az = two.z - one.z
-            val bx = three.x - one.x
-            val by = three.y - one.y
-            val bz = three.z - one.z
-            val normalX = ay * bz - az * by
-            val normalY = az * bx - ax * bz
-            val normalZ = ax * by - ay * bx
+            val ab = a.vectorTo(b)
+            val ac = a.vectorTo(c)
+            val normalABC = ab.crossProduct(ac)
 
             // DotProduct - 4th Point
-            val cx = four.x - one.x
-            val cy = four.y - one.y
-            val cz = four.z - one.z
-            val dotV4 = (normalX * cx) + (normalY * cy) + (normalZ * cz)
+            val ad = a.vectorTo(d)
+            val aDotD = normalABC.dotProduct(ad)
 
             // DotProduct - TestPoint
-            val tx = tested.x - one.x
-            val ty = tested.y - one.y
-            val tz = tested.z - one.z
-            val dotTested = (normalX * tx) + (normalY * ty) + (normalZ * tz)
+            val aTested = a.vectorTo(tested)
+            val aDotTested = normalABC.dotProduct(aTested)
 
-            return ((dotV4 < 0) == (dotTested < 0)) || dotTested == 0.0
+            return ((aDotD < 0) == (aDotTested < 0)) || aDotTested == 0.0
 
         }
     }
@@ -143,9 +132,9 @@ data class Tetrahedron constructor(val a: Point, val b: Point, val c: Point, val
         // https://stackoverflow.com/a/25180294
 
         return sameSide(this.a, this.b, this.c, this.d, point) &&
-                sameSide(this.b, this.c, this.d, this.a, point) &&
-                sameSide(this.c, this.d, this.a, this.b, point) &&
-                sameSide(this.d, this.a, this.b, this.c, point)
+                sameSide(this.d, this.b, this.c, this.a, point) &&
+                sameSide(this.a, this.c, this.d, this.b, point) &&
+                sameSide(this.a, this.b, this.d, this.c, point)
     }
 
     fun rotateAroundXAxis(degrees: Double): Tetrahedron {
