@@ -37,7 +37,10 @@ class Handler :
 
     private fun buildResponse(byteArray: ByteArray): APIGatewayV2HTTPResponse {
         val body = Base64.getEncoder().encodeToString(byteArray)
-        val headers = mapOf("content-type" to "image/png")
+        val headers = mapOf(
+            "content-type" to "image/png",
+            "Cache-Control" to "max-age=360"
+        )
         return APIGatewayV2HTTPResponse
             .builder()
             .withHeaders(headers)
