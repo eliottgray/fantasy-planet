@@ -39,7 +39,8 @@ class Handler :
         val body = Base64.getEncoder().encodeToString(byteArray)
         val headers = mapOf(
             "content-type" to "image/png",
-            "Cache-Control" to "max-age=360"
+            "Cache-Control" to "max-age=360",
+            "Access-Control-Allow-Origin" to "*"
         )
         return APIGatewayV2HTTPResponse
             .builder()
