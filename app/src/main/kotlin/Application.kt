@@ -67,9 +67,11 @@ fun Application.module() = runBlocking {
             // TODO: Allow user to input this seed, and regenerate the map, rather than needing to hit 'refresh'.
             val randomOrDemoSeed = if (Config.demoEnabled) Config.demoSeed.toString() else Math.random().toString()
             val maxDepth = environment.config.propertyOrNull("ktor.max_depth")?.getString()?.toInt()
+            val nameGeneratorKey = environment.config.propertyOrNull("ktor.name.planet_name_generator_key")?.getString() ?: "UNSET"
             val root = mapOf(
                 "seed" to randomOrDemoSeed,
-                "depth" to maxDepth
+                "depth" to maxDepth,
+                "nameGeneratorKey" to nameGeneratorKey
             )
             call.respond(FreeMarkerContent("index.ftl", root))
         }

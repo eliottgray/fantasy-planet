@@ -41,6 +41,34 @@
         })
     });
 
+    function addLabel(planetName) {
+      const entity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(
+          0.0,
+          90.0,
+          1500000.0
+        ),
+        label: {
+          text: planetName.toString(),
+        },
+      });
+
+      entity.label.scale = 1.5;
+      entity.label.showBackground = false;
+    }
+
+    function addPlanetName() {
+        fetch("https://pamelaschainfunction-apim.azure-api.net/PamelasChainFunction/ChainFunction?kind=planet&seed=" + parseInt(seed * 1000000), {
+          headers: {
+            "Ocp-Apim-Subscription-Key": "${nameGeneratorKey}"
+          }
+        }).then((response) => response.text())
+        .then(addLabel)
+        .catch(console.error)
+    }
+
+    addPlanetName()
+
   </script>
 </body>
 </html>
