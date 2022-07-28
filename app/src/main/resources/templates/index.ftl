@@ -41,6 +41,43 @@
         })
     });
 
+    // TODO: Is there a better way to set the default location than a fly-to with duration zero?  Set default, instead?
+    viewer.camera.flyTo({
+        duration: 0,
+        destination: Cesium.Cartesian3.fromDegrees(0.0, 0.0, 25000000.0)
+      });
+
+    function addLabel(planetName) {
+      const entity = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(
+          0.0,
+          90.0,
+          1500000.0
+        ),
+        label: {
+          text: planetName,
+        },
+      });
+
+      entity.label.scale = 1.5;
+      entity.label.showBackground = false;
+    }
+
+    function addPlanetName() {
+        fetch("https://pamelaschainfunction-apim.azure-api.net/PamelasChainFunction/ChainFunction?kind=planet&seed=" + parseInt(seed * 1000000), {
+          headers: {
+            "Ocp-Apim-Subscription-Key": "${nameGeneratorKey}"
+          }
+        }).then((response) => {
+                if (response.ok) return response.text();
+                else throw new Error("Name generator fetch threw status code: " + response.status)
+        })
+        .then(addLabel)
+        .catch(console.error)
+    }
+
+    addPlanetName()
+
   </script>
 </body>
 </html>

@@ -26,3 +26,6 @@ Generate, populate, and display procedurally-generated fantasy worlds. [A limite
   * DEMO_MODE - defaults to `false`, set to `true` to enable limiting of world to a specific seed.
   * DEMO_SEED - controls the seed to which generation is limited.
 * Example: `DEMO_MODE=true DEMO_SEED=98765 ./gradlew run`
+
+# Name Generation
+* The application uses a name-generating API by [Pamela Fox](https://github.com/pamelafox) which requires credentials. Set environment variable PLANET_NAME_GENERATOR_KEY to the appropriate header value for **"Ocp-Apim-Subscription-Key"** (See [api documentation](https://github.com/pamelafox/chain-function).)
