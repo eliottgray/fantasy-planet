@@ -41,6 +41,12 @@
         })
     });
 
+    // TODO: Is there a better way to set the default location than a fly-to with duration zero?  Set default, instead?
+    viewer.camera.flyTo({
+        duration: 0,
+        destination: Cesium.Cartesian3.fromDegrees(0.0, 0.0, 25000000.0)
+      });
+
     function addLabel(planetName) {
       const entity = viewer.entities.add({
         position: Cesium.Cartesian3.fromDegrees(
