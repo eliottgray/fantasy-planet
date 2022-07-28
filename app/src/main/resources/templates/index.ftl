@@ -49,7 +49,7 @@
           1500000.0
         ),
         label: {
-          text: planetName.toString(),
+          text: planetName,
         },
       });
 
@@ -62,7 +62,10 @@
           headers: {
             "Ocp-Apim-Subscription-Key": "${nameGeneratorKey}"
           }
-        }).then((response) => response.text())
+        }).then((response) => {
+                if (response.ok) return response.text();
+                else throw new Error("Name generator fetch threw status code: " + response.status)
+        })
         .then(addLabel)
         .catch(console.error)
     }
