@@ -1,3 +1,4 @@
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent
 import com.eliottgray.kotlin.MapTileKey
 import com.eliottgray.kotlin.planet.FractalPlanet
 import org.junit.jupiter.api.Assertions.*
@@ -15,13 +16,13 @@ class HandlerTest {
         val y = 0
         val z = 0
         val mapTileKey = MapTileKey(z, x, y, seed.toDouble())
-        val pathParameters = mapOf<String, Any>(
-            "x" to "0",
-            "y" to "0",
-            "z" to "0",
-            "seed" to seed
+        val pathParameters = mapOf(
+            "x" to x.toString(),
+            "y" to y.toString(),
+            "z" to z.toString(),
+            "seed" to seed.toString()
         )
-        val event = buildEventJson(pathParameters)
+        val event = APIGatewayV2HTTPEvent.builder().withPathParameters(pathParameters).build()
         val result = handler.handleRequest(event, context)
         val actualBytesBase64 = result.body
         val actualBytes = Base64.getDecoder().decode(actualBytesBase64)
@@ -32,9 +33,5 @@ class HandlerTest {
             val actualByte = actualBytes[i]
             assertEquals(expectedByte, actualByte, "Contents of result failed to match expected result.")
         }
-    }
-
-    private fun buildEventJson(params: Map<String, Any>): Map<String?, Any?> {
-        return mapOf("pathParameters" to params)
     }
 }
