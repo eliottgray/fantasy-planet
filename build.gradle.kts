@@ -6,6 +6,6 @@ plugins {
     // Please add the Kotlin plugin to the common parent project or the root project, then remove the versions in the subprojects.
     // If the parent project does not need the plugin, add 'apply false' to the plugin line.
     // See: https://docs.gradle.org/current/userguide/plugins.html#sec:subprojects_plugins_dsl
-    kotlin("jvm") version "1.6.10" apply false
+    kotlin("jvm") version "1.9.22" apply false
 
 }
