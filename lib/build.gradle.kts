@@ -18,7 +18,7 @@ dependencies {
 
     implementation("com.uber:h3:3.7.0")
     implementation("com.googlecode.json-simple:json-simple:1.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
 
     // Logging
     implementation("org.slf4j:slf4j-api:1.7.32")
@@ -29,5 +29,5 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "17"
 }
