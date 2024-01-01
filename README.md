@@ -6,7 +6,7 @@ Generate, populate, and display procedurally-generated fantasy worlds. [A limite
 ![Fantasy Planet Viewer](/fantasy-globe.png?raw=true "Fantasy planet viewer.")
 
 # Requirements
-* Java 11
+* Java 17
 
 # Building
 * Project is built using the [Gradle Build Tool](https://gradle.org/), with a provided wrapper file.
