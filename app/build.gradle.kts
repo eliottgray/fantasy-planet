@@ -27,7 +27,7 @@ dependencies {
     implementation("io.ktor:ktor-html-builder:$ktorVersion")
     implementation("io.ktor:ktor-freemarker:$ktorVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.2.5")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
 
     // Caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
