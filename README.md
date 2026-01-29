@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/eliottgray/fantasy-planet/tree/main.svg?style=svg)](https://circleci.com/gh/eliottgray/fantasy-planet/tree/main)
 
 # fantasy-planet
-Generate, populate, and display procedurally-generated fantasy worlds. [A limited demo can be found here.](http://fantasy-planet.us-west-1.elasticbeanstalk.com/)
+Generate, populate, and display procedurally-generated fantasy worlds.
 
 ![Fantasy Planet Viewer](/fantasy-globe.png?raw=true "Fantasy planet viewer.")
 
